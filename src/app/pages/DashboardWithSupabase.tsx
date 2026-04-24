@@ -254,7 +254,7 @@ export default function DashboardWithSupabase() {
                 Sem dados de evolução mensal ainda
               </p>
               <Link
-                to="/adicionar"
+                to="/app/adicionar"
                 style={{ fontSize: 12, fontWeight: 500 }}
                 className="text-black underline underline-offset-2"
               >
@@ -411,7 +411,7 @@ export default function DashboardWithSupabase() {
             Últimas Transações
           </h3>
           <Link
-            to="/analise"
+            to="/app/analise"
             className="text-[#555555] hover:text-black transition-colors"
             style={{ fontSize: 12, fontWeight: 500 }}
           >
@@ -428,7 +428,7 @@ export default function DashboardWithSupabase() {
               Nenhuma transação ainda.
             </p>
             <Link
-              to="/adicionar"
+              to="/app/adicionar"
               className="bg-black text-white px-4 py-2 rounded-lg hover:bg-[#333333] transition-colors"
               style={{ fontSize: 13, fontWeight: 600 }}
             >
@@ -476,7 +476,7 @@ export default function DashboardWithSupabase() {
 
       {/* FAB mobile */}
       <Link
-        to="/adicionar"
+        to="/app/adicionar"
         className="lg:hidden fixed bottom-20 right-5 w-14 h-14 bg-black text-white rounded-full flex items-center justify-center shadow-lg hover:bg-[#333333] transition-colors z-10"
         style={{ boxShadow: "0 4px 16px rgba(0,0,0,0.25)" }}
       >

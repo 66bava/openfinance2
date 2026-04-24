@@ -17,19 +17,19 @@ import { getProfile } from "../../lib/queries";
 import type { Profile } from "../../lib/types";
 
 const navItems = [
-  { path: "/", label: "Dashboard", icon: LayoutDashboard },
-  { path: "/adicionar", label: "Adicionar", icon: PlusCircle },
-  { path: "/analise", label: "Análise", icon: BarChart2 },
-  { path: "/relatorios", label: "Relatórios", icon: FileText },
-  { path: "/perfil", label: "Perfil", icon: User },
+  { path: "/app", label: "Dashboard", icon: LayoutDashboard },
+  { path: "/app/adicionar", label: "Adicionar", icon: PlusCircle },
+  { path: "/app/analise", label: "Análise", icon: BarChart2 },
+  { path: "/app/relatorios", label: "Relatórios", icon: FileText },
+  { path: "/app/perfil", label: "Perfil", icon: User },
 ];
 
 const pageTitles: Record<string, string> = {
-  "/": "Dashboard",
-  "/adicionar": "Adicionar Gasto",
-  "/analise": "Análise de Gastos",
-  "/relatorios": "Relatório Mensal",
-  "/perfil": "Meu Perfil",
+  "/app": "Dashboard",
+  "/app/adicionar": "Adicionar Gasto",
+  "/app/analise": "Análise de Gastos",
+  "/app/relatorios": "Relatório Mensal",
+  "/app/perfil": "Meu Perfil",
 };
 
 export function Layout() {
@@ -70,7 +70,7 @@ export function Layout() {
             <NavLink
               key={path}
               to={path}
-              end={path === "/"}
+              end={path === "/app"}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
                   isActive
@@ -153,7 +153,7 @@ export function Layout() {
             <NavLink
               key={path}
               to={path}
-              end={path === "/"}
+              end={path === "/app"}
               onClick={() => setSidebarOpen(false)}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-3 rounded-lg transition-all duration-200 ${
@@ -242,7 +242,7 @@ export function Layout() {
               <NavLink
                 key={path}
                 to={path}
-                end={path === "/"}
+                end={path === "/app"}
                 className={({ isActive }) =>
                   `flex flex-col items-center gap-1 py-2 px-3 ${
                     isActive ? "text-black" : "text-[#999999]"

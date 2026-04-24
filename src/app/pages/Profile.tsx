@@ -1,62 +1,77 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
-import { toast } from "sonner";
-import {
-  Edit3, LogOut, Bell, Globe, DollarSign, Shield,
-  ChevronRight, Check, X, Camera,
-} from "lucide-react";
-import { supabase } from "../../lib/supabase";
-import { useAuth } from "../../lib/auth-context";
-import { getProfile, upsertProfile } from "../../lib/queries";
-import type { Profile as ProfileType } from "../../lib/types";
+import { useState, useEffect } from "react"
+import { useNavigate } from "react-router"
+import { toast } from "sonner"
+import { Edit3, LogOut, Bell, Globe, DollarSign, Shield, ChevronRight, Check, X, Camera } from "lucide-react"
+import { supabase } from "../../lib/supabase"
+import { useAuth } from "../../lib/auth-context"
+import { getProfile, upsertProfile } from "../../lib/queries"
+import { nomeSchema, telefoneSchema } from "../../lib/validations"
+import type { Profile as ProfileType } from "../../lib/types"
 
 export default function Profile() {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const userId = user!.id;
-  const userEmail = user?.email ?? "";
+  const navigate = useNavigate()
+  const { user } = useAuth()
+  const userId = user!.id
+  const userEmail = user?.email ?? ""
 
-  const [profile, setProfile] = useState<ProfileType | null>(null);
-  const [editing, setEditing] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const [loggingOut, setLoggingOut] = useState(false);
-  const [notifications, setNotifications] = useState(true);
-  const [currency, setCurrency] = useState("BRL");
-  const [language, setLanguage] = useState("Português");
+  const [profile, setProfile] = useState<ProfileType | null>(null)
+  const [editing, setEditing] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+  const [loggingOut, setLoggingOut] = useState(false)
+  const [notifications, setNotifications] = useState(true)
+  const [currency, setCurrency] = useState("BRL")
+  const [language, setLanguage] = useState("Português")
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
-  const [form, setForm] = useState({
-    nome: "",
-    telefone: "",
-    data_nascimento: "",
-  });
-  const [tempForm, setTempForm] = useState(form);
+  const [form, setForm] = useState({ nome: "", telefone: "", data_nascimento: "" })
+  const [tempForm, setTempForm] = useState(form)
 
   useEffect(() => {
     getProfile(userId).then((p) => {
       if (p) {
-        setProfile(p);
+        setProfile(p)
         const f = {
           nome: p.nome || user?.user_metadata?.full_name || userEmail.split("@")[0] || "",
           telefone: p.telefone || "",
           data_nascimento: p.data_nascimento || "",
-        };
-        setForm(f);
-        setTempForm(f);
+        }
+        setForm(f)
+        setTempForm(f)
       } else {
         const f = {
           nome: user?.user_metadata?.full_name || userEmail.split("@")[0] || "",
           telefone: user?.user_metadata?.phone || "",
           data_nascimento: user?.user_metadata?.birth_date || "",
-        };
-        setForm(f);
-        setTempForm(f);
+        }
+        setForm(f)
+        setTempForm(f)
       }
-    });
-  }, [userId]);
+    })
+  }, [userId])
+
+  function validateForm() {
+    const errs: Record<string, string> = {}
+
+    const nomeResult = nomeSchema.safeParse(tempForm.nome)
+    if (!nomeResult.success) errs.nome = nomeResult.error.issues[0].message
+
+    if (tempForm.telefone) {
+      const telResult = telefoneSchema.safeParse(tempForm.telefone)
+      if (!telResult.success) errs.telefone = telResult.error.issues[0].message
+    }
+
+    return errs
+  }
 
   const handleSave = async () => {
-    setSaving(true);
+    const errs = validateForm()
+    if (Object.keys(errs).length > 0) {
+      setFieldErrors(errs)
+      return
+    }
+    setFieldErrors({})
+    setSaving(true)
     try {
       const updated = await upsertProfile(userId, userEmail, {
         nome: tempForm.nome,
@@ -65,43 +80,41 @@ export default function Profile() {
         plano: profile?.plano ?? "free",
         renda_mensal: profile?.renda_mensal ?? 0,
         meta_economia: profile?.meta_economia ?? 0,
-      });
-      setProfile(updated);
-      setForm(tempForm);
-      setEditing(false);
-      toast.success("Perfil atualizado!", { duration: 3000 });
+      })
+      setProfile(updated)
+      setForm(tempForm)
+      setEditing(false)
+      toast.success("Perfil atualizado!", { duration: 3000 })
     } catch {
-      toast.error("Erro ao salvar. Tente novamente.");
+      toast.error("Erro ao salvar. Tente novamente.")
     } finally {
-      setSaving(false);
+      setSaving(false)
     }
-  };
+  }
 
   const handleCancel = () => {
-    setTempForm(form);
-    setEditing(false);
-  };
+    setTempForm(form)
+    setEditing(false)
+    setFieldErrors({})
+  }
 
   const handleLogout = async () => {
-    setLoggingOut(true);
-    await supabase.auth.signOut();
-    navigate("/login", { replace: true });
-  };
+    setLoggingOut(true)
+    await supabase.auth.signOut()
+    navigate("/login", { replace: true })
+  }
 
-  const displayName = form.nome || userEmail.split("@")[0] || "Usuário";
-  const avatarLetter = displayName.charAt(0).toUpperCase();
-  const plano = profile?.plano ?? "free";
+  const displayName = form.nome || userEmail.split("@")[0] || "Usuário"
+  const avatarLetter = displayName.charAt(0).toUpperCase()
+  const plano = profile?.plano ?? "free"
   const memberSince = user?.created_at
     ? new Date(user.created_at).toLocaleDateString("pt-BR", { month: "long", year: "numeric" })
-    : "";
+    : ""
 
   return (
     <div className="p-4 lg:p-6 max-w-xl mx-auto">
       {/* Avatar */}
-      <div
-        className="bg-white rounded-lg border border-[#E0E0E0] p-6 mb-4 text-center"
-        style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}
-      >
+      <div className="bg-white rounded-lg border border-[#E0E0E0] p-6 mb-4 text-center" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
         <div className="relative inline-block mb-4">
           <div className="w-20 h-20 bg-black text-white rounded-full flex items-center justify-center mx-auto">
             <span style={{ fontSize: 28, fontWeight: 700 }}>{avatarLetter}</span>
@@ -110,24 +123,15 @@ export default function Profile() {
             <Camera size={13} className="text-[#555555]" />
           </button>
         </div>
-        <h2 style={{ fontSize: 18, fontWeight: 700 }} className="text-black">
-          {displayName}
-        </h2>
+        <h2 style={{ fontSize: 18, fontWeight: 700 }} className="text-black">{displayName}</h2>
         <p style={{ fontSize: 13 }} className="text-[#777777]">{userEmail}</p>
         <div className="flex items-center justify-center gap-2 mt-2">
           {memberSince && (
-            <p style={{ fontSize: 11 }} className="text-[#BBBBBB]">
-              Membro desde {memberSince}
-            </p>
+            <p style={{ fontSize: 11 }} className="text-[#BBBBBB]">Membro desde {memberSince}</p>
           )}
           <span
             className="inline-block px-2 py-0.5 rounded-full"
-            style={{
-              fontSize: 10,
-              fontWeight: 600,
-              backgroundColor: plano === "pro" ? "#111111" : "#F0F0F0",
-              color: plano === "pro" ? "#FFFFFF" : "#555555",
-            }}
+            style={{ fontSize: 10, fontWeight: 600, backgroundColor: plano === "pro" ? "#111111" : "#F0F0F0", color: plano === "pro" ? "#FFFFFF" : "#555555" }}
           >
             {plano === "pro" ? "Plano Pro" : "Plano Free"}
           </span>
@@ -135,17 +139,12 @@ export default function Profile() {
       </div>
 
       {/* Dados Pessoais */}
-      <div
-        className="bg-white rounded-lg border border-[#E0E0E0] mb-4 overflow-hidden"
-        style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}
-      >
+      <div className="bg-white rounded-lg border border-[#E0E0E0] mb-4 overflow-hidden" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
         <div className="flex items-center justify-between px-5 py-4 border-b border-[#F0F0F0]">
-          <h3 style={{ fontSize: 14, fontWeight: 600 }} className="text-black">
-            Dados Pessoais
-          </h3>
+          <h3 style={{ fontSize: 14, fontWeight: 600 }} className="text-black">Dados Pessoais</h3>
           {!editing ? (
             <button
-              onClick={() => { setTempForm(form); setEditing(true); }}
+              onClick={() => { setTempForm(form); setEditing(true) }}
               className="flex items-center gap-1.5 text-[#555555] hover:text-black transition-colors"
               style={{ fontSize: 12, fontWeight: 500 }}
             >
@@ -187,17 +186,23 @@ export default function Profile() {
               Nome Completo
             </label>
             {editing ? (
-              <input
-                type="text"
-                value={tempForm.nome}
-                onChange={(e) => setTempForm({ ...tempForm, nome: e.target.value })}
-                className="w-full border border-[#E0E0E0] rounded-md px-3 py-2 outline-none focus:border-black transition-colors text-black"
-                style={{ fontSize: 14 }}
-              />
+              <>
+                <input
+                  type="text"
+                  value={tempForm.nome}
+                  onChange={(e) => {
+                    setTempForm({ ...tempForm, nome: e.target.value })
+                    if (fieldErrors.nome) setFieldErrors((prev) => ({ ...prev, nome: "" }))
+                  }}
+                  className={`w-full border rounded-md px-3 py-2 outline-none transition-colors text-black ${fieldErrors.nome ? "border-[#D32F2F] focus:border-[#D32F2F]" : "border-[#E0E0E0] focus:border-black"}`}
+                  style={{ fontSize: 14 }}
+                />
+                {fieldErrors.nome && (
+                  <p style={{ fontSize: 12 }} className="text-[#D32F2F] mt-1">{fieldErrors.nome}</p>
+                )}
+              </>
             ) : (
-              <p style={{ fontSize: 14, fontWeight: 500 }} className="text-black">
-                {form.nome || "—"}
-              </p>
+              <p style={{ fontSize: 14, fontWeight: 500 }} className="text-black">{form.nome || "—"}</p>
             )}
           </div>
 
@@ -206,9 +211,7 @@ export default function Profile() {
             <label style={{ fontSize: 11, fontWeight: 500 }} className="text-[#777777] uppercase tracking-wider block mb-1.5">
               Email
             </label>
-            <p style={{ fontSize: 14, fontWeight: 500 }} className="text-black">
-              {userEmail}
-            </p>
+            <p style={{ fontSize: 14, fontWeight: 500 }} className="text-black">{userEmail}</p>
           </div>
 
           {/* Telefone */}
@@ -217,18 +220,24 @@ export default function Profile() {
               Telefone
             </label>
             {editing ? (
-              <input
-                type="tel"
-                value={tempForm.telefone}
-                onChange={(e) => setTempForm({ ...tempForm, telefone: e.target.value })}
-                placeholder="(11) 99999-0000"
-                className="w-full border border-[#E0E0E0] rounded-md px-3 py-2 outline-none focus:border-black transition-colors text-black"
-                style={{ fontSize: 14 }}
-              />
+              <>
+                <input
+                  type="tel"
+                  value={tempForm.telefone}
+                  onChange={(e) => {
+                    setTempForm({ ...tempForm, telefone: e.target.value })
+                    if (fieldErrors.telefone) setFieldErrors((prev) => ({ ...prev, telefone: "" }))
+                  }}
+                  placeholder="(11) 99999-0000"
+                  className={`w-full border rounded-md px-3 py-2 outline-none transition-colors text-black ${fieldErrors.telefone ? "border-[#D32F2F] focus:border-[#D32F2F]" : "border-[#E0E0E0] focus:border-black"}`}
+                  style={{ fontSize: 14 }}
+                />
+                {fieldErrors.telefone && (
+                  <p style={{ fontSize: 12 }} className="text-[#D32F2F] mt-1">{fieldErrors.telefone}</p>
+                )}
+              </>
             ) : (
-              <p style={{ fontSize: 14, fontWeight: 500 }} className="text-black">
-                {form.telefone || "—"}
-              </p>
+              <p style={{ fontSize: 14, fontWeight: 500 }} className="text-black">{form.telefone || "—"}</p>
             )}
           </div>
 
@@ -257,14 +266,9 @@ export default function Profile() {
       </div>
 
       {/* Configurações */}
-      <div
-        className="bg-white rounded-lg border border-[#E0E0E0] mb-4 overflow-hidden"
-        style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}
-      >
+      <div className="bg-white rounded-lg border border-[#E0E0E0] mb-4 overflow-hidden" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
         <div className="px-5 py-4 border-b border-[#F0F0F0]">
-          <h3 style={{ fontSize: 14, fontWeight: 600 }} className="text-black">
-            Configurações
-          </h3>
+          <h3 style={{ fontSize: 14, fontWeight: 600 }} className="text-black">Configurações</h3>
         </div>
 
         <div className="flex items-center justify-between px-5 py-4 border-b border-[#F5F5F5]">
@@ -279,14 +283,12 @@ export default function Profile() {
           </div>
           <button
             onClick={() => {
-              setNotifications(!notifications);
-              toast.success(notifications ? "Notificações desativadas" : "Notificações ativadas", { duration: 2000 });
+              setNotifications(!notifications)
+              toast.success(notifications ? "Notificações desativadas" : "Notificações ativadas", { duration: 2000 })
             }}
             className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${notifications ? "bg-black" : "bg-[#E0E0E0]"}`}
           >
-            <span
-              className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${notifications ? "translate-x-5" : ""}`}
-            />
+            <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${notifications ? "translate-x-5" : ""}`} />
           </button>
         </div>
 
@@ -359,16 +361,9 @@ export default function Profile() {
           Sair da Conta
         </button>
       ) : (
-        <div
-          className="bg-white border border-[#E0E0E0] rounded-lg p-5"
-          style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}
-        >
-          <p style={{ fontSize: 14, fontWeight: 600 }} className="text-black mb-1">
-            Confirmar saída?
-          </p>
-          <p style={{ fontSize: 13 }} className="text-[#777777] mb-4">
-            Você será desconectado da sua conta.
-          </p>
+        <div className="bg-white border border-[#E0E0E0] rounded-lg p-5" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
+          <p style={{ fontSize: 14, fontWeight: 600 }} className="text-black mb-1">Confirmar saída?</p>
+          <p style={{ fontSize: 13 }} className="text-[#777777] mb-4">Você será desconectado da sua conta.</p>
           <div className="flex gap-3">
             <button
               onClick={() => setShowLogoutConfirm(false)}
@@ -399,5 +394,5 @@ export default function Profile() {
         Open Finance v1.0.0 · © {new Date().getFullYear()}
       </p>
     </div>
-  );
+  )
 }

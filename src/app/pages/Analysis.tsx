@@ -180,7 +180,7 @@ export default function Analysis() {
                   Sem dados de evolução ainda
                 </p>
                 <Link
-                  to="/adicionar"
+                  to="/app/adicionar"
                   style={{ fontSize: 12, fontWeight: 500 }}
                   className="text-black underline underline-offset-2"
                 >
@@ -210,7 +210,7 @@ export default function Analysis() {
                 Nenhum gasto registrado {periodoLabel[period]}
               </p>
               <Link
-                to="/adicionar"
+                to="/app/adicionar"
                 style={{ fontSize: 12, fontWeight: 500 }}
                 className="text-black underline underline-offset-2"
               >
@@ -311,7 +311,7 @@ export default function Analysis() {
               Nenhuma despesa encontrada {periodoLabel[period]}.
             </p>
             <Link
-              to="/adicionar"
+              to="/app/adicionar"
               className="bg-black text-white px-4 py-2 rounded-lg hover:bg-[#333333] transition-colors"
               style={{ fontSize: 13, fontWeight: 600 }}
             >
