@@ -1,9 +1,9 @@
-import { useState, type FormEvent } from "react"
-import { useNavigate, Navigate, Link } from "react-router"
+import { useState, useEffect, type FormEvent } from "react"
+import { Navigate, Link } from "react-router"
 import { supabase } from "../../lib/supabase"
 import { useAuth } from "../../lib/auth-context"
 import { emailSchema, senhaSchema, nomeSchema } from "../../lib/validations"
-import { Eye, EyeOff, Check, ArrowRight, TrendingUp, Shield, Zap } from "lucide-react"
+import { Eye, EyeOff, Check, ArrowRight, TrendingUp, Shield, Zap, Lock } from "lucide-react"
 
 const BENEFITS = [
   {
@@ -37,7 +37,6 @@ function getPasswordStrength(pwd: string): { score: number; label: string; color
 }
 
 export default function Cadastro() {
-  const navigate = useNavigate()
   const { user, loading: authLoading } = useAuth()
 
   const [nome, setNome] = useState("")
@@ -50,8 +49,20 @@ export default function Cadastro() {
   const [success, setSuccess] = useState(false)
   const [serverError, setServerError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+  const [betaFechado, setBetaFechado] = useState(false)
 
   const pwdStrength = getPasswordStrength(password)
+
+  useEffect(() => {
+    supabase
+      .from("app_config")
+      .select("valor")
+      .eq("chave", "beta_fechado")
+      .single()
+      .then(({ data }) => {
+        if (data?.valor === "true") setBetaFechado(true)
+      })
+  }, [])
 
   if (authLoading) {
     return (
@@ -94,6 +105,24 @@ export default function Cadastro() {
     setFieldErrors({})
     setLoading(true)
 
+    // Verificar whitelist se beta fechado
+    if (betaFechado) {
+      const { data: betaCheck, error: betaErr } = await supabase
+        .rpc("check_beta_access", { p_email: email.toLowerCase().trim() })
+
+      if (betaErr || !betaCheck?.allowed) {
+        setServerError("Cadastros estão fechados. Entre na lista de espera para receber um convite.")
+        setLoading(false)
+        return
+      }
+
+      if (betaCheck.already_used) {
+        setServerError("Este convite já foi utilizado. Faça login normalmente.")
+        setLoading(false)
+        return
+      }
+    }
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -121,6 +150,10 @@ export default function Cadastro() {
         renda_mensal: 0,
         meta_economia: 0,
       }, { onConflict: "id" })
+
+      if (betaFechado) {
+        await supabase.rpc("mark_beta_email_used", { p_email: email.toLowerCase().trim() })
+      }
     }
 
     setSuccess(true)
@@ -191,7 +224,6 @@ export default function Cadastro() {
           overflow: "hidden",
         }}
       >
-        {/* Decorative circles */}
         <div style={{
           position: "absolute", top: -120, right: -120,
           width: 400, height: 400, borderRadius: "50%",
@@ -205,7 +237,6 @@ export default function Cadastro() {
           pointerEvents: "none",
         }} />
 
-        {/* Logo */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{
             width: 36, height: 36, background: "#16A34A",
@@ -216,7 +247,6 @@ export default function Cadastro() {
           <span style={{ color: "#FFFFFF", fontSize: 18, fontWeight: 700, letterSpacing: "-0.02em" }}>Openfy</span>
         </div>
 
-        {/* Main content */}
         <div>
           <p style={{ fontSize: 13, fontWeight: 500, color: "#16A34A", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 16 }}>
             Score de Saúde Financeira
@@ -250,7 +280,6 @@ export default function Cadastro() {
           </div>
         </div>
 
-        {/* Social proof */}
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div style={{ display: "flex" }}>
             {["P", "A", "R", "M"].map((l, i) => (
@@ -292,14 +321,34 @@ export default function Cadastro() {
             <span style={{ fontSize: 18, fontWeight: 700, color: "#0A0A0A" }}>Openfy</span>
           </div>
 
-          <div style={{ marginBottom: 32 }}>
+          <div style={{ marginBottom: 28 }}>
             <h2 style={{ fontSize: 26, fontWeight: 700, color: "#0A0A0A", letterSpacing: "-0.02em", marginBottom: 6 }}>
               Crie sua conta
             </h2>
             <p style={{ fontSize: 14, color: "#525252" }}>
-              Comece gratuitamente. Sem cartão de crédito.
+              {betaFechado ? "Acesso exclusivo para convidados." : "Comece gratuitamente. Sem cartão de crédito."}
             </p>
           </div>
+
+          {/* Beta fechado — aviso */}
+          {betaFechado && (
+            <div style={{
+              display: "flex", alignItems: "flex-start", gap: 10,
+              padding: "12px 14px", marginBottom: 20,
+              background: "#FFFBEB", border: "1px solid #FDE68A", borderRadius: 10,
+            }}>
+              <Lock size={16} style={{ color: "#D97706", flexShrink: 0, marginTop: 1 }} />
+              <div>
+                <p style={{ fontSize: 13, fontWeight: 600, color: "#92400E", marginBottom: 2 }}>Beta fechado</p>
+                <p style={{ fontSize: 12, color: "#B45309", lineHeight: 1.5 }}>
+                  Apenas e-mails convidados podem criar conta.{" "}
+                  <Link to="/" style={{ color: "#92400E", fontWeight: 600, textDecoration: "underline" }}>
+                    Entrar na lista de espera
+                  </Link>
+                </p>
+              </div>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             {/* Nome */}
@@ -323,7 +372,7 @@ export default function Cadastro() {
             {/* Email */}
             <div>
               <label style={{ fontSize: 13, fontWeight: 500, color: "#0A0A0A", display: "block", marginBottom: 6 }}>
-                E-mail
+                E-mail {betaFechado && <span style={{ fontSize: 11, color: "#D97706", fontWeight: 400 }}>(deve ser convidado)</span>}
               </label>
               <input
                 type="email"
@@ -368,7 +417,6 @@ export default function Cadastro() {
               </div>
               {fieldErrors.password && <p style={{ fontSize: 12, color: "#EF4444", marginTop: 4 }}>{fieldErrors.password}</p>}
 
-              {/* Strength indicator */}
               {password && (
                 <div style={{ marginTop: 8 }}>
                   <div style={{ display: "flex", gap: 4, marginBottom: 4 }}>
@@ -466,10 +514,10 @@ export default function Cadastro() {
               {loading ? (
                 <>
                   <span style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,0.4)", borderTopColor: "#FFF", borderRadius: "50%", display: "inline-block", animation: "spin 0.7s linear infinite" }} />
-                  Criando conta...
+                  Verificando...
                 </>
               ) : (
-                <>Criar conta grátis <ArrowRight size={16} /></>
+                <>Criar conta {betaFechado ? "com convite" : "grátis"} <ArrowRight size={16} /></>
               )}
             </button>
           </form>

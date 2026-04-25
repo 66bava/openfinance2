@@ -1,8 +1,9 @@
-import { useState, FormEvent } from "react"
-import { useNavigate, Navigate } from "react-router"
+import { useState, useEffect, FormEvent } from "react"
+import { useNavigate, Navigate, Link } from "react-router"
 import { supabase } from "../../lib/supabase"
 import { useAuth } from "../../lib/auth-context"
 import { emailSchema, senhaSchema, nomeSchema, telefoneSchema } from "../../lib/validations"
+import { Lock } from "lucide-react"
 
 export default function Login() {
   const navigate = useNavigate()
@@ -18,6 +19,18 @@ export default function Login() {
   const [serverError, setServerError] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+  const [betaFechado, setBetaFechado] = useState(false)
+
+  useEffect(() => {
+    supabase
+      .from("app_config")
+      .select("valor")
+      .eq("chave", "beta_fechado")
+      .single()
+      .then(({ data }) => {
+        if (data?.valor === "true") setBetaFechado(true)
+      })
+  }, [])
 
   if (authLoading) {
     return (
@@ -72,6 +85,24 @@ export default function Login() {
     setLoading(true)
 
     if (isSignUp) {
+      // Verificar whitelist se beta fechado
+      if (betaFechado) {
+        const { data: betaCheck, error: betaErr } = await supabase
+          .rpc("check_beta_access", { p_email: email.toLowerCase().trim() })
+
+        if (betaErr || !betaCheck?.allowed) {
+          setServerError("Cadastros estão fechados. Entre na lista de espera para receber um convite.")
+          setLoading(false)
+          return
+        }
+
+        if (betaCheck.already_used) {
+          setServerError("Este convite já foi utilizado. Faça login normalmente.")
+          setLoading(false)
+          return
+        }
+      }
+
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
@@ -102,6 +133,10 @@ export default function Login() {
           renda_mensal: 0,
           meta_economia: 0,
         }, { onConflict: "id" })
+
+        if (betaFechado) {
+          await supabase.rpc("mark_beta_email_used", { p_email: email.toLowerCase().trim() })
+        }
       }
 
       setSuccessMessage("Conta criada! Verifique seu e-mail para confirmar o cadastro.")
@@ -147,9 +182,29 @@ export default function Login() {
             Openfy
           </h1>
           <p style={{ fontSize: 13 }} className="text-[#777777] mt-1">
-            {isSignUp ? "Crie sua conta gratuitamente" : "Entre na sua conta"}
+            {isSignUp ? (betaFechado ? "Acesso exclusivo para convidados" : "Crie sua conta gratuitamente") : "Entre na sua conta"}
           </p>
         </div>
+
+        {/* Aviso beta fechado */}
+        {isSignUp && betaFechado && (
+          <div style={{
+            display: "flex", alignItems: "flex-start", gap: 8,
+            padding: "10px 12px", marginBottom: 16,
+            background: "#FFFBEB", border: "1px solid #FDE68A", borderRadius: 8,
+          }}>
+            <Lock size={14} style={{ color: "#D97706", flexShrink: 0, marginTop: 1 }} />
+            <div>
+              <p style={{ fontSize: 12, fontWeight: 600, color: "#92400E", marginBottom: 2 }}>Beta fechado</p>
+              <p style={{ fontSize: 11, color: "#B45309", lineHeight: 1.4 }}>
+                Apenas e-mails convidados.{" "}
+                <Link to="/" style={{ color: "#92400E", fontWeight: 600, textDecoration: "underline" }}>
+                  Lista de espera
+                </Link>
+              </p>
+            </div>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3.5">
           {isSignUp && (
