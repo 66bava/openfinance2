@@ -26,12 +26,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(data.session?.user ?? null);
       prevUserIdRef.current = data.session?.user?.id ?? null;
       setLoading(false);
-    });
+    }).catch(() => setLoading(false));
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, newSession) => {
       const newUser = newSession?.user ?? null;
+
+      if (event === "INITIAL_SESSION") {
+        setSession(newSession);
+        setUser(newUser);
+        prevUserIdRef.current = newUser?.id ?? null;
+        setLoading(false);
+        return;
+      }
 
       if (event === "SIGNED_IN" && newUser && prevUserIdRef.current !== newUser.id) {
         supabase.from("audit_logs").insert({
