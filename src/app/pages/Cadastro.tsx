@@ -50,6 +50,8 @@ export default function Cadastro() {
   const [serverError, setServerError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [betaFechado, setBetaFechado] = useState(false)
+  const [consentimentoPolitica, setConsentimentoPolitica] = useState(false)
+  const [consentimentoMarketing, setConsentimentoMarketing] = useState(false)
 
   const pwdStrength = getPasswordStrength(password)
 
@@ -91,6 +93,10 @@ export default function Cadastro() {
     }
     if (!confirmPassword) {
       errs.confirmPassword = "Confirme sua senha"
+    }
+
+    if (!consentimentoPolitica) {
+      errs.consentimentoPolitica = "Você precisa aceitar a Política de Privacidade para continuar"
     }
 
     return errs
@@ -149,7 +155,22 @@ export default function Cadastro() {
         plano: "free",
         renda_mensal: 0,
         meta_economia: 0,
+        consentimento_politica: consentimentoPolitica,
+        consentimento_marketing: consentimentoMarketing,
+        data_consentimento: new Date().toISOString(),
+        versao_politica: "1.0",
       }, { onConflict: "id" })
+
+      await supabase.from("audit_logs").insert({
+        user_id: data.user.id,
+        acao: "cadastro",
+        detalhes: {
+          email,
+          consentimento_politica: consentimentoPolitica,
+          consentimento_marketing: consentimentoMarketing,
+          versao_politica: "1.0",
+        },
+      })
 
       if (betaFechado) {
         await supabase.rpc("mark_beta_email_used", { p_email: email.toLowerCase().trim() })
@@ -486,6 +507,62 @@ export default function Cadastro() {
               )}
             </div>
 
+            {/* Consentimentos LGPD */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, paddingTop: 4 }}>
+              {/* Política — obrigatório */}
+              <label style={{
+                display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer",
+                padding: "12px 14px",
+                background: fieldErrors.consentimentoPolitica ? "#FEF2F2" : "#F5F5F0",
+                border: `1px solid ${fieldErrors.consentimentoPolitica ? "#FCA5A5" : "#E5E5E3"}`,
+                borderRadius: 10,
+              }}>
+                <input
+                  type="checkbox"
+                  checked={consentimentoPolitica}
+                  onChange={(e) => {
+                    setConsentimentoPolitica(e.target.checked)
+                    clearError("consentimentoPolitica")
+                  }}
+                  style={{ marginTop: 2, accentColor: "#16A34A", width: 16, height: 16, flexShrink: 0 }}
+                />
+                <span style={{ fontSize: 12, color: "#525252", lineHeight: 1.5 }}>
+                  Li e aceito a{" "}
+                  <Link to="/privacidade" target="_blank" style={{ color: "#0A0A0A", fontWeight: 600, textDecoration: "underline" }}>
+                    Política de Privacidade
+                  </Link>
+                  {" "}e os{" "}
+                  <Link to="/termos" target="_blank" style={{ color: "#0A0A0A", fontWeight: 600, textDecoration: "underline" }}>
+                    Termos de Uso
+                  </Link>
+                  . <span style={{ color: "#EF4444", fontWeight: 600 }}>*</span>
+                </span>
+              </label>
+              {fieldErrors.consentimentoPolitica && (
+                <p style={{ fontSize: 12, color: "#EF4444", marginTop: -8 }}>{fieldErrors.consentimentoPolitica}</p>
+              )}
+
+              {/* Marketing — opcional */}
+              <label style={{
+                display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer",
+                padding: "12px 14px",
+                background: "#F5F5F0",
+                border: "1px solid #E5E5E3",
+                borderRadius: 10,
+              }}>
+                <input
+                  type="checkbox"
+                  checked={consentimentoMarketing}
+                  onChange={(e) => setConsentimentoMarketing(e.target.checked)}
+                  style={{ marginTop: 2, accentColor: "#16A34A", width: 16, height: 16, flexShrink: 0 }}
+                />
+                <span style={{ fontSize: 12, color: "#525252", lineHeight: 1.5 }}>
+                  Aceito receber dicas financeiras e novidades do Openfy por e-mail.{" "}
+                  <span style={{ color: "#A3A3A3" }}>(opcional)</span>
+                </span>
+              </label>
+            </div>
+
             {serverError && (
               <div style={{
                 padding: "12px 14px", background: "#FEF2F2",
@@ -532,13 +609,6 @@ export default function Cadastro() {
             >
               Entrar
             </Link>
-          </p>
-
-          <p style={{ textAlign: "center", marginTop: 16, fontSize: 11, color: "#A3A3A3", lineHeight: 1.6 }}>
-            Ao criar uma conta você concorda com os{" "}
-            <Link to="/termos" style={{ color: "#525252", textDecoration: "underline" }}>Termos de Uso</Link>
-            {" "}e a{" "}
-            <Link to="/privacidade" style={{ color: "#525252", textDecoration: "underline" }}>Política de Privacidade</Link>
           </p>
         </div>
       </div>

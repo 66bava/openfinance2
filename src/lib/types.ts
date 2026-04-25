@@ -8,6 +8,18 @@ export interface Profile {
   meta_economia: number
   avatar_url?: string
   plano: string
+  consentimento_politica?: boolean
+  consentimento_marketing?: boolean
+  data_consentimento?: string | null
+  versao_politica?: string
+}
+
+export interface AuditLog {
+  id: string
+  user_id: string
+  acao: string
+  detalhes: Record<string, unknown> | null
+  criado_em: string
 }
 
 export interface Categoria {

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import type { User, Session } from "@supabase/supabase-js";
 import { supabase } from "./supabase";
 
@@ -18,19 +18,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const prevUserIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
       setUser(data.session?.user ?? null);
+      prevUserIdRef.current = data.session?.user?.id ?? null;
       setLoading(false);
     });
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, newSession) => {
+    } = supabase.auth.onAuthStateChange((event, newSession) => {
+      const newUser = newSession?.user ?? null;
+
+      if (event === "SIGNED_IN" && newUser && prevUserIdRef.current !== newUser.id) {
+        supabase.from("audit_logs").insert({
+          user_id: newUser.id,
+          acao: "login",
+          detalhes: { email: newUser.email },
+        });
+      }
+
+      if (event === "SIGNED_OUT" && prevUserIdRef.current) {
+        supabase.from("audit_logs").insert({
+          user_id: prevUserIdRef.current,
+          acao: "logout",
+          detalhes: {},
+        });
+      }
+
+      prevUserIdRef.current = newUser?.id ?? null;
       setSession(newSession);
-      setUser(newSession?.user ?? null);
+      setUser(newUser);
     });
 
     return () => subscription.unsubscribe();

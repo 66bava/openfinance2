@@ -3,11 +3,12 @@ import { useNavigate } from "react-router"
 import { toast } from "sonner"
 import {
   Edit3, LogOut, Bell, Globe, DollarSign, Shield,
-  ChevronRight, Check, X, Camera, TrendingUp,
+  ChevronRight, Check, X, Camera, TrendingUp, Download, Trash2,
 } from "lucide-react"
 import { supabase } from "../../lib/supabase"
 import { useAuth } from "../../lib/auth-context"
 import { getProfile, upsertProfile } from "../../lib/queries"
+import { logAudit } from "../../lib/audit"
 import { nomeSchema, telefoneSchema } from "../../lib/validations"
 import type { Profile as ProfileType } from "../../lib/types"
 import { ConfigureIncomeModal } from "../components/dashboard/ConfigureIncomeModal"
@@ -31,11 +32,17 @@ export default function Profile() {
   const [language, setLanguage] = useState("Português")
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [incomeModalOpen, setIncomeModalOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState<"dados" | "plano" | "preferencias" | "seguranca">("dados")
+  const [activeTab, setActiveTab] = useState<"dados" | "plano" | "preferencias" | "seguranca" | "privacidade">("dados")
 
   const [form, setForm] = useState({ nome: "", telefone: "", data_nascimento: "" })
   const [tempForm, setTempForm] = useState(form)
   const [metaEconomia, setMetaEconomia] = useState("")
+
+  const [exportando, setExportando] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deleteInput, setDeleteInput] = useState("")
+  const [deletando, setDeletando] = useState(false)
+  const [marketingToggle, setMarketingToggle] = useState(false)
 
   useEffect(() => {
     getProfile(userId).then((p) => {
@@ -53,6 +60,7 @@ export default function Profile() {
             ? p.meta_economia.toLocaleString("pt-BR", { minimumFractionDigits: 2 })
             : ""
         )
+        setMarketingToggle(p.consentimento_marketing ?? false)
       } else {
         const f = {
           nome: user?.user_metadata?.full_name || userEmail.split("@")[0] || "",
@@ -93,6 +101,7 @@ export default function Profile() {
       setProfile(updated)
       setForm(tempForm)
       setEditing(false)
+      await logAudit(userId, "alteracao_dados", { campos: Object.keys(tempForm) })
       toast.success("Perfil atualizado!", { duration: 3000 })
     } catch {
       toast.error("Erro ao salvar. Tente novamente.")
@@ -121,8 +130,78 @@ export default function Profile() {
 
   const handleLogout = async () => {
     setLoggingOut(true)
+    await logAudit(userId, "logout", { email: userEmail })
     await supabase.auth.signOut()
     navigate("/login", { replace: true })
+  }
+
+  const handleExportData = async () => {
+    setExportando(true)
+    try {
+      const [profileRes, transacoesRes, metasRes, auditRes] = await Promise.all([
+        supabase.from("profiles").select("*").eq("id", userId).single(),
+        supabase.from("transacoes").select("*, categorias(*)").eq("user_id", userId),
+        supabase.from("metas").select("*").eq("user_id", userId),
+        supabase.from("audit_logs").select("acao, detalhes, criado_em").eq("user_id", userId).order("criado_em", { ascending: false }).limit(100),
+      ])
+
+      const exportData = {
+        exportado_em: new Date().toISOString(),
+        versao: "1.0",
+        perfil: profileRes.data,
+        transacoes: transacoesRes.data ?? [],
+        metas: metasRes.data ?? [],
+        historico_acoes: auditRes.data ?? [],
+      }
+
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = `openfy-dados-${new Date().toISOString().split("T")[0]}.json`
+      a.click()
+      URL.revokeObjectURL(url)
+
+      await logAudit(userId, "exportacao_dados", { email: userEmail })
+      toast.success("Dados exportados com sucesso!")
+    } catch {
+      toast.error("Erro ao exportar dados.")
+    } finally {
+      setExportando(false)
+    }
+  }
+
+  const handleDeleteAccount = async () => {
+    if (deleteInput !== "EXCLUIR") return
+    setDeletando(true)
+    try {
+      await logAudit(userId, "exclusao_conta", { email: userEmail })
+      await supabase.from("transacoes").delete().eq("user_id", userId)
+      await supabase.from("metas").delete().eq("user_id", userId)
+      await supabase.from("profiles").delete().eq("id", userId)
+      const { error } = await supabase.rpc("delete_user")
+      if (error) throw error
+      await supabase.auth.signOut()
+      navigate("/", { replace: true })
+    } catch {
+      toast.error("Erro ao excluir conta. Entre em contato: suporte@openfy.app")
+      setDeletando(false)
+    }
+  }
+
+  const handleMarketingToggle = async (value: boolean) => {
+    setMarketingToggle(value)
+    try {
+      await supabase
+        .from("profiles")
+        .update({ consentimento_marketing: value })
+        .eq("id", userId)
+      await logAudit(userId, "alteracao_consentimento_marketing", { consentimento_marketing: value })
+      toast.success(value ? "E-mails de marketing ativados" : "E-mails de marketing desativados", { duration: 2000 })
+    } catch {
+      setMarketingToggle(!value)
+      toast.error("Erro ao atualizar preferência.")
+    }
   }
 
   const displayName = form.nome || userEmail.split("@")[0] || "Usuário"
@@ -138,6 +217,7 @@ export default function Profile() {
     { key: "plano", label: "Plano" },
     { key: "preferencias", label: "Preferências" },
     { key: "seguranca", label: "Segurança" },
+    { key: "privacidade", label: "Privacidade" },
   ] as const
 
   const cardStyle: React.CSSProperties = {
@@ -211,6 +291,7 @@ export default function Profile() {
           padding: 4,
           marginBottom: 20,
           gap: 4,
+          overflowX: "auto",
         }}>
           {TABS.map(({ key, label }) => (
             <button
@@ -224,6 +305,7 @@ export default function Profile() {
                 backgroundColor: activeTab === key ? "#FFFFFF" : "transparent",
                 color: activeTab === key ? "#0A0A0A" : "#525252",
                 boxShadow: activeTab === key ? "0 1px 4px rgba(0,0,0,0.08)" : "none",
+                whiteSpace: "nowrap",
               }}
             >
               {label}
@@ -234,7 +316,6 @@ export default function Profile() {
         {/* TAB: Dados pessoais */}
         {activeTab === "dados" && (
           <>
-            {/* Dados pessoais */}
             <div style={cardStyle}>
               <div style={{
                 display: "flex", alignItems: "center", justifyContent: "space-between",
@@ -306,7 +387,7 @@ export default function Profile() {
                       <>
                         <input
                           type={type}
-                          value={(tempForm as any)[field]}
+                          value={(tempForm as Record<string, string>)[field]}
                           onChange={(e) => {
                             setTempForm({ ...tempForm, [field]: e.target.value })
                             if (fieldErrors[field]) setFieldErrors((p) => ({ ...p, [field]: "" }))
@@ -329,7 +410,7 @@ export default function Profile() {
                           ? form.data_nascimento
                             ? new Date(form.data_nascimento + "T00:00:00").toLocaleDateString("pt-BR")
                             : "—"
-                          : (form as any)[field] || "—"
+                          : (form as Record<string, string>)[field] || "—"
                         }
                       </p>
                     )}
@@ -614,43 +695,180 @@ export default function Profile() {
                 </button>
               </div>
             </div>
+          </>
+        )}
 
-            <div style={{ ...cardStyle, border: "1px solid #FCA5A5" }}>
-              <div style={{ padding: "16px 20px", borderBottom: "1px solid #FCA5A5" }}>
-                <h3 style={{ fontSize: 14, fontWeight: 600, color: "#DC2626" }}>Zona de Perigo</h3>
+        {/* TAB: Privacidade */}
+        {activeTab === "privacidade" && (
+          <>
+            {/* Consentimentos */}
+            <div style={cardStyle}>
+              <div style={{ padding: "16px 20px", borderBottom: "1px solid #F5F5F0" }}>
+                <h3 style={{ fontSize: 14, fontWeight: 600, color: "#0A0A0A" }}>Consentimentos LGPD</h3>
+                <p style={{ fontSize: 12, color: "#A3A3A3", marginTop: 2 }}>
+                  Gerencie suas preferências de privacidade
+                </p>
               </div>
-              <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: 20 }}>
-                <div>
-                  <p style={{ fontSize: 13, fontWeight: 500, color: "#0A0A0A", marginBottom: 4 }}>Exportar dados (LGPD)</p>
-                  <p style={{ fontSize: 12, color: "#A3A3A3", marginBottom: 12 }}>
-                    Baixe todos os seus dados em formato JSON
-                  </p>
+              <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: 16 }}>
+                {/* Política — informativo */}
+                <div style={{
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                  padding: "14px 16px", background: "#F0FDF4", border: "1px solid #BBF7D0", borderRadius: 10,
+                }}>
+                  <div>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: "#0A0A0A" }}>Política de Privacidade e Termos</p>
+                    <p style={{ fontSize: 11, color: "#525252", marginTop: 2 }}>
+                      Aceito em: {profile?.data_consentimento
+                        ? new Date(profile.data_consentimento).toLocaleDateString("pt-BR")
+                        : "—"} · v{profile?.versao_politica ?? "1.0"}
+                    </p>
+                  </div>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: "#16A34A", background: "#DCFCE7", padding: "3px 10px", borderRadius: 20 }}>
+                    Aceito
+                  </span>
+                </div>
+
+                {/* Marketing toggle */}
+                <div style={{
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                  padding: "14px 16px", background: "#F5F5F0", border: "1px solid #E5E5E3", borderRadius: 10,
+                }}>
+                  <div>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: "#0A0A0A" }}>E-mails de marketing</p>
+                    <p style={{ fontSize: 11, color: "#525252", marginTop: 2 }}>
+                      Dicas financeiras e novidades do Openfy
+                    </p>
+                  </div>
                   <button
+                    onClick={() => handleMarketingToggle(!marketingToggle)}
+                    aria-label={marketingToggle ? "Desativar e-mails de marketing" : "Ativar e-mails de marketing"}
                     style={{
-                      padding: "9px 20px", border: "1px solid #E5E5E3",
-                      borderRadius: 8, fontSize: 13, fontWeight: 500,
-                      color: "#525252", background: "#FFFFFF", cursor: "pointer",
+                      position: "relative", width: 44, height: 24, borderRadius: 12,
+                      border: "none", cursor: "pointer", transition: "background 0.2s",
+                      backgroundColor: marketingToggle ? "#0A0A0A" : "#E5E5E3",
+                      flexShrink: 0,
                     }}
-                    onClick={() => toast.info("Exportação de dados em breve")}
                   >
-                    Exportar meus dados
+                    <span style={{
+                      position: "absolute", top: 2, left: 2,
+                      width: 20, height: 20, borderRadius: "50%",
+                      background: "#FFFFFF", boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+                      transition: "transform 0.2s",
+                      transform: marketingToggle ? "translateX(20px)" : "translateX(0)",
+                    }} />
                   </button>
                 </div>
-                <div style={{ borderTop: "1px solid #FEE2E2", paddingTop: 20 }}>
-                  <p style={{ fontSize: 13, fontWeight: 500, color: "#DC2626", marginBottom: 4 }}>Excluir conta</p>
+              </div>
+            </div>
+
+            {/* Exportar e Excluir */}
+            <div style={{ ...cardStyle, border: "1px solid #FCA5A5" }}>
+              <div style={{ padding: "16px 20px", borderBottom: "1px solid #FCA5A5" }}>
+                <h3 style={{ fontSize: 14, fontWeight: 600, color: "#DC2626" }}>Seus dados (LGPD)</h3>
+              </div>
+              <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: 20 }}>
+                {/* Exportar */}
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                    <Download size={14} style={{ color: "#525252" }} />
+                    <p style={{ fontSize: 13, fontWeight: 600, color: "#0A0A0A" }}>Exportar meus dados</p>
+                  </div>
                   <p style={{ fontSize: 12, color: "#A3A3A3", marginBottom: 12 }}>
-                    Esta ação é irreversível. Todos os seus dados serão excluídos permanentemente.
+                    Baixe todos os seus dados (perfil, transações, metas) em formato JSON — direito garantido pela LGPD.
                   </p>
                   <button
+                    onClick={handleExportData}
+                    disabled={exportando}
                     style={{
-                      padding: "9px 20px", border: "none",
-                      borderRadius: 8, fontSize: 13, fontWeight: 600,
-                      color: "#FFFFFF", background: "#DC2626", cursor: "pointer",
+                      display: "flex", alignItems: "center", gap: 8,
+                      padding: "9px 20px", border: "1px solid #E5E5E3",
+                      borderRadius: 8, fontSize: 13, fontWeight: 500,
+                      color: exportando ? "#A3A3A3" : "#525252",
+                      background: "#FFFFFF", cursor: exportando ? "not-allowed" : "pointer",
                     }}
-                    onClick={() => toast.error("Funcionalidade em desenvolvimento")}
                   >
-                    Excluir minha conta
+                    {exportando
+                      ? <span style={{ width: 14, height: 14, border: "1.5px solid #A3A3A3", borderTopColor: "#525252", borderRadius: "50%", display: "inline-block", animation: "spin 0.7s linear infinite" }} />
+                      : <Download size={14} />
+                    }
+                    {exportando ? "Exportando..." : "Exportar meus dados"}
                   </button>
+                </div>
+
+                {/* Excluir conta */}
+                <div style={{ borderTop: "1px solid #FEE2E2", paddingTop: 20 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                    <Trash2 size={14} style={{ color: "#DC2626" }} />
+                    <p style={{ fontSize: 13, fontWeight: 600, color: "#DC2626" }}>Excluir minha conta</p>
+                  </div>
+                  <p style={{ fontSize: 12, color: "#A3A3A3", marginBottom: 12 }}>
+                    Esta ação é <strong>irreversível</strong>. Todos os seus dados serão excluídos permanentemente dos nossos servidores.
+                  </p>
+
+                  {!showDeleteConfirm ? (
+                    <button
+                      onClick={() => setShowDeleteConfirm(true)}
+                      style={{
+                        padding: "9px 20px", border: "none",
+                        borderRadius: 8, fontSize: 13, fontWeight: 600,
+                        color: "#FFFFFF", background: "#DC2626", cursor: "pointer",
+                      }}
+                    >
+                      Excluir minha conta
+                    </button>
+                  ) : (
+                    <div style={{ background: "#FEF2F2", border: "1px solid #FCA5A5", borderRadius: 10, padding: 16 }}>
+                      <p style={{ fontSize: 13, fontWeight: 600, color: "#DC2626", marginBottom: 8 }}>
+                        Confirmação necessária
+                      </p>
+                      <p style={{ fontSize: 12, color: "#525252", marginBottom: 12 }}>
+                        Digite <strong>EXCLUIR</strong> para confirmar a exclusão permanente da sua conta.
+                      </p>
+                      <input
+                        type="text"
+                        value={deleteInput}
+                        onChange={(e) => setDeleteInput(e.target.value)}
+                        placeholder="EXCLUIR"
+                        style={{
+                          width: "100%", border: "1px solid #FCA5A5", borderRadius: 8,
+                          padding: "10px 12px", fontSize: 14, color: "#DC2626",
+                          outline: "none", boxSizing: "border-box", marginBottom: 12,
+                          fontWeight: 700, letterSpacing: "0.05em",
+                        }}
+                      />
+                      <div style={{ display: "flex", gap: 10 }}>
+                        <button
+                          onClick={() => { setShowDeleteConfirm(false); setDeleteInput("") }}
+                          disabled={deletando}
+                          style={{
+                            flex: 1, padding: "10px 0", border: "1px solid #E5E5E3",
+                            borderRadius: 8, fontSize: 13, fontWeight: 500,
+                            color: "#525252", background: "#FFFFFF", cursor: "pointer",
+                          }}
+                        >
+                          Cancelar
+                        </button>
+                        <button
+                          onClick={handleDeleteAccount}
+                          disabled={deleteInput !== "EXCLUIR" || deletando}
+                          style={{
+                            flex: 1, padding: "10px 0", border: "none",
+                            borderRadius: 8, fontSize: 13, fontWeight: 600,
+                            color: "#FFFFFF",
+                            background: deleteInput === "EXCLUIR" ? "#DC2626" : "#E5E5E3",
+                            cursor: deleteInput === "EXCLUIR" ? "pointer" : "not-allowed",
+                            display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                          }}
+                        >
+                          {deletando
+                            ? <span style={{ width: 14, height: 14, border: "1.5px solid rgba(255,255,255,0.4)", borderTopColor: "#FFF", borderRadius: "50%", display: "inline-block", animation: "spin 0.7s linear infinite" }} />
+                            : <Trash2 size={13} />
+                          }
+                          {deletando ? "Excluindo..." : "Confirmar exclusão"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
