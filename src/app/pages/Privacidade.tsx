@@ -5,7 +5,7 @@ export default function Privacidade() {
     <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", minHeight: "100vh", backgroundColor: "#FFFFFF" }}>
       <nav style={{ borderBottom: "1px solid #F0F0F0", padding: "0 24px", height: 64, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <Link to="/" style={{ fontSize: 16, fontWeight: 700, color: "#111111", textDecoration: "none", letterSpacing: "-0.02em" }}>
-          Open Finance
+          Openfy
         </Link>
         <Link to="/" style={{ fontSize: 14, color: "#666666", textDecoration: "none" }}>← Voltar</Link>
       </nav>
@@ -18,7 +18,7 @@ export default function Privacidade() {
         {[
           {
             title: "1. Coleta de dados",
-            text: "O Open Finance coleta apenas os dados necessários para o funcionamento do serviço: endereço de e-mail, dados financeiros que você registra manualmente e informações de perfil que você fornece voluntariamente.",
+            text: "O Openfy coleta apenas os dados necessários para o funcionamento do serviço: endereço de e-mail, dados financeiros que você registra manualmente e informações de perfil que você fornece voluntariamente.",
           },
           {
             title: "2. Uso dos dados",
@@ -34,11 +34,11 @@ export default function Privacidade() {
           },
           {
             title: "5. Seus direitos",
-            text: "Você pode solicitar a exportação ou exclusão completa dos seus dados a qualquer momento. Envie um e-mail para suporte@openfinance.app.",
+            text: "Você pode solicitar a exportação ou exclusão completa dos seus dados a qualquer momento. Envie um e-mail para suporte@openfy.app.",
           },
           {
             title: "6. Contato",
-            text: "Para dúvidas sobre privacidade, entre em contato: suporte@openfinance.app",
+            text: "Para dúvidas sobre privacidade, entre em contato: suporte@openfy.app",
           },
         ].map((section) => (
           <section key={section.title} style={{ marginBottom: 36 }}>

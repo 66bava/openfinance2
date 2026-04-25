@@ -1,0 +1,47 @@
+<svg width="600" height="700" xmlns="http://www.w3.org/2000/svg">
+  <rect width="600" height="700" fill="#0A0A0A" opacity="0.5"/>
+  
+  <rect x="0" y="0" width="600" height="700" fill="#FFFFFF" rx="16"/>
+  
+  <circle cx="560" cy="40" r="16" fill="#E5E5E5"/>
+  <line x1="555" y1="35" x2="565" y2="45" stroke="#0A0A0A" stroke-width="2"/>
+  <line x1="565" y1="35" x2="555" y2="45" stroke="#0A0A0A" stroke-width="2"/>
+  
+  <text x="40" y="55" font-family="DM Sans" font-size="24" font-weight="700" fill="#0A0A0A">Nova transação</text>
+  
+  <rect x="40" y="90" width="250" height="56" rx="8" fill="#16A34A"/>
+  <text x="165" y="125" font-family="Inter" font-size="16" font-weight="600" fill="#FFFFFF" text-anchor="middle">DESPESA</text>
+  
+  <rect x="310" y="90" width="250" height="56" rx="8" fill="#E5E5E5"/>
+  <text x="435" y="125" font-family="Inter" font-size="16" font-weight="600" fill="#0A0A0A" text-anchor="middle">RECEITA</text>
+  
+  <text x="40" y="190" font-family="Inter" font-size="14" font-weight="500" fill="#0A0A0A">Descrição</text>
+  <rect x="40" y="200" width="520" height="48" rx="8" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="1"/>
+  <text x="56" y="228" font-family="Inter" font-size="15" fill="#999999">Ex: Mercado, Uber, Conta de luz...</text>
+  
+  <text x="40" y="285" font-family="Inter" font-size="14" font-weight="500" fill="#0A0A0A">Valor</text>
+  <rect x="40" y="295" width="520" height="64" rx="8" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="1"/>
+  <text x="56" y="336" font-family="Inter" font-size="28" font-weight="600" fill="#0A0A0A">R$ ___,__</text>
+  
+  <text x="40" y="395" font-family="Inter" font-size="14" font-weight="500" fill="#0A0A0A">Categoria</text>
+  <rect x="40" y="405" width="520" height="48" rx="8" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="1"/>
+  <text x="56" y="433" font-family="Inter" font-size="15" fill="#0A0A0A">🛒 Alimentação</text>
+  <polygon points="540,428 545,433 535,433" fill="#0A0A0A"/>
+  
+  <text x="40" y="490" font-family="Inter" font-size="14" font-weight="500" fill="#0A0A0A">Data</text>
+  <rect x="40" y="500" width="250" height="48" rx="8" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="1"/>
+  <text x="56" y="528" font-family="Inter" font-size="15" fill="#0A0A0A">24/04/2026</text>
+  <text x="265" y="528" font-family="Inter" font-size="18" fill="#999999">📅</text>
+  
+  <text x="310" y="490" font-family="Inter" font-size="14" font-weight="500" fill="#0A0A0A">Notas (opcional)</text>
+  <rect x="310" y="500" width="250" height="48" rx="8" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="1"/>
+  <text x="326" y="528" font-family="Inter" font-size="15" fill="#999999">Observações...</text>
+  
+  <rect x="40" y="620" width="520" height="1" fill="#E5E5E5"/>
+  
+  <rect x="40" y="635" width="120" height="48" rx="8" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="1"/>
+  <text x="100" y="663" font-family="Inter" font-size="15" font-weight="500" fill="#0A0A0A" text-anchor="middle">Cancelar</text>
+  
+  <rect x="390" y="635" width="170" height="48" rx="8" fill="#16A34A"/>
+  <text x="475" y="663" font-family="Inter" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">Adicionar (R$)</text>
+</svg>

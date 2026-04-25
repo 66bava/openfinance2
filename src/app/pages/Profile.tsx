@@ -1,12 +1,19 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router"
 import { toast } from "sonner"
-import { Edit3, LogOut, Bell, Globe, DollarSign, Shield, ChevronRight, Check, X, Camera } from "lucide-react"
+import {
+  Edit3, LogOut, Bell, Globe, DollarSign, Shield,
+  ChevronRight, Check, X, Camera, TrendingUp,
+} from "lucide-react"
 import { supabase } from "../../lib/supabase"
 import { useAuth } from "../../lib/auth-context"
 import { getProfile, upsertProfile } from "../../lib/queries"
 import { nomeSchema, telefoneSchema } from "../../lib/validations"
 import type { Profile as ProfileType } from "../../lib/types"
+import { ConfigureIncomeModal } from "../components/dashboard/ConfigureIncomeModal"
+
+const fmt = (v: number) =>
+  new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v)
 
 export default function Profile() {
   const navigate = useNavigate()
@@ -23,9 +30,12 @@ export default function Profile() {
   const [currency, setCurrency] = useState("BRL")
   const [language, setLanguage] = useState("Português")
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+  const [incomeModalOpen, setIncomeModalOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState<"dados" | "plano" | "preferencias" | "seguranca">("dados")
 
   const [form, setForm] = useState({ nome: "", telefone: "", data_nascimento: "" })
   const [tempForm, setTempForm] = useState(form)
+  const [metaEconomia, setMetaEconomia] = useState("")
 
   useEffect(() => {
     getProfile(userId).then((p) => {
@@ -38,6 +48,11 @@ export default function Profile() {
         }
         setForm(f)
         setTempForm(f)
+        setMetaEconomia(
+          p.meta_economia
+            ? p.meta_economia.toLocaleString("pt-BR", { minimumFractionDigits: 2 })
+            : ""
+        )
       } else {
         const f = {
           nome: user?.user_metadata?.full_name || userEmail.split("@")[0] || "",
@@ -52,24 +67,18 @@ export default function Profile() {
 
   function validateForm() {
     const errs: Record<string, string> = {}
-
     const nomeResult = nomeSchema.safeParse(tempForm.nome)
     if (!nomeResult.success) errs.nome = nomeResult.error.issues[0].message
-
     if (tempForm.telefone) {
       const telResult = telefoneSchema.safeParse(tempForm.telefone)
       if (!telResult.success) errs.telefone = telResult.error.issues[0].message
     }
-
     return errs
   }
 
   const handleSave = async () => {
     const errs = validateForm()
-    if (Object.keys(errs).length > 0) {
-      setFieldErrors(errs)
-      return
-    }
+    if (Object.keys(errs).length > 0) { setFieldErrors(errs); return }
     setFieldErrors({})
     setSaving(true)
     try {
@@ -92,10 +101,22 @@ export default function Profile() {
     }
   }
 
-  const handleCancel = () => {
-    setTempForm(form)
-    setEditing(false)
-    setFieldErrors({})
+  const handleSaveMeta = async () => {
+    const valor = parseFloat(metaEconomia.replace(/\./g, "").replace(",", ".")) || 0
+    try {
+      const updated = await upsertProfile(userId, userEmail, {
+        nome: form.nome,
+        telefone: form.telefone || undefined,
+        data_nascimento: form.data_nascimento || null,
+        plano: profile?.plano ?? "free",
+        renda_mensal: profile?.renda_mensal ?? 0,
+        meta_economia: valor,
+      })
+      setProfile(updated)
+      toast.success("Meta atualizada!", { duration: 2500 })
+    } catch {
+      toast.error("Erro ao salvar meta.")
+    }
   }
 
   const handleLogout = async () => {
@@ -110,289 +131,602 @@ export default function Profile() {
   const memberSince = user?.created_at
     ? new Date(user.created_at).toLocaleDateString("pt-BR", { month: "long", year: "numeric" })
     : ""
+  const rendaMensal = profile?.renda_mensal ?? 0
+
+  const TABS = [
+    { key: "dados", label: "Dados" },
+    { key: "plano", label: "Plano" },
+    { key: "preferencias", label: "Preferências" },
+    { key: "seguranca", label: "Segurança" },
+  ] as const
+
+  const cardStyle: React.CSSProperties = {
+    background: "#FFFFFF",
+    borderRadius: 16,
+    border: "1px solid #E5E5E3",
+    marginBottom: 16,
+    overflow: "hidden",
+    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+  }
+
+  const inputStyle: React.CSSProperties = {
+    width: "100%",
+    border: "1px solid #E0E0E0",
+    borderRadius: 8,
+    padding: "10px 12px",
+    fontSize: 14,
+    color: "#0A0A0A",
+    outline: "none",
+    transition: "border-color 0.15s",
+    boxSizing: "border-box",
+  }
 
   return (
-    <div className="p-4 lg:p-6 max-w-xl mx-auto">
-      {/* Avatar */}
-      <div className="bg-white rounded-lg border border-[#E0E0E0] p-6 mb-4 text-center" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
-        <div className="relative inline-block mb-4">
-          <div className="w-20 h-20 bg-black text-white rounded-full flex items-center justify-center mx-auto">
-            <span style={{ fontSize: 28, fontWeight: 700 }}>{avatarLetter}</span>
-          </div>
-          <button className="absolute bottom-0 right-0 w-7 h-7 bg-white border border-[#E0E0E0] rounded-full flex items-center justify-center shadow-sm hover:bg-[#F5F5F5] transition-colors">
-            <Camera size={13} className="text-[#555555]" />
-          </button>
-        </div>
-        <h2 style={{ fontSize: 18, fontWeight: 700 }} className="text-black">{displayName}</h2>
-        <p style={{ fontSize: 13 }} className="text-[#777777]">{userEmail}</p>
-        <div className="flex items-center justify-center gap-2 mt-2">
-          {memberSince && (
-            <p style={{ fontSize: 11 }} className="text-[#BBBBBB]">Membro desde {memberSince}</p>
-          )}
-          <span
-            className="inline-block px-2 py-0.5 rounded-full"
-            style={{ fontSize: 10, fontWeight: 600, backgroundColor: plano === "pro" ? "#111111" : "#F0F0F0", color: plano === "pro" ? "#FFFFFF" : "#555555" }}
-          >
-            {plano === "pro" ? "Plano Pro" : "Plano Free"}
-          </span>
-        </div>
-      </div>
+    <>
+      <div style={{ padding: "20px", maxWidth: 680, margin: "0 auto" }} className="lg:p-6">
 
-      {/* Dados Pessoais */}
-      <div className="bg-white rounded-lg border border-[#E0E0E0] mb-4 overflow-hidden" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#F0F0F0]">
-          <h3 style={{ fontSize: 14, fontWeight: 600 }} className="text-black">Dados Pessoais</h3>
-          {!editing ? (
-            <button
-              onClick={() => { setTempForm(form); setEditing(true) }}
-              className="flex items-center gap-1.5 text-[#555555] hover:text-black transition-colors"
-              style={{ fontSize: 12, fontWeight: 500 }}
-            >
-              <Edit3 size={13} />
-              Editar
+        {/* Profile card */}
+        <div style={{ ...cardStyle, padding: "24px", textAlign: "center", marginBottom: 20 }}>
+          <div style={{ position: "relative", display: "inline-block", marginBottom: 12 }}>
+            <div style={{
+              width: 72, height: 72, borderRadius: "50%",
+              background: "#0A0A0A", color: "#FFFFFF",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 26, fontWeight: 700, margin: "0 auto",
+            }}>
+              {avatarLetter}
+            </div>
+            <button style={{
+              position: "absolute", bottom: 0, right: 0,
+              width: 26, height: 26, borderRadius: "50%",
+              background: "#FFFFFF", border: "1px solid #E5E5E3",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              cursor: "pointer", boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
+            }}>
+              <Camera size={12} style={{ color: "#525252" }} />
             </button>
-          ) : (
-            <div className="flex gap-2">
+          </div>
+          <h2 style={{ fontSize: 18, fontWeight: 700, color: "#0A0A0A" }}>{displayName}</h2>
+          <p style={{ fontSize: 13, color: "#A3A3A3" }}>{userEmail}</p>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 8 }}>
+            {memberSince && (
+              <p style={{ fontSize: 11, color: "#A3A3A3" }}>Membro desde {memberSince}</p>
+            )}
+            <span style={{
+              fontSize: 10, fontWeight: 700, letterSpacing: "0.04em",
+              padding: "2px 8px", borderRadius: 10,
+              backgroundColor: plano === "pro" ? "#0A0A0A" : "#F5F5F0",
+              color: plano === "pro" ? "#FFFFFF" : "#525252",
+            }}>
+              {plano === "pro" ? "PRO" : "FREE"}
+            </span>
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <div style={{
+          display: "flex",
+          background: "#F5F5F0",
+          borderRadius: 10,
+          padding: 4,
+          marginBottom: 20,
+          gap: 4,
+        }}>
+          {TABS.map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => setActiveTab(key)}
+              style={{
+                flex: 1, padding: "8px 4px", border: "none",
+                borderRadius: 7, cursor: "pointer",
+                fontSize: 12, fontWeight: activeTab === key ? 600 : 400,
+                transition: "all 0.15s",
+                backgroundColor: activeTab === key ? "#FFFFFF" : "transparent",
+                color: activeTab === key ? "#0A0A0A" : "#525252",
+                boxShadow: activeTab === key ? "0 1px 4px rgba(0,0,0,0.08)" : "none",
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* TAB: Dados pessoais */}
+        {activeTab === "dados" && (
+          <>
+            {/* Dados pessoais */}
+            <div style={cardStyle}>
+              <div style={{
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+                padding: "16px 20px", borderBottom: "1px solid #F5F5F0",
+              }}>
+                <h3 style={{ fontSize: 14, fontWeight: 600, color: "#0A0A0A" }}>Dados Pessoais</h3>
+                {!editing ? (
+                  <button
+                    onClick={() => { setTempForm(form); setEditing(true) }}
+                    style={{
+                      display: "flex", alignItems: "center", gap: 6,
+                      background: "none", border: "none", cursor: "pointer",
+                      fontSize: 12, fontWeight: 500, color: "#525252", transition: "color 0.15s",
+                    }}
+                    onMouseOver={(e) => (e.currentTarget.style.color = "#0A0A0A")}
+                    onMouseOut={(e) => (e.currentTarget.style.color = "#525252")}
+                  >
+                    <Edit3 size={13} />
+                    Editar
+                  </button>
+                ) : (
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button
+                      onClick={() => { setTempForm(form); setEditing(false); setFieldErrors({}) }}
+                      disabled={saving}
+                      style={{
+                        display: "flex", alignItems: "center", gap: 4,
+                        padding: "5px 12px", border: "1px solid #E5E5E3",
+                        borderRadius: 7, fontSize: 12, fontWeight: 500,
+                        color: "#525252", background: "#FFFFFF", cursor: "pointer",
+                      }}
+                    >
+                      <X size={12} /> Cancelar
+                    </button>
+                    <button
+                      onClick={handleSave}
+                      disabled={saving}
+                      style={{
+                        display: "flex", alignItems: "center", gap: 4,
+                        padding: "5px 12px", border: "none",
+                        borderRadius: 7, fontSize: 12, fontWeight: 600,
+                        color: "#FFFFFF", background: "#0A0A0A", cursor: "pointer",
+                      }}
+                    >
+                      {saving
+                        ? <span style={{ width: 12, height: 12, border: "1.5px solid rgba(255,255,255,0.4)", borderTopColor: "#FFF", borderRadius: "50%", display: "inline-block", animation: "spin 0.7s linear infinite" }} />
+                        : <Check size={12} />
+                      }
+                      Salvar
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                {[
+                  { label: "Nome Completo", field: "nome", type: "text", placeholder: "Seu nome" },
+                  { label: "Telefone", field: "telefone", type: "tel", placeholder: "(11) 99999-0000" },
+                  { label: "Data de Nascimento", field: "data_nascimento", type: "date", placeholder: "" },
+                ].map(({ label, field, type, placeholder }, idx, arr) => (
+                  <div key={field} style={{
+                    padding: "14px 20px",
+                    borderBottom: idx < arr.length - 1 ? "1px solid #F5F5F0" : "none",
+                  }}>
+                    <label style={{ fontSize: 11, fontWeight: 500, color: "#A3A3A3", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>
+                      {label}
+                    </label>
+                    {editing ? (
+                      <>
+                        <input
+                          type={type}
+                          value={(tempForm as any)[field]}
+                          onChange={(e) => {
+                            setTempForm({ ...tempForm, [field]: e.target.value })
+                            if (fieldErrors[field]) setFieldErrors((p) => ({ ...p, [field]: "" }))
+                          }}
+                          placeholder={placeholder}
+                          style={{
+                            ...inputStyle,
+                            borderColor: fieldErrors[field] ? "#EF4444" : "#E0E0E0",
+                          }}
+                          onFocus={(e) => (e.currentTarget.style.borderColor = fieldErrors[field] ? "#EF4444" : "#0A0A0A")}
+                          onBlur={(e) => (e.currentTarget.style.borderColor = fieldErrors[field] ? "#EF4444" : "#E0E0E0")}
+                        />
+                        {fieldErrors[field] && (
+                          <p style={{ fontSize: 12, color: "#EF4444", marginTop: 4 }}>{fieldErrors[field]}</p>
+                        )}
+                      </>
+                    ) : (
+                      <p style={{ fontSize: 14, fontWeight: 500, color: "#0A0A0A" }}>
+                        {field === "data_nascimento"
+                          ? form.data_nascimento
+                            ? new Date(form.data_nascimento + "T00:00:00").toLocaleDateString("pt-BR")
+                            : "—"
+                          : (form as any)[field] || "—"
+                        }
+                      </p>
+                    )}
+                  </div>
+                ))}
+                <div style={{ padding: "14px 20px", borderTop: "1px solid #F5F5F0" }}>
+                  <label style={{ fontSize: 11, fontWeight: 500, color: "#A3A3A3", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>
+                    Email
+                  </label>
+                  <p style={{ fontSize: 14, fontWeight: 500, color: "#0A0A0A" }}>{userEmail}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Renda mensal */}
+            <div style={cardStyle}>
+              <div style={{ padding: "16px 20px", borderBottom: "1px solid #F5F5F0" }}>
+                <h3 style={{ fontSize: 14, fontWeight: 600, color: "#0A0A0A" }}>Renda Mensal</h3>
+                <p style={{ fontSize: 12, color: "#A3A3A3", marginTop: 2 }}>
+                  Configure para análises e score mais precisos
+                </p>
+              </div>
+              <div style={{ padding: "20px" }}>
+                <div style={{
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                  padding: "16px 20px", background: "#F0FDF4",
+                  border: "1px solid #BBF7D0", borderRadius: 12, marginBottom: 16,
+                }}>
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                      <TrendingUp size={14} style={{ color: "#15803D" }} />
+                      <p style={{ fontSize: 12, fontWeight: 500, color: "#15803D" }}>Renda mensal configurada</p>
+                    </div>
+                    <p style={{ fontSize: 26, fontWeight: 800, color: "#15803D", letterSpacing: "-0.02em" }}>
+                      {rendaMensal > 0 ? fmt(rendaMensal) : "Não configurada"}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setIncomeModalOpen(true)}
+                    style={{
+                      padding: "8px 16px", border: "none", borderRadius: 8,
+                      fontSize: 13, fontWeight: 600, color: "#FFFFFF",
+                      background: "#16A34A", cursor: "pointer",
+                      transition: "background 0.15s",
+                    }}
+                    onMouseOver={(e) => (e.currentTarget.style.background = "#15803D")}
+                    onMouseOut={(e) => (e.currentTarget.style.background = "#16A34A")}
+                  >
+                    {rendaMensal > 0 ? "Editar" : "Configurar"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* TAB: Plano */}
+        {activeTab === "plano" && (
+          <div style={cardStyle}>
+            <div style={{ padding: "20px" }}>
+              {plano === "pro" ? (
+                <div style={{ padding: "20px", background: "#F0FDF4", border: "1px solid #BBF7D0", borderRadius: 12, marginBottom: 16 }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 12 }}>
+                    <div>
+                      <h3 style={{ fontSize: 18, fontWeight: 700, color: "#0A0A0A" }}>Openfy Pro</h3>
+                      <p style={{ fontSize: 12, color: "#A3A3A3", marginTop: 2 }}>R$ 19,90/mês</p>
+                    </div>
+                    <span style={{
+                      fontSize: 10, fontWeight: 700, letterSpacing: "0.04em",
+                      padding: "3px 10px", borderRadius: 10,
+                      backgroundColor: "#16A34A", color: "#FFFFFF",
+                    }}>
+                      ATIVO
+                    </span>
+                  </div>
+                  {[
+                    "Transações ilimitadas",
+                    "Score de Saúde completo com 5 pilares",
+                    "Relatórios PDF e Excel",
+                    "Análise detalhada de gastos",
+                  ].map((feature) => (
+                    <div key={feature} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                      <Check size={14} style={{ color: "#16A34A", flexShrink: 0 }} />
+                      <span style={{ fontSize: 13, color: "#525252" }}>{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div style={{ padding: "20px", background: "#F5F5F0", borderRadius: 12, marginBottom: 16 }}>
+                  <h3 style={{ fontSize: 16, fontWeight: 700, color: "#0A0A0A", marginBottom: 4 }}>Plano Free</h3>
+                  <p style={{ fontSize: 13, color: "#A3A3A3", marginBottom: 16 }}>Você está usando o plano gratuito</p>
+                  <div style={{ padding: "16px", background: "#0A0A0A", borderRadius: 10, color: "#FFFFFF" }}>
+                    <p style={{ fontSize: 13, fontWeight: 700, marginBottom: 4 }}>Upgrade para Pro</p>
+                    <p style={{ fontSize: 12, color: "#A3A3A3", marginBottom: 12 }}>
+                      IA + Score completo + relatórios ilimitados
+                    </p>
+                    <a
+                      href="/#precos"
+                      style={{
+                        display: "inline-block", padding: "9px 20px",
+                        background: "#16A34A", color: "#FFFFFF",
+                        borderRadius: 8, fontSize: 13, fontWeight: 700,
+                        textDecoration: "none",
+                      }}
+                    >
+                      Ver planos →
+                    </a>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* TAB: Preferências */}
+        {activeTab === "preferencias" && (
+          <>
+            <div style={cardStyle}>
+              <div style={{ padding: "16px 20px", borderBottom: "1px solid #F5F5F0" }}>
+                <h3 style={{ fontSize: 14, fontWeight: 600, color: "#0A0A0A" }}>Meta de Economia</h3>
+                <p style={{ fontSize: 12, color: "#A3A3A3", marginTop: 2 }}>Meta mensal de economia (R$)</p>
+              </div>
+              <div style={{ padding: "20px", display: "flex", gap: 12 }}>
+                <div style={{ display: "flex", alignItems: "center", border: "1px solid #E5E5E3", borderRadius: 10, padding: "10px 14px", flex: 1, transition: "border-color 0.15s" }}>
+                  <span style={{ fontSize: 15, fontWeight: 600, color: "#A3A3A3", marginRight: 8 }}>R$</span>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={metaEconomia}
+                    onChange={(e) => setMetaEconomia(e.target.value)}
+                    placeholder="0,00"
+                    style={{ flex: 1, border: "none", outline: "none", fontSize: 18, fontWeight: 700, color: "#0A0A0A", background: "transparent" }}
+                    onFocus={(e) => { e.currentTarget.parentElement!.style.borderColor = "#0A0A0A" }}
+                    onBlur={(e) => { e.currentTarget.parentElement!.style.borderColor = "#E5E5E3" }}
+                  />
+                </div>
+                <button
+                  onClick={handleSaveMeta}
+                  style={{
+                    padding: "0 20px", border: "none", borderRadius: 10,
+                    fontSize: 13, fontWeight: 600, color: "#FFFFFF",
+                    background: "#0A0A0A", cursor: "pointer", transition: "background 0.15s",
+                  }}
+                  onMouseOver={(e) => (e.currentTarget.style.background = "#262626")}
+                  onMouseOut={(e) => (e.currentTarget.style.background = "#0A0A0A")}
+                >
+                  Salvar
+                </button>
+              </div>
+            </div>
+
+            <div style={cardStyle}>
+              <div style={{ padding: "16px 20px", borderBottom: "1px solid #F5F5F0" }}>
+                <h3 style={{ fontSize: 14, fontWeight: 600, color: "#0A0A0A" }}>Configurações</h3>
+              </div>
+
+              {[
+                {
+                  icon: Bell, label: "Notificações", sub: "Alertas de gastos e limites",
+                  control: (
+                    <button
+                      onClick={() => {
+                        setNotifications(!notifications)
+                        toast.success(notifications ? "Notificações desativadas" : "Notificações ativadas", { duration: 2000 })
+                      }}
+                      style={{
+                        position: "relative", width: 44, height: 24, borderRadius: 12,
+                        border: "none", cursor: "pointer", transition: "background 0.2s",
+                        backgroundColor: notifications ? "#0A0A0A" : "#E5E5E3",
+                        flexShrink: 0,
+                      }}
+                    >
+                      <span style={{
+                        position: "absolute", top: 2, left: 2,
+                        width: 20, height: 20, borderRadius: "50%",
+                        background: "#FFFFFF", boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+                        transition: "transform 0.2s",
+                        transform: notifications ? "translateX(20px)" : "translateX(0)",
+                      }} />
+                    </button>
+                  ),
+                },
+                {
+                  icon: DollarSign, label: "Moeda", sub: "Moeda padrão para exibição",
+                  control: (
+                    <select
+                      value={currency}
+                      onChange={(e) => setCurrency(e.target.value)}
+                      style={{ border: "1px solid #E5E5E3", borderRadius: 7, padding: "5px 8px", fontSize: 12, color: "#0A0A0A", outline: "none" }}
+                    >
+                      <option value="BRL">R$ BRL</option>
+                      <option value="USD">$ USD</option>
+                      <option value="EUR">€ EUR</option>
+                    </select>
+                  ),
+                },
+                {
+                  icon: Globe, label: "Idioma", sub: "Idioma da interface",
+                  control: (
+                    <select
+                      value={language}
+                      onChange={(e) => setLanguage(e.target.value)}
+                      style={{ border: "1px solid #E5E5E3", borderRadius: 7, padding: "5px 8px", fontSize: 12, color: "#0A0A0A", outline: "none" }}
+                    >
+                      <option>Português</option>
+                      <option>English</option>
+                      <option>Español</option>
+                    </select>
+                  ),
+                },
+              ].map(({ icon: Icon, label, sub, control }, idx, arr) => (
+                <div key={label} style={{
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                  padding: "14px 20px",
+                  borderBottom: idx < arr.length - 1 ? "1px solid #F5F5F0" : "none",
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{ width: 32, height: 32, background: "#F5F5F0", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <Icon size={15} style={{ color: "#525252" }} />
+                    </div>
+                    <div>
+                      <p style={{ fontSize: 13, fontWeight: 500, color: "#0A0A0A" }}>{label}</p>
+                      <p style={{ fontSize: 11, color: "#A3A3A3" }}>{sub}</p>
+                    </div>
+                  </div>
+                  {control}
+                </div>
+              ))}
+
+              <div style={{
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+                padding: "14px 20px",
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ width: 32, height: 32, background: "#F5F5F0", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Shield size={15} style={{ color: "#525252" }} />
+                  </div>
+                  <div>
+                    <p style={{ fontSize: 13, fontWeight: 500, color: "#0A0A0A" }}>Segurança</p>
+                    <p style={{ fontSize: 11, color: "#A3A3A3" }}>Autenticação e privacidade</p>
+                  </div>
+                </div>
+                <ChevronRight size={16} style={{ color: "#A3A3A3" }} />
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* TAB: Segurança */}
+        {activeTab === "seguranca" && (
+          <>
+            <div style={cardStyle}>
+              <div style={{ padding: "16px 20px", borderBottom: "1px solid #F5F5F0" }}>
+                <h3 style={{ fontSize: 14, fontWeight: 600, color: "#0A0A0A" }}>Alterar Senha</h3>
+              </div>
+              <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: 12 }}>
+                {["Senha atual", "Nova senha", "Confirmar nova senha"].map((label) => (
+                  <div key={label}>
+                    <label style={{ fontSize: 11, fontWeight: 500, color: "#A3A3A3", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>
+                      {label}
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="••••••••"
+                      style={inputStyle}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = "#0A0A0A")}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = "#E0E0E0")}
+                    />
+                  </div>
+                ))}
+                <button
+                  style={{
+                    alignSelf: "flex-start", padding: "10px 24px",
+                    border: "none", borderRadius: 8, fontSize: 13, fontWeight: 600,
+                    color: "#FFFFFF", background: "#0A0A0A", cursor: "pointer",
+                    transition: "background 0.15s",
+                  }}
+                  onMouseOver={(e) => (e.currentTarget.style.background = "#262626")}
+                  onMouseOut={(e) => (e.currentTarget.style.background = "#0A0A0A")}
+                >
+                  Atualizar senha
+                </button>
+              </div>
+            </div>
+
+            <div style={{ ...cardStyle, border: "1px solid #FCA5A5" }}>
+              <div style={{ padding: "16px 20px", borderBottom: "1px solid #FCA5A5" }}>
+                <h3 style={{ fontSize: 14, fontWeight: 600, color: "#DC2626" }}>Zona de Perigo</h3>
+              </div>
+              <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: 20 }}>
+                <div>
+                  <p style={{ fontSize: 13, fontWeight: 500, color: "#0A0A0A", marginBottom: 4 }}>Exportar dados (LGPD)</p>
+                  <p style={{ fontSize: 12, color: "#A3A3A3", marginBottom: 12 }}>
+                    Baixe todos os seus dados em formato JSON
+                  </p>
+                  <button
+                    style={{
+                      padding: "9px 20px", border: "1px solid #E5E5E3",
+                      borderRadius: 8, fontSize: 13, fontWeight: 500,
+                      color: "#525252", background: "#FFFFFF", cursor: "pointer",
+                    }}
+                    onClick={() => toast.info("Exportação de dados em breve")}
+                  >
+                    Exportar meus dados
+                  </button>
+                </div>
+                <div style={{ borderTop: "1px solid #FEE2E2", paddingTop: 20 }}>
+                  <p style={{ fontSize: 13, fontWeight: 500, color: "#DC2626", marginBottom: 4 }}>Excluir conta</p>
+                  <p style={{ fontSize: 12, color: "#A3A3A3", marginBottom: 12 }}>
+                    Esta ação é irreversível. Todos os seus dados serão excluídos permanentemente.
+                  </p>
+                  <button
+                    style={{
+                      padding: "9px 20px", border: "none",
+                      borderRadius: 8, fontSize: 13, fontWeight: 600,
+                      color: "#FFFFFF", background: "#DC2626", cursor: "pointer",
+                    }}
+                    onClick={() => toast.error("Funcionalidade em desenvolvimento")}
+                  >
+                    Excluir minha conta
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Logout */}
+        {!showLogoutConfirm ? (
+          <button
+            onClick={() => setShowLogoutConfirm(true)}
+            style={{
+              width: "100%", padding: "12px 0",
+              border: "1px solid #E5E5E3", borderRadius: 12,
+              fontSize: 14, fontWeight: 600, color: "#DC2626",
+              background: "#FFFFFF", cursor: "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              transition: "all 0.15s",
+            }}
+            onMouseOver={(e) => { e.currentTarget.style.background = "#FEF2F2"; e.currentTarget.style.borderColor = "#DC2626" }}
+            onMouseOut={(e) => { e.currentTarget.style.background = "#FFFFFF"; e.currentTarget.style.borderColor = "#E5E5E3" }}
+          >
+            <LogOut size={16} />
+            Sair da Conta
+          </button>
+        ) : (
+          <div style={{ ...cardStyle, padding: "20px" }}>
+            <p style={{ fontSize: 14, fontWeight: 600, color: "#0A0A0A", marginBottom: 4 }}>Confirmar saída?</p>
+            <p style={{ fontSize: 13, color: "#A3A3A3", marginBottom: 16 }}>
+              Você será desconectado da sua conta.
+            </p>
+            <div style={{ display: "flex", gap: 12 }}>
               <button
-                onClick={handleCancel}
-                disabled={saving}
-                className="flex items-center gap-1 px-3 py-1 border border-[#E0E0E0] rounded-md text-[#555555] hover:bg-[#F5F5F5] transition-colors disabled:opacity-50"
-                style={{ fontSize: 12 }}
+                onClick={() => setShowLogoutConfirm(false)}
+                disabled={loggingOut}
+                style={{
+                  flex: 1, padding: "11px 0",
+                  border: "1px solid #E5E5E3", borderRadius: 8,
+                  fontSize: 14, fontWeight: 500, color: "#525252",
+                  background: "#FFFFFF", cursor: "pointer",
+                }}
               >
-                <X size={12} />
                 Cancelar
               </button>
               <button
-                onClick={handleSave}
-                disabled={saving}
-                className="flex items-center gap-1 px-3 py-1 bg-black text-white rounded-md hover:bg-[#333333] transition-colors disabled:opacity-50"
-                style={{ fontSize: 12 }}
+                onClick={handleLogout}
+                disabled={loggingOut}
+                style={{
+                  flex: 1, padding: "11px 0",
+                  border: "none", borderRadius: 8,
+                  fontSize: 14, fontWeight: 600, color: "#FFFFFF",
+                  background: "#DC2626", cursor: "pointer",
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                }}
               >
-                {saving ? (
-                  <span className="w-3 h-3 border border-white/40 border-t-white rounded-full animate-spin" />
-                ) : (
-                  <Check size={12} />
-                )}
-                Salvar
+                {loggingOut
+                  ? <span style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,0.4)", borderTopColor: "#FFF", borderRadius: "50%", display: "inline-block", animation: "spin 0.7s linear infinite" }} />
+                  : <LogOut size={14} />
+                }
+                {loggingOut ? "Saindo..." : "Confirmar saída"}
               </button>
             </div>
-          )}
-        </div>
-
-        <div className="divide-y divide-[#F5F5F5]">
-          {/* Nome */}
-          <div className="px-5 py-4">
-            <label style={{ fontSize: 11, fontWeight: 500 }} className="text-[#777777] uppercase tracking-wider block mb-1.5">
-              Nome Completo
-            </label>
-            {editing ? (
-              <>
-                <input
-                  type="text"
-                  value={tempForm.nome}
-                  onChange={(e) => {
-                    setTempForm({ ...tempForm, nome: e.target.value })
-                    if (fieldErrors.nome) setFieldErrors((prev) => ({ ...prev, nome: "" }))
-                  }}
-                  className={`w-full border rounded-md px-3 py-2 outline-none transition-colors text-black ${fieldErrors.nome ? "border-[#D32F2F] focus:border-[#D32F2F]" : "border-[#E0E0E0] focus:border-black"}`}
-                  style={{ fontSize: 14 }}
-                />
-                {fieldErrors.nome && (
-                  <p style={{ fontSize: 12 }} className="text-[#D32F2F] mt-1">{fieldErrors.nome}</p>
-                )}
-              </>
-            ) : (
-              <p style={{ fontSize: 14, fontWeight: 500 }} className="text-black">{form.nome || "—"}</p>
-            )}
           </div>
+        )}
 
-          {/* Email (somente leitura) */}
-          <div className="px-5 py-4">
-            <label style={{ fontSize: 11, fontWeight: 500 }} className="text-[#777777] uppercase tracking-wider block mb-1.5">
-              Email
-            </label>
-            <p style={{ fontSize: 14, fontWeight: 500 }} className="text-black">{userEmail}</p>
-          </div>
-
-          {/* Telefone */}
-          <div className="px-5 py-4">
-            <label style={{ fontSize: 11, fontWeight: 500 }} className="text-[#777777] uppercase tracking-wider block mb-1.5">
-              Telefone
-            </label>
-            {editing ? (
-              <>
-                <input
-                  type="tel"
-                  value={tempForm.telefone}
-                  onChange={(e) => {
-                    setTempForm({ ...tempForm, telefone: e.target.value })
-                    if (fieldErrors.telefone) setFieldErrors((prev) => ({ ...prev, telefone: "" }))
-                  }}
-                  placeholder="(11) 99999-0000"
-                  className={`w-full border rounded-md px-3 py-2 outline-none transition-colors text-black ${fieldErrors.telefone ? "border-[#D32F2F] focus:border-[#D32F2F]" : "border-[#E0E0E0] focus:border-black"}`}
-                  style={{ fontSize: 14 }}
-                />
-                {fieldErrors.telefone && (
-                  <p style={{ fontSize: 12 }} className="text-[#D32F2F] mt-1">{fieldErrors.telefone}</p>
-                )}
-              </>
-            ) : (
-              <p style={{ fontSize: 14, fontWeight: 500 }} className="text-black">{form.telefone || "—"}</p>
-            )}
-          </div>
-
-          {/* Data de nascimento */}
-          <div className="px-5 py-4">
-            <label style={{ fontSize: 11, fontWeight: 500 }} className="text-[#777777] uppercase tracking-wider block mb-1.5">
-              Data de Nascimento
-            </label>
-            {editing ? (
-              <input
-                type="date"
-                value={tempForm.data_nascimento}
-                onChange={(e) => setTempForm({ ...tempForm, data_nascimento: e.target.value })}
-                className="w-full border border-[#E0E0E0] rounded-md px-3 py-2 outline-none focus:border-black transition-colors text-black"
-                style={{ fontSize: 14 }}
-              />
-            ) : (
-              <p style={{ fontSize: 14, fontWeight: 500 }} className="text-black">
-                {form.data_nascimento
-                  ? new Date(form.data_nascimento + "T00:00:00").toLocaleDateString("pt-BR")
-                  : "—"}
-              </p>
-            )}
-          </div>
-        </div>
+        <p style={{ fontSize: 11, textAlign: "center", color: "#A3A3A3", marginTop: 20 }}>
+          Openfy v1.0.0 · © {new Date().getFullYear()}
+        </p>
       </div>
 
-      {/* Configurações */}
-      <div className="bg-white rounded-lg border border-[#E0E0E0] mb-4 overflow-hidden" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
-        <div className="px-5 py-4 border-b border-[#F0F0F0]">
-          <h3 style={{ fontSize: 14, fontWeight: 600 }} className="text-black">Configurações</h3>
-        </div>
-
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#F5F5F5]">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-[#F5F5F5] rounded-lg flex items-center justify-center">
-              <Bell size={15} className="text-[#555555]" />
-            </div>
-            <div>
-              <p style={{ fontSize: 13, fontWeight: 500 }} className="text-black">Notificações</p>
-              <p style={{ fontSize: 11 }} className="text-[#999999]">Alertas de gastos e limites</p>
-            </div>
-          </div>
-          <button
-            onClick={() => {
-              setNotifications(!notifications)
-              toast.success(notifications ? "Notificações desativadas" : "Notificações ativadas", { duration: 2000 })
-            }}
-            className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${notifications ? "bg-black" : "bg-[#E0E0E0]"}`}
-          >
-            <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${notifications ? "translate-x-5" : ""}`} />
-          </button>
-        </div>
-
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#F5F5F5]">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-[#F5F5F5] rounded-lg flex items-center justify-center">
-              <DollarSign size={15} className="text-[#555555]" />
-            </div>
-            <div>
-              <p style={{ fontSize: 13, fontWeight: 500 }} className="text-black">Moeda</p>
-              <p style={{ fontSize: 11 }} className="text-[#999999]">Moeda padrão para exibição</p>
-            </div>
-          </div>
-          <select
-            value={currency}
-            onChange={(e) => setCurrency(e.target.value)}
-            className="border border-[#E0E0E0] rounded-md px-2 py-1 text-black outline-none focus:border-black bg-white"
-            style={{ fontSize: 12 }}
-          >
-            <option value="BRL">R$ BRL</option>
-            <option value="USD">$ USD</option>
-            <option value="EUR">€ EUR</option>
-          </select>
-        </div>
-
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#F5F5F5]">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-[#F5F5F5] rounded-lg flex items-center justify-center">
-              <Globe size={15} className="text-[#555555]" />
-            </div>
-            <div>
-              <p style={{ fontSize: 13, fontWeight: 500 }} className="text-black">Idioma</p>
-              <p style={{ fontSize: 11 }} className="text-[#999999]">Idioma da interface</p>
-            </div>
-          </div>
-          <select
-            value={language}
-            onChange={(e) => setLanguage(e.target.value)}
-            className="border border-[#E0E0E0] rounded-md px-2 py-1 text-black outline-none focus:border-black bg-white"
-            style={{ fontSize: 12 }}
-          >
-            <option>Português</option>
-            <option>English</option>
-            <option>Español</option>
-          </select>
-        </div>
-
-        <div className="flex items-center justify-between px-5 py-4">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-[#F5F5F5] rounded-lg flex items-center justify-center">
-              <Shield size={15} className="text-[#555555]" />
-            </div>
-            <div>
-              <p style={{ fontSize: 13, fontWeight: 500 }} className="text-black">Segurança</p>
-              <p style={{ fontSize: 11 }} className="text-[#999999]">Alterar senha e autenticação</p>
-            </div>
-          </div>
-          <ChevronRight size={16} className="text-[#BBBBBB]" />
-        </div>
-      </div>
-
-      {/* Logout */}
-      {!showLogoutConfirm ? (
-        <button
-          onClick={() => setShowLogoutConfirm(true)}
-          className="w-full py-3 border border-[#E0E0E0] rounded-lg text-[#D32F2F] hover:bg-[#FFEBEE] hover:border-[#D32F2F] transition-colors flex items-center justify-center gap-2"
-          style={{ fontSize: 14, fontWeight: 600 }}
-        >
-          <LogOut size={16} />
-          Sair da Conta
-        </button>
-      ) : (
-        <div className="bg-white border border-[#E0E0E0] rounded-lg p-5" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
-          <p style={{ fontSize: 14, fontWeight: 600 }} className="text-black mb-1">Confirmar saída?</p>
-          <p style={{ fontSize: 13 }} className="text-[#777777] mb-4">Você será desconectado da sua conta.</p>
-          <div className="flex gap-3">
-            <button
-              onClick={() => setShowLogoutConfirm(false)}
-              disabled={loggingOut}
-              className="flex-1 py-2.5 border border-[#E0E0E0] rounded-lg text-[#333333] hover:bg-[#F5F5F5] transition-colors disabled:opacity-50"
-              style={{ fontSize: 14, fontWeight: 500 }}
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={handleLogout}
-              disabled={loggingOut}
-              className="flex-1 py-2.5 bg-[#D32F2F] text-white rounded-lg hover:bg-[#B71C1C] transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-              style={{ fontSize: 14, fontWeight: 600 }}
-            >
-              {loggingOut ? (
-                <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-              ) : (
-                <LogOut size={14} />
-              )}
-              {loggingOut ? "Saindo..." : "Confirmar"}
-            </button>
-          </div>
-        </div>
-      )}
-
-      <p style={{ fontSize: 11 }} className="text-center text-[#BBBBBB] mt-6">
-        Open Finance v1.0.0 · © {new Date().getFullYear()}
-      </p>
-    </div>
+      <ConfigureIncomeModal
+        open={incomeModalOpen}
+        onOpenChange={setIncomeModalOpen}
+        onSuccess={(total) => {
+          setProfile((prev) => prev ? { ...prev, renda_mensal: total } : prev)
+        }}
+      />
+    </>
   )
 }

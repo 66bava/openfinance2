@@ -1,0 +1,52 @@
+<svg width="1440" height="900" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1440" height="900" fill="#F5F5F0"/>
+  
+  <rect x="0" y="0" width="280" height="900" fill="#0A0A0A"/>
+  <text x="40" y="50" font-family="DM Sans" font-size="24" font-weight="700" fill="#16A34A">Openfy</text>
+  
+  <rect x="20" y="240" width="240" height="48" rx="8" fill="#16A34A"/>
+  <text x="40" y="268" font-family="Inter" font-size="15" font-weight="600" fill="#FFFFFF">🔍 Análise</text>
+  
+  <rect x="280" y="0" width="1160" height="80" fill="#FFFFFF"/>
+  <text x="320" y="50" font-family="DM Sans" font-size="32" font-weight="700" fill="#0A0A0A">Análise Detalhada</text>
+  
+  <rect x="320" y="120" width="250" height="100" rx="12" fill="#FFFFFF"/>
+  <text x="340" y="145" font-family="Inter" font-size="13" fill="#666666">Taxa Poupança</text>
+  <text x="340" y="180" font-family="DM Sans" font-size="32" font-weight="700" fill="#16A34A">23%</text>
+  
+  <rect x="590" y="120" width="250" height="100" rx="12" fill="#FFFFFF"/>
+  <text x="610" y="145" font-family="Inter" font-size="13" fill="#666666">Média Diária</text>
+  <text x="610" y="180" font-family="DM Sans" font-size="32" font-weight="700" fill="#0A0A0A">R$ 230</text>
+  
+  <rect x="860" y="120" width="250" height="100" rx="12" fill="#FFFFFF"/>
+  <text x="880" y="145" font-family="Inter" font-size="13" fill="#666666">Maior Gasto</text>
+  <text x="880" y="180" font-family="DM Sans" font-size="32" font-weight="700" fill="#0A0A0A">R$ 890</text>
+  
+  <rect x="1130" y="120" width="250" height="100" rx="12" fill="#FFFFFF"/>
+  <text x="1150" y="145" font-family="Inter" font-size="13" fill="#666666">Menor Gasto</text>
+  <text x="1150" y="180" font-family="DM Sans" font-size="32" font-weight="700" fill="#0A0A0A">R$ 12</text>
+  
+  <rect x="320" y="240" width="520" height="300" rx="12" fill="#FFFFFF"/>
+  <text x="350" y="270" font-family="Inter" font-size="18" font-weight="600" fill="#0A0A0A">Gastos por categoria</text>
+  
+  <circle cx="510" cy="390" r="80" fill="none" stroke="#16A34A" stroke-width="40" stroke-dasharray="175 500" transform="rotate(-90 510 390)"/>
+  <circle cx="510" cy="390" r="80" fill="none" stroke="#0A0A0A" stroke-width="40" stroke-dasharray="85 500" stroke-dashoffset="-175" transform="rotate(-90 510 390)"/>
+  
+  <rect x="650" y="340" width="15" height="15" rx="3" fill="#16A34A"/>
+  <text x="675" y="352" font-family="Inter" font-size="13" fill="#0A0A0A">Alimentação</text>
+  <text x="800" y="352" font-family="Inter" font-size="13" font-weight="600" fill="#0A0A0A" text-anchor="end">R$ 2.450 (35%)</text>
+  
+  <rect x="650" y="370" width="15" height="15" rx="3" fill="#0A0A0A"/>
+  <text x="675" y="382" font-family="Inter" font-size="13" fill="#0A0A0A">Transporte</text>
+  <text x="800" y="382" font-family="Inter" font-size="13" font-weight="600" fill="#0A0A0A" text-anchor="end">R$ 1.200 (17%)</text>
+  
+  <rect x="860" y="240" width="520" height="140" rx="12" fill="#FFFFFF"/>
+  <text x="890" y="270" font-family="Inter" font-size="18" font-weight="600" fill="#0A0A0A">Top 5 maiores despesas</text>
+  
+  <text x="910" y="310" font-family="Inter" font-size="15" fill="#0A0A0A">1. Mercado Extra</text>
+  <text x="1340" y="310" font-family="Inter" font-size="15" font-weight="600" fill="#0A0A0A" text-anchor="end">R$ 890</text>
+  <text x="910" y="340" font-family="Inter" font-size="15" fill="#0A0A0A">2. Uber viagem</text>
+  <text x="1340" y="340" font-family="Inter" font-size="15" font-weight="600" fill="#0A0A0A" text-anchor="end">R$ 450</text>
+  <text x="910" y="370" font-family="Inter" font-size="15" fill="#0A0A0A">3. Academia</text>
+  <text x="1340" y="370" font-family="Inter" font-size="15" font-weight="600" fill="#0A0A0A" text-anchor="end">R$ 199</text>
+</svg>

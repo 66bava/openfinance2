@@ -7,6 +7,7 @@ import Analysis from "./pages/Analysis"
 import Reports from "./pages/Reports"
 import Profile from "./pages/Profile"
 import Login from "./pages/login"
+import Cadastro from "./pages/Cadastro"
 import LandingPage from "./pages/LandingPage"
 import Privacidade from "./pages/Privacidade"
 import Termos from "./pages/Termos"
@@ -22,7 +23,7 @@ export const router = createBrowserRouter([
   },
   {
     path: "/cadastro",
-    Component: Login,
+    Component: Cadastro,
   },
   {
     path: "/privacidade",

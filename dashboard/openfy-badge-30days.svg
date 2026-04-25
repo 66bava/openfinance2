@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="160" height="160" id="svg-badge2" data-om-id="c299d454:403" data-src-loc="61606:61707:62508">
+          <rect x="14" y="20" width="52" height="46" rx="4" fill="#DCFCE7" data-src-loc="61718:61784"></rect>
+          <rect x="14" y="20" width="52" height="10" rx="4" fill="#16A34A" data-src-loc="61795:61861"></rect>
+          <rect x="14" y="26" width="52" height="4" fill="#16A34A" data-src-loc="61872:61930"></rect>
+          <line x1="26" y1="14" x2="26" y2="26" stroke="#14532D" stroke-width="3" stroke-linecap="round" data-src-loc="61941:62037"></line>
+          <line x1="54" y1="14" x2="54" y2="26" stroke="#14532D" stroke-width="3" stroke-linecap="round" data-src-loc="62048:62144"></line>
+          <g stroke="#16A34A" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round" data-om-id="c299d454:404" data-src-loc="62155:62253:62493">
+            <path d="M22 42 L26 46 L34 38" data-src-loc="62266:62298"></path>
+            <path d="M36 42 L40 46 L48 38" data-src-loc="62311:62343"></path>
+            <path d="M50 42 L54 46 L62 38" data-src-loc="62356:62388"></path>
+            <path d="M22 56 L26 60 L34 52" data-src-loc="62401:62433"></path>
+            <path d="M36 56 L40 60 L48 52" data-src-loc="62446:62478"></path>
+          </g>
+        </svg>

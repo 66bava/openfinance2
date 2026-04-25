@@ -1,0 +1,55 @@
+<svg width="600" height="600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="600" height="600" fill="#0A0A0A" opacity="0.5"/>
+  
+  <rect x="0" y="0" width="600" height="600" fill="#FFFFFF" rx="16"/>
+  
+  <circle cx="560" cy="40" r="16" fill="#E5E5E5"/>
+  <line x1="555" y1="35" x2="565" y2="45" stroke="#0A0A0A" stroke-width="2"/>
+  <line x1="565" y1="35" x2="555" y2="45" stroke="#0A0A0A" stroke-width="2"/>
+  
+  <text x="40" y="55" font-family="DM Sans" font-size="24" font-weight="700" fill="#0A0A0A">Configurar renda mensal</text>
+  
+  <text x="40" y="110" font-family="Inter" font-size="14" font-weight="500" fill="#0A0A0A">Sua renda principal</text>
+  <rect x="40" y="120" width="520" height="64" rx="8" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="1"/>
+  <text x="56" y="161" font-family="Inter" font-size="28" font-weight="600" fill="#0A0A0A">R$ _____,__</text>
+  
+  <text x="40" y="225" font-family="Inter" font-size="14" font-weight="500" fill="#0A0A0A">Outras fontes (opcional)</text>
+  
+  <rect x="40" y="240" width="520" height="180" rx="12" fill="#F5F5F0"/>
+  
+  <text x="60" y="270" font-family="Inter" font-size="13" font-weight="500" fill="#666666">Fonte</text>
+  <text x="360" y="270" font-family="Inter" font-size="13" font-weight="500" fill="#666666">Valor mensal</text>
+  
+  <rect x="60" y="285" width="260" height="44" rx="8" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="1"/>
+  <text x="80" y="312" font-family="Inter" font-size="15" fill="#0A0A0A">Freelance</text>
+  <polygon points="305,307 310,312 300,312" fill="#0A0A0A"/>
+  
+  <rect x="340" y="285" width="180" height="44" rx="8" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="1"/>
+  <text x="360" y="312" font-family="Inter" font-size="15" fill="#0A0A0A">R$ 2.000,00</text>
+  
+  <circle cx="540" cy="307" r="12" fill="#E5E5E5"/>
+  <line x1="536" y1="303" x2="544" y2="311" stroke="#0A0A0A" stroke-width="2"/>
+  <line x1="544" y1="303" x2="536" y2="311" stroke="#0A0A0A" stroke-width="2"/>
+  
+  <rect x="60" y="345" width="260" height="44" rx="8" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="1"/>
+  <text x="80" y="372" font-family="Inter" font-size="15" fill="#0A0A0A">Aluguel</text>
+  <polygon points="305,367 310,372 300,372" fill="#0A0A0A"/>
+  
+  <rect x="340" y="345" width="180" height="44" rx="8" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="1"/>
+  <text x="360" y="372" font-family="Inter" font-size="15" fill="#0A0A0A">R$ 1.500,00</text>
+  
+  <circle cx="540" cy="367" r="12" fill="#E5E5E5"/>
+  <line x1="536" y1="363" x2="544" y2="371" stroke="#0A0A0A" stroke-width="2"/>
+  <line x1="544" y1="363" x2="536" y2="371" stroke="#0A0A0A" stroke-width="2"/>
+  
+  <text x="60" y="445" font-family="Inter" font-size="14" font-weight="600" fill="#16A34A">+ Adicionar outra fonte</text>
+  
+  <rect x="40" y="460" width="520" height="60" rx="8" fill="#F5F5F0"/>
+  <text x="60" y="495" font-family="Inter" font-size="18" font-weight="600" fill="#0A0A0A">Renda total: R$ 16.000,00/mês</text>
+  
+  <rect x="40" y="540" width="120" height="48" rx="8" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="1"/>
+  <text x="100" y="568" font-family="Inter" font-size="15" font-weight="500" fill="#0A0A0A" text-anchor="middle">Cancelar</text>
+  
+  <rect x="440" y="540" width="120" height="48" rx="8" fill="#16A34A"/>
+  <text x="500" y="568" font-family="Inter" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">Salvar</text>
+</svg>

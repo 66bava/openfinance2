@@ -5,7 +5,7 @@ export default function Termos() {
     <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", minHeight: "100vh", backgroundColor: "#FFFFFF" }}>
       <nav style={{ borderBottom: "1px solid #F0F0F0", padding: "0 24px", height: 64, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <Link to="/" style={{ fontSize: 16, fontWeight: 700, color: "#111111", textDecoration: "none", letterSpacing: "-0.02em" }}>
-          Open Finance
+          Openfy
         </Link>
         <Link to="/" style={{ fontSize: 14, color: "#666666", textDecoration: "none" }}>← Voltar</Link>
       </nav>
@@ -18,15 +18,15 @@ export default function Termos() {
         {[
           {
             title: "1. Aceitação dos termos",
-            text: "Ao utilizar o Open Finance, você concorda com estes termos. Caso não concorde, não utilize o serviço.",
+            text: "Ao utilizar o Openfy, você concorda com estes termos. Caso não concorde, não utilize o serviço.",
           },
           {
             title: "2. Descrição do serviço",
-            text: "O Open Finance é uma ferramenta de gestão financeira pessoal que permite registrar transações, acompanhar metas e visualizar o Score de Saúde Financeira. O serviço é fornecido 'como está'.",
+            text: "O Openfy é uma ferramenta de gestão financeira pessoal que permite registrar transações, acompanhar metas e visualizar o Score de Saúde Financeira. O serviço é fornecido 'como está'.",
           },
           {
             title: "3. Contas e responsabilidades",
-            text: "Você é responsável por manter a segurança de sua conta e senha. Não compartilhe suas credenciais. O Open Finance não pode ser responsabilizado por acessos não autorizados decorrentes de negligência do usuário.",
+            text: "Você é responsável por manter a segurança de sua conta e senha. Não compartilhe suas credenciais. O Openfy não pode ser responsabilizado por acessos não autorizados decorrentes de negligência do usuário.",
           },
           {
             title: "4. Planos e pagamentos",
@@ -34,7 +34,7 @@ export default function Termos() {
           },
           {
             title: "5. Limitação de responsabilidade",
-            text: "O Open Finance não se responsabiliza por decisões financeiras tomadas com base nas informações exibidas no aplicativo. As informações são apenas orientativas.",
+            text: "O Openfy não se responsabiliza por decisões financeiras tomadas com base nas informações exibidas no aplicativo. As informações são apenas orientativas.",
           },
           {
             title: "6. Modificações",
@@ -42,7 +42,7 @@ export default function Termos() {
           },
           {
             title: "7. Contato",
-            text: "Dúvidas sobre os termos: suporte@openfinance.app",
+            text: "Dúvidas sobre os termos: suporte@openfy.app",
           },
         ].map((section) => (
           <section key={section.title} style={{ marginBottom: 36 }}>

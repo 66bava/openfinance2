@@ -1,0 +1,387 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900" role="img" aria-label="Openfy dashboard">
+  <defs>
+    
+    
+    
+    <filter id="card-shadow" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#0A0A0A" flood-opacity="0.04"></feDropShadow>
+    </filter>
+    
+    <linearGradient id="gauge-g" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#16A34A" stop-opacity=".6"></stop>
+      <stop offset="1" stop-color="#16A34A"></stop>
+    </linearGradient>
+    
+    <linearGradient id="area-g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#16A34A" stop-opacity=".22"></stop>
+      <stop offset="1" stop-color="#16A34A" stop-opacity="0"></stop>
+    </linearGradient>
+    <clipPath id="chart-clip">
+      <rect x="40" y="40" width="440" height="180" rx="4"></rect>
+    </clipPath>
+  </defs>
+
+  
+  <rect width="1200" height="900" fill="#F5F5F0"></rect>
+
+  
+  <g>
+    <rect x="0" y="0" width="80" height="900" fill="#FFFFFF"></rect>
+    <line x1="80" y1="0" x2="80" y2="900" stroke="#E8E8E6" stroke-width="1"></line>
+
+    
+    <g transform="translate(22 28)">
+      <rect x="0" y="20" width="10" height="6" rx="1.5" fill="#0A0A0A"></rect>
+      <rect x="13" y="12" width="10" height="6" rx="1.5" fill="#0A0A0A"></rect>
+      <rect x="26" y="4" width="10" height="6" rx="1.5" fill="#16A34A"></rect>
+    </g>
+
+    
+    
+    <rect x="0" y="118" width="3" height="36" rx="1.5" fill="#16A34A"></rect>
+
+    
+    <g transform="translate(28 128)">
+      <rect x="0" y="0" width="10" height="10" rx="2" fill="#0A0A0A"></rect>
+      <rect x="14" y="0" width="10" height="10" rx="2" fill="#0A0A0A"></rect>
+      <rect x="0" y="14" width="10" height="10" rx="2" fill="#0A0A0A"></rect>
+      <rect x="14" y="14" width="10" height="10" rx="2" fill="#16A34A"></rect>
+    </g>
+
+    
+    <g transform="translate(28 188)" stroke="#8B8B86" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 4 L4 20 M4 4 L1 8 M4 4 L7 8"></path>
+      <path d="M20 20 L20 4 M20 20 L17 16 M20 20 L23 16"></path>
+    </g>
+
+    
+    <g transform="translate(28 248)" stroke="#8B8B86" stroke-width="2" fill="none">
+      <circle cx="12" cy="12" r="11"></circle>
+      <circle cx="12" cy="12" r="6"></circle>
+      <circle cx="12" cy="12" r="1.8" fill="#8B8B86"></circle>
+    </g>
+
+    
+    <g transform="translate(28 308)" stroke="#8B8B86" stroke-width="2" fill="none" stroke-linecap="round">
+      <path d="M2 18 A10 10 0 0 1 22 18"></path>
+      <line x1="12" y1="18" x2="18" y2="10"></line>
+    </g>
+
+    
+    <g transform="translate(28 368)" fill="#8B8B86">
+      <rect x="1" y="14" width="4" height="9" rx="1"></rect>
+      <rect x="8" y="8" width="4" height="15" rx="1"></rect>
+      <rect x="15" y="2" width="4" height="21" rx="1"></rect>
+    </g>
+
+    
+    <g transform="translate(28 428)" stroke="#8B8B86" stroke-width="2" fill="none">
+      <circle cx="12" cy="12" r="3.5"></circle>
+      <path d="M12 2 L12 5 M12 19 L12 22 M2 12 L5 12 M19 12 L22 12 M5 5 L7 7 M17 17 L19 19 M5 19 L7 17 M17 7 L19 5" stroke-linecap="round"></path>
+    </g>
+
+    
+    <g transform="translate(22 840)">
+      <circle cx="18" cy="18" r="18" fill="#EFEEEA"></circle>
+      <text x="18" y="23" text-anchor="middle" class="sans" font-size="12" font-weight="600" fill="#0A0A0A">P</text>
+    </g>
+  </g>
+
+  
+  <g>
+    <rect x="80" y="0" width="1120" height="80" fill="#F5F5F0"></rect>
+    <line x1="80" y1="80" x2="1200" y2="80" stroke="#E8E8E6" stroke-width="1"></line>
+
+    <text x="112" y="44" class="sans" font-size="22" font-weight="600" fill="#0A0A0A" letter-spacing="-0.4">Bom dia, Pedro</text>
+    <text x="112" y="64" class="sans" font-size="12" fill="#6B6B68">Aqui está o resumo das suas finanças — quarta, 24 abr.</text>
+
+    
+    <g transform="translate(760 22)">
+      <rect x="0" y="0" width="220" height="36" rx="8" fill="#FFFFFF" stroke="#E8E8E6"></rect>
+      <g transform="translate(12 10)" stroke="#8B8B86" stroke-width="1.6" fill="none">
+        <circle cx="7" cy="7" r="5.5"></circle>
+        <line x1="11" y1="11" x2="15" y2="15" stroke-linecap="round"></line>
+      </g>
+      <text x="38" y="23" class="sans" font-size="12" fill="#8B8B86">Buscar transações, metas…</text>
+      <text x="188" y="23" class="mono" font-size="10" fill="#8B8B86">⌘K</text>
+    </g>
+
+    
+    <g transform="translate(1000 22)" fill="none" stroke="#0A0A0A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="0" y="0" width="36" height="36" rx="8" fill="#FFFFFF" stroke="#E8E8E6"></rect>
+      <path d="M11 20 L11 16 A7 7 0 0 1 25 16 L25 20 L27 23 L9 23 Z"></path>
+      <path d="M15 25 A3 3 0 0 0 21 25"></path>
+      <circle cx="24" cy="12" r="3" fill="#16A34A" stroke="none"></circle>
+    </g>
+
+    
+    <g transform="translate(1050 22)">
+      <rect x="0" y="0" width="134" height="36" rx="8" fill="#16A34A"></rect>
+      <g transform="translate(14 12)" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round">
+        <line x1="0" y1="6" x2="12" y2="6"></line>
+        <line x1="6" y1="0" x2="6" y2="12"></line>
+      </g>
+      <text x="36" y="23" class="sans" font-size="13" font-weight="500" fill="#FFFFFF">Nova transação</text>
+    </g>
+  </g>
+
+  
+  
+
+  
+  <g filter="url(#card-shadow)">
+    <rect x="104" y="104" width="720" height="180" rx="12" fill="#FFFFFF" stroke="#E8E8E6"></rect>
+  </g>
+
+  <g>
+    
+    <text x="128" y="138" class="mono" font-size="10" fill="#6B6B68" letter-spacing="1.2">SCORE DE SAÚDE FINANCEIRA</text>
+
+    
+    <g transform="translate(128 152)">
+      <rect x="0" y="0" width="80" height="22" rx="11" fill="#DCFCE7"></rect>
+      <circle cx="12" cy="11" r="3" fill="#16A34A"></circle>
+      <text x="21" y="15" class="sans" font-size="11" font-weight="500" fill="#14532D">Excelente</text>
+    </g>
+
+    
+    <text x="128" y="232" class="display" font-size="56" font-weight="600" fill="#0A0A0A" letter-spacing="-1.8">782</text>
+    <text x="238" y="232" class="display" font-size="16" font-weight="400" fill="#8B8B86" letter-spacing="-0.2">/ 1000</text>
+
+    
+    <g transform="translate(128 252)">
+      <path d="M0 6 L4 2 L8 6" stroke="#16A34A" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+      <text x="14" y="9" class="mono" font-size="11" fill="#16A34A">+24 pts esta semana</text>
+    </g>
+
+    
+    
+    <g transform="translate(680 244)">
+      
+      <path d="M -58 0 A 58 58 0 0 1 58 0" fill="none" stroke="#EFEEEA" stroke-width="12" stroke-linecap="round"></path>
+      
+      
+      
+      <path d="M -58 0 A 58 58 0 0 1 44.94 -36.66" fill="none" stroke="url(#gauge-g)" stroke-width="12" stroke-linecap="round"></path>
+
+      
+      <text x="-58" y="18" class="mono" font-size="9" fill="#8B8B86" text-anchor="middle">0</text>
+      <text x="0" y="-70" class="mono" font-size="9" fill="#8B8B86" text-anchor="middle">500</text>
+      <text x="58" y="18" class="mono" font-size="9" fill="#8B8B86" text-anchor="middle">1000</text>
+
+      
+      <circle cx="44.94" cy="-36.66" r="5" fill="#FFFFFF" stroke="#16A34A" stroke-width="2.5"></circle>
+
+      
+      <text x="0" y="-8" class="mono" font-size="8" fill="#8B8B86" text-anchor="middle" letter-spacing="1">SCORE</text>
+      <text x="0" y="-22" class="mono" font-size="8" fill="#8B8B86" text-anchor="middle">▲</text>
+    </g>
+  </g>
+
+  
+  
+  
+
+  <g filter="url(#card-shadow)">
+    <rect x="844" y="104" width="332" height="54" rx="12" fill="#FFFFFF" stroke="#E8E8E6"></rect>
+  </g>
+  <g>
+    <text x="866" y="126" class="mono" font-size="10" fill="#6B6B68" letter-spacing="1.2">SALDO TOTAL</text>
+    <text x="866" y="150" class="display" font-size="22" font-weight="600" fill="#0A0A0A" letter-spacing="-0.6">R$ 8.450<tspan class="display" font-size="15" fill="#8B8B86" font-weight="400">,32</tspan></text>
+    
+    <path d="M1060 142 L1074 138 L1088 144 L1102 134 L1116 136 L1130 128 L1144 130 L1158 122" stroke="#16A34A" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+  </g>
+
+  <g filter="url(#card-shadow)">
+    <rect x="844" y="168" width="332" height="54" rx="12" fill="#FFFFFF" stroke="#E8E8E6"></rect>
+  </g>
+  <g>
+    <text x="866" y="190" class="mono" font-size="10" fill="#6B6B68" letter-spacing="1.2">RECEITAS · ABR</text>
+    <text x="866" y="214" class="display" font-size="22" font-weight="600" fill="#0A0A0A" letter-spacing="-0.6">R$ 12.500<tspan class="display" font-size="15" fill="#8B8B86" font-weight="400">,00</tspan></text>
+    <g transform="translate(1100 200)">
+      <path d="M0 6 L4 2 L8 6" stroke="#16A34A" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+      <text x="14" y="9" class="mono" font-size="11" fill="#16A34A">+8,2%</text>
+    </g>
+  </g>
+
+  <g filter="url(#card-shadow)">
+    <rect x="844" y="232" width="332" height="52" rx="12" fill="#FFFFFF" stroke="#E8E8E6"></rect>
+  </g>
+  <g>
+    <text x="866" y="254" class="mono" font-size="10" fill="#6B6B68" letter-spacing="1.2">DESPESAS · ABR</text>
+    <text x="866" y="278" class="display" font-size="22" font-weight="600" fill="#0A0A0A" letter-spacing="-0.6">R$ 6.890<tspan class="display" font-size="15" fill="#8B8B86" font-weight="400">,14</tspan></text>
+    <g transform="translate(1100 264)">
+      <path d="M0 2 L4 6 L8 2" stroke="#8B8B86" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+      <text x="14" y="9" class="mono" font-size="11" fill="#6B6B68">−3,4%</text>
+    </g>
+  </g>
+
+  
+  
+  <g filter="url(#card-shadow)">
+    <rect x="104" y="304" width="720" height="280" rx="12" fill="#FFFFFF" stroke="#E8E8E6"></rect>
+  </g>
+  <g>
+    <text x="128" y="338" class="sans" font-size="15" font-weight="600" fill="#0A0A0A" letter-spacing="-0.3">Receitas vs Despesas</text>
+    <text x="128" y="356" class="sans" font-size="11" fill="#6B6B68">Últimos 6 meses · valores em R$</text>
+
+    
+    <g transform="translate(608 332)">
+      <circle cx="4" cy="0" r="4" fill="#16A34A"></circle>
+      <text x="14" y="4" class="sans" font-size="11" fill="#0A0A0A">Receitas</text>
+      <circle cx="84" cy="0" r="4" fill="#0A0A0A"></circle>
+      <text x="94" y="4" class="sans" font-size="11" fill="#0A0A0A">Despesas</text>
+    </g>
+
+    
+    <g transform="translate(128 380)">
+      
+      <g stroke="#EFEEEA" stroke-width="1">
+        <line x1="0" y1="0" x2="672" y2="0"></line>
+        <line x1="0" y1="40" x2="672" y2="40"></line>
+        <line x1="0" y1="80" x2="672" y2="80"></line>
+        <line x1="0" y1="120" x2="672" y2="120"></line>
+        <line x1="0" y1="160" x2="672" y2="160" stroke="#E8E8E6"></line>
+      </g>
+
+      
+      <g class="mono" font-size="9" fill="#8B8B86">
+        <text x="-8" y="3" text-anchor="end">15k</text>
+        <text x="-8" y="43" text-anchor="end">10k</text>
+        <text x="-8" y="83" text-anchor="end">5k</text>
+        <text x="-8" y="123" text-anchor="end">2k</text>
+        <text x="-8" y="163" text-anchor="end">0</text>
+      </g>
+
+      
+      <path d="M0 74 L112 56 L224 68 L336 42 L448 50 L560 28 L672 32&#xA;               L672 160 L0 160 Z" fill="url(#area-g)"></path>
+      
+      <path d="M0 74 L112 56 L224 68 L336 42 L448 50 L560 28 L672 32" stroke="#16A34A" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+      
+      <path d="M0 112 L112 104 L224 96 L336 108 L448 92 L560 100 L672 88" stroke="#0A0A0A" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+
+      
+      <circle cx="672" cy="32" r="5" fill="#FFFFFF" stroke="#16A34A" stroke-width="2.5"></circle>
+      <circle cx="672" cy="88" r="4" fill="#FFFFFF" stroke="#0A0A0A" stroke-width="2"></circle>
+
+      
+      <g transform="translate(582 -20)">
+        <rect x="0" y="0" width="104" height="42" rx="6" fill="#0A0A0A"></rect>
+        <text x="12" y="16" class="mono" font-size="9" fill="#8B8B86" letter-spacing="1">ABR 2026</text>
+        <text x="12" y="32" class="display" font-size="12" font-weight="600" fill="#FFFFFF">R$ 12.500</text>
+        <text x="68" y="32" class="display" font-size="12" font-weight="500" fill="#8B8B86">6.890</text>
+        <path d="M52 42 L58 50 L64 42" fill="#0A0A0A"></path>
+      </g>
+
+      
+      <g class="mono" font-size="9" fill="#8B8B86" text-anchor="middle">
+        <text x="0" y="176">NOV</text>
+        <text x="112" y="176">DEZ</text>
+        <text x="224" y="176">JAN</text>
+        <text x="336" y="176">FEV</text>
+        <text x="448" y="176">MAR</text>
+        <text x="560" y="176">ABR</text>
+      </g>
+    </g>
+  </g>
+
+  
+  <g filter="url(#card-shadow)">
+    <rect x="844" y="304" width="332" height="280" rx="12" fill="#FFFFFF" stroke="#E8E8E6"></rect>
+  </g>
+  <g>
+    <text x="866" y="338" class="sans" font-size="15" font-weight="600" fill="#0A0A0A" letter-spacing="-0.3">Categorias</text>
+    <text x="866" y="356" class="sans" font-size="11" fill="#6B6B68">Despesas · abril</text>
+
+    
+    <g transform="translate(940 448)">
+      
+      
+      <circle cx="0" cy="0" r="54" fill="none" stroke="#EFEEEA" stroke-width="22"></circle>
+      <circle cx="0" cy="0" r="54" fill="none" stroke="#16A34A" stroke-width="22" stroke-dasharray="142.5 339.29" stroke-dashoffset="0" transform="rotate(-90)"></circle>
+      <circle cx="0" cy="0" r="54" fill="none" stroke="#14532D" stroke-width="22" stroke-dasharray="81.4 339.29" stroke-dashoffset="-142.5" transform="rotate(-90)"></circle>
+      <circle cx="0" cy="0" r="54" fill="none" stroke="#6B6B68" stroke-width="22" stroke-dasharray="61.1 339.29" stroke-dashoffset="-223.9" transform="rotate(-90)"></circle>
+      <circle cx="0" cy="0" r="54" fill="none" stroke="#D4D3CD" stroke-width="22" stroke-dasharray="54.3 339.29" stroke-dashoffset="-285" transform="rotate(-90)"></circle>
+
+      
+      <text x="0" y="-2" text-anchor="middle" class="mono" font-size="9" fill="#8B8B86" letter-spacing="1">TOTAL</text>
+      <text x="0" y="18" text-anchor="middle" class="display" font-size="17" font-weight="600" fill="#0A0A0A">R$ 6.890</text>
+    </g>
+
+    
+    <g transform="translate(866 544)" class="sans" font-size="11">
+      <g>
+        <rect x="0" y="0" width="8" height="8" rx="2" fill="#16A34A"></rect>
+        <text x="14" y="8" fill="#0A0A0A">Moradia</text>
+        <text x="290" y="8" text-anchor="end" fill="#6B6B68" class="mono" font-size="10">42%</text>
+      </g>
+      <g transform="translate(0 16)">
+        <rect x="0" y="0" width="8" height="8" rx="2" fill="#14532D"></rect>
+        <text x="14" y="8" fill="#0A0A0A">Alimentação</text>
+        <text x="290" y="8" text-anchor="end" fill="#6B6B68" class="mono" font-size="10">24%</text>
+      </g>
+    </g>
+  </g>
+
+  
+  <g filter="url(#card-shadow)">
+    <rect x="104" y="604" width="1072" height="260" rx="12" fill="#FFFFFF" stroke="#E8E8E6"></rect>
+  </g>
+  <g>
+    <text x="128" y="638" class="sans" font-size="15" font-weight="600" fill="#0A0A0A" letter-spacing="-0.3">Transações recentes</text>
+    <text x="128" y="656" class="sans" font-size="11" fill="#6B6B68">4 de 142 este mês</text>
+
+    
+    <g transform="translate(1080 638)">
+      <text x="0" y="0" class="sans" font-size="12" font-weight="500" fill="#0A0A0A" text-anchor="end">Ver todas</text>
+      <path d="M4 -4 L10 -4 M7 -8 L11 -4 L7 0" stroke="#0A0A0A" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round" transform="translate(0 -4)"></path>
+    </g>
+
+    
+    <line x1="128" y1="680" x2="1152" y2="680" stroke="#EFEEEA" stroke-width="1"></line>
+    <g class="mono" font-size="9" fill="#8B8B86" letter-spacing="1">
+      <text x="176" y="698">DESCRIÇÃO</text>
+      <text x="660" y="698">CATEGORIA</text>
+      <text x="880" y="698">DATA</text>
+      <text x="1140" y="698" text-anchor="end">VALOR</text>
+    </g>
+    <line x1="128" y1="708" x2="1152" y2="708" stroke="#EFEEEA" stroke-width="1"></line>
+
+    
+    <g transform="translate(128 728)">
+      
+      <rect x="0" y="0" width="32" height="32" rx="8" fill="#DCFCE7"></rect>
+      <g transform="translate(8 8)" stroke="#14532D" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 14 L8 8 L12 12 L16 6"></path>
+        <path d="M12 6 L16 6 L16 10"></path>
+      </g>
+      <text x="48" y="14" class="sans" font-size="13" font-weight="500" fill="#0A0A0A">Transferência PIX recebida</text>
+      <text x="48" y="30" class="sans" font-size="11" fill="#6B6B68">de Ana P. Rodrigues</text>
+      <text x="532" y="22" class="sans" font-size="12" fill="#0A0A0A">Receita</text>
+      <text x="752" y="22" class="mono" font-size="11" fill="#6B6B68">24 abr · 09:14</text>
+      <text x="1012" y="22" class="display" font-size="14" font-weight="600" fill="#16A34A" text-anchor="end">+ R$ 2.400,00</text>
+    </g>
+    <line x1="128" y1="770" x2="1152" y2="770" stroke="#EFEEEA" stroke-width="1"></line>
+
+    
+    <g transform="translate(128 780)">
+      <rect x="0" y="0" width="32" height="32" rx="8" fill="#EFEEEA"></rect>
+      <g transform="translate(8 8)" stroke="#0A0A0A" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="4" width="12" height="10" rx="1.5"></rect>
+        <path d="M2 8 L14 8"></path>
+      </g>
+      <text x="48" y="14" class="sans" font-size="13" font-weight="500" fill="#0A0A0A">Supermercado Pão de Açúcar</text>
+      <text x="48" y="30" class="sans" font-size="11" fill="#6B6B68">cartão de crédito · 4×</text>
+      <text x="532" y="22" class="sans" font-size="12" fill="#0A0A0A">Alimentação</text>
+      <text x="752" y="22" class="mono" font-size="11" fill="#6B6B68">23 abr · 19:42</text>
+      <text x="1012" y="22" class="display" font-size="14" font-weight="600" fill="#0A0A0A" text-anchor="end">− R$ 486,20</text>
+    </g>
+    <line x1="128" y1="822" x2="1152" y2="822" stroke="#EFEEEA" stroke-width="1"></line>
+
+  </g>
+
+  
+  <g transform="translate(1130 880)" opacity=".5">
+    <text x="0" y="0" class="mono" font-size="9" fill="#6B6B68" letter-spacing="1" text-anchor="end">OPENFY · V2.4</text>
+  </g>
+</svg>

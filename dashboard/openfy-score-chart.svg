@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200" width="600" height="200" id="svg-chart" data-om-id="c299d454:430" data-src-loc="64325:64427:66755">
+        <defs data-om-id="c299d454:431" data-src-loc="64436:64442:64789">
+          <linearGradient id="chart-grad" x1="0" y1="0" x2="0" y2="1" data-om-id="c299d454:432" data-src-loc="64453:64513:64681">
+            <stop offset="0" stop-color="#16A34A" stop-opacity=".22" data-src-loc="64526:64584"></stop>
+            <stop offset="1" stop-color="#16A34A" stop-opacity="0" data-src-loc="64597:64653"></stop>
+          </linearGradient>
+          <style data-src-loc="64692:64699:64773">.mono{font-family:'JetBrains Mono',monospace;letter-spacing:.04em}</style>
+        </defs>
+        <!-- grid -->
+        <g stroke="#EFEEEA" data-om-id="c299d454:433" data-src-loc="64820:64840:65025"><line x1="40" y1="20" x2="580" y2="20" data-src-loc="64840:64880"></line><line x1="40" y1="60" x2="580" y2="60" data-src-loc="64880:64920"></line><line x1="40" y1="100" x2="580" y2="100" data-src-loc="64920:64962"></line><line x1="40" y1="140" x2="580" y2="140" stroke="#E8E8E6" data-src-loc="64962:65021"></line></g>
+        <!-- y labels -->
+        <g class="mono" font-size="9" fill="#8B8B86" text-anchor="end" data-om-id="c299d454:434" data-src-loc="65060:65123:65269">
+          <text x="32" y="23" data-om-id="c299d454:435" data-src-loc="65134:65154:65164">800</text><text x="32" y="63" data-om-id="c299d454:436" data-src-loc="65164:65184:65194">750</text><text x="32" y="103" data-om-id="c299d454:437" data-src-loc="65194:65215:65225">700</text><text x="32" y="143" data-om-id="c299d454:438" data-src-loc="65225:65246:65256">650</text>
+        </g>
+        <!-- 650→132, 680→108, 710→84, 740→60, 765→40, 782→26.4 (using y=(800-v)*0.8 from base 800=0, 650=120; corrected) -->
+        <!-- Actually mapping: y(800)=20, y(650)=140 -> y = 20 + (800-v)*0.8 -->
+        <!-- 650:140, 680:116, 710:92, 740:68, 765:48, 782:34.4 -->
+        <path d="M40 140 L148 116 L256 92 L364 68 L472 48 L580 34.4 L580 160 L40 160 Z" fill="url(#chart-grad)" data-src-loc="65565:65670"></path>
+        <path d="M40 140 L148 116 L256 92 L364 68 L472 48 L580 34.4" stroke="#16A34A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" data-src-loc="65679:65834"></path>
+        <g fill="#fff" stroke="#16A34A" stroke-width="2.5" data-om-id="c299d454:439" data-src-loc="65843:65894:66113">
+          <circle cx="40" cy="140" r="4" data-src-loc="65905:65937"></circle><circle cx="148" cy="116" r="4" data-src-loc="65937:65970"></circle><circle cx="256" cy="92" r="4" data-src-loc="65970:66002"></circle><circle cx="364" cy="68" r="4" data-src-loc="66002:66034"></circle><circle cx="472" cy="48" r="4" data-src-loc="66034:66066"></circle><circle cx="580" cy="34.4" r="5" data-src-loc="66066:66100"></circle>
+        </g>
+        <!-- x labels -->
+        <g class="mono" font-size="9" fill="#8B8B86" text-anchor="middle" data-om-id="c299d454:440" data-src-loc="66148:66214:66444">
+          <text x="40" y="178" data-om-id="c299d454:441" data-src-loc="66225:66246:66256">OUT</text><text x="148" y="178" data-om-id="c299d454:442" data-src-loc="66256:66278:66288">NOV</text><text x="256" y="178" data-om-id="c299d454:443" data-src-loc="66288:66310:66320">DEZ</text><text x="364" y="178" data-om-id="c299d454:444" data-src-loc="66320:66342:66352">JAN</text><text x="472" y="178" data-om-id="c299d454:445" data-src-loc="66352:66374:66384">FEV</text><text x="580" y="178" fill="#16A34A" data-om-id="c299d454:446" data-src-loc="66384:66421:66431">MAR</text>
+        </g>
+        <!-- last point label -->
+        <g transform="translate(540 16)" data-om-id="c299d454:447" data-src-loc="66487:66520:66742">
+          <rect width="56" height="20" rx="4" fill="#0A0A0A" data-src-loc="66531:66583"></rect>
+          <text x="28" y="13" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" font-weight="600" fill="#fff" data-om-id="c299d454:448" data-src-loc="66594:66715:66729">782 PTS</text>
+        </g>
+      </svg>

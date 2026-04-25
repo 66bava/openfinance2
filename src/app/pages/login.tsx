@@ -143,7 +143,7 @@ export default function Login() {
       >
         <div className="mb-7 text-center">
           <h1 style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.02em" }} className="text-black">
-            Open Finance
+            Openfy
           </h1>
           <p style={{ fontSize: 13 }} className="text-[#777777] mt-1">
             {isSignUp ? "Crie sua conta gratuitamente" : "Entre na sua conta"}

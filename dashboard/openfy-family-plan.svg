@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" width="600" height="400" id="svg-family" data-om-id="c299d454:489" data-src-loc="70704:70807:74357">
+        <!-- Connection lines -->
+        <g stroke="#0A0A0A" stroke-width="1" stroke-dasharray="2 3" fill="none" opacity=".4" data-om-id="c299d454:490" data-src-loc="70850:70935:71264">
+          <line x1="80" y1="60" x2="150" y2="100" data-src-loc="70946:70987"></line>
+          <line x1="220" y1="60" x2="150" y2="100" data-src-loc="70998:71040"></line>
+          <line x1="80" y1="140" x2="150" y2="100" data-src-loc="71051:71093"></line>
+          <line x1="220" y1="140" x2="150" y2="100" data-src-loc="71104:71147"></line>
+          <line x1="80" y1="60" x2="220" y2="60" data-src-loc="71158:71198"></line>
+          <line x1="80" y1="140" x2="220" y2="140" data-src-loc="71209:71251"></line>
+        </g>
+
+        <!-- Center node (largest, primary) -->
+        <g transform="translate(150 100)" data-om-id="c299d454:491" data-src-loc="71322:71356:71823">
+          <circle r="32" fill="#0A0A0A" data-src-loc="71367:71398"></circle>
+          <!-- mini gauge inside -->
+          <path d="M -20 4 A 20 20 0 0 1 20 4" fill="none" stroke="#1F1F1E" stroke-width="4" stroke-linecap="round" data-src-loc="71446:71553"></path>
+          <path d="M -20 4 A 20 20 0 0 1 14.5 -13" fill="none" stroke="#16A34A" stroke-width="4" stroke-linecap="round" data-src-loc="71564:71675"></path>
+          <text y="-2" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="11" font-weight="700" fill="#fff" data-om-id="c299d454:492" data-src-loc="71686:71800:71810">782</text>
+        </g>
+
+        <!-- Top-left node -->
+        <g transform="translate(80 60)" data-om-id="c299d454:493" data-src-loc="71864:71896:72358">
+          <circle r="22" fill="#fff" stroke="#0A0A0A" stroke-width="1.5" data-src-loc="71907:71971"></circle>
+          <path d="M -14 3 A 14 14 0 0 1 14 3" fill="none" stroke="#EFEEEA" stroke-width="3" stroke-linecap="round" data-src-loc="71982:72089"></path>
+          <path d="M -14 3 A 14 14 0 0 1 12 -6" fill="none" stroke="#16A34A" stroke-width="3" stroke-linecap="round" data-src-loc="72100:72208"></path>
+          <text y="-1" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" font-weight="600" fill="#0A0A0A" data-om-id="c299d454:494" data-src-loc="72219:72335:72345">724</text>
+        </g>
+
+        <!-- Top-right node -->
+        <g transform="translate(220 60)" data-om-id="c299d454:495" data-src-loc="72400:72433:72895">
+          <circle r="22" fill="#fff" stroke="#0A0A0A" stroke-width="1.5" data-src-loc="72444:72508"></circle>
+          <path d="M -14 3 A 14 14 0 0 1 14 3" fill="none" stroke="#EFEEEA" stroke-width="3" stroke-linecap="round" data-src-loc="72519:72626"></path>
+          <path d="M -14 3 A 14 14 0 0 1 8 -11" fill="none" stroke="#16A34A" stroke-width="3" stroke-linecap="round" data-src-loc="72637:72745"></path>
+          <text y="-1" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" font-weight="600" fill="#0A0A0A" data-om-id="c299d454:496" data-src-loc="72756:72872:72882">681</text>
+        </g>
+
+        <!-- Bottom-left node -->
+        <g transform="translate(80 140)" data-om-id="c299d454:497" data-src-loc="72939:72972:73434">
+          <circle r="22" fill="#fff" stroke="#0A0A0A" stroke-width="1.5" data-src-loc="72983:73047"></circle>
+          <path d="M -14 3 A 14 14 0 0 1 14 3" fill="none" stroke="#EFEEEA" stroke-width="3" stroke-linecap="round" data-src-loc="73058:73165"></path>
+          <path d="M -14 3 A 14 14 0 0 1 13 -4" fill="none" stroke="#16A34A" stroke-width="3" stroke-linecap="round" data-src-loc="73176:73284"></path>
+          <text y="-1" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" font-weight="600" fill="#0A0A0A" data-om-id="c299d454:498" data-src-loc="73295:73411:73421">756</text>
+        </g>
+
+        <!-- Bottom-right node -->
+        <g transform="translate(220 140)" data-om-id="c299d454:499" data-src-loc="73479:73513:73974">
+          <circle r="22" fill="#fff" stroke="#0A0A0A" stroke-width="1.5" data-src-loc="73524:73588"></circle>
+          <path d="M -14 3 A 14 14 0 0 1 14 3" fill="none" stroke="#EFEEEA" stroke-width="3" stroke-linecap="round" data-src-loc="73599:73706"></path>
+          <path d="M -14 3 A 14 14 0 0 1 14 1" fill="none" stroke="#16A34A" stroke-width="3" stroke-linecap="round" data-src-loc="73717:73824"></path>
+          <text y="-1" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="9" font-weight="600" fill="#0A0A0A" data-om-id="c299d454:500" data-src-loc="73835:73951:73961">792</text>
+        </g>
+
+        <!-- Tiny dots in background for stars feel -->
+        <g fill="#0A0A0A" opacity=".15" data-om-id="c299d454:501" data-src-loc="74040:74072:74344">
+          <circle cx="40" cy="30" r="1" data-src-loc="74083:74114"></circle>
+          <circle cx="270" cy="40" r="1" data-src-loc="74125:74157"></circle>
+          <circle cx="50" cy="170" r="1" data-src-loc="74168:74200"></circle>
+          <circle cx="260" cy="180" r="1" data-src-loc="74211:74244"></circle>
+          <circle cx="160" cy="20" r="1" data-src-loc="74255:74287"></circle>
+          <circle cx="150" cy="180" r="1" data-src-loc="74298:74331"></circle>
+        </g>
+      </svg>

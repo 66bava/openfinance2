@@ -1,0 +1,88 @@
+<svg width="1440" height="900" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1440" height="900" fill="#F5F5F0"/>
+  
+  <rect x="0" y="0" width="280" height="900" fill="#0A0A0A"/>
+  <text x="40" y="50" font-family="DM Sans" font-size="24" font-weight="700" fill="#16A34A">Openfy</text>
+  
+  <rect x="20" y="180" width="240" height="48" rx="8" fill="#16A34A"/>
+  <text x="40" y="208" font-family="Inter" font-size="15" font-weight="600" fill="#FFFFFF">📄 Relatórios</text>
+  
+  <rect x="280" y="0" width="1160" height="80" fill="#FFFFFF"/>
+  <text x="320" y="50" font-family="DM Sans" font-size="32" font-weight="700" fill="#0A0A0A">Relatórios</text>
+  <rect x="1140" y="28" width="260" height="44" rx="8" fill="#16A34A"/>
+  <text x="1270" y="55" font-family="Inter" font-size="15" font-weight="600" fill="#FFFFFF" text-anchor="middle">+ Gerar novo relatório</text>
+  
+  <rect x="320" y="120" width="660" height="340" rx="12" fill="#FFFFFF"/>
+  <text x="350" y="155" font-family="Inter" font-size="18" font-weight="600" fill="#0A0A0A">Último relatório gerado</text>
+  
+  <text x="350" y="195" font-family="DM Sans" font-size="20" font-weight="700" fill="#0A0A0A">📄 Relatório Março 2026</text>
+  <text x="350" y="220" font-family="Inter" font-size="14" fill="#666666">Gerado em 01/04/2026 por IA</text>
+  
+  <rect x="350" y="240" width="600" height="120" rx="8" fill="#F5F5F0"/>
+  <text x="370" y="265" font-family="Inter" font-size="14" fill="#0A0A0A">Sua saúde financeira melhorou em relação ao mês anterior.</text>
+  <text x="370" y="290" font-family="Inter" font-size="14" fill="#0A0A0A">Você conseguiu economizar 23% da sua renda e reduziu</text>
+  <text x="370" y="315" font-family="Inter" font-size="14" fill="#0A0A0A">gastos com alimentação em 12%. Continue assim!</text>
+  <text x="370" y="345" font-family="Inter" font-size="14" font-weight="600" fill="#16A34A">Ver mais ›</text>
+  
+  <rect x="350" y="380" width="140" height="40" rx="8" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="1"/>
+  <text x="420" y="405" font-family="Inter" font-size="14" font-weight="500" fill="#0A0A0A" text-anchor="middle">📄 Baixar PDF</text>
+  
+  <rect x="510" y="380" width="140" height="40" rx="8" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="1"/>
+  <text x="580" y="405" font-family="Inter" font-size="14" font-weight="500" fill="#0A0A0A" text-anchor="middle">📊 Baixar Excel</text>
+  
+  <rect x="320" y="480" width="660" height="380" rx="12" fill="#FFFFFF"/>
+  <text x="350" y="515" font-family="Inter" font-size="18" font-weight="600" fill="#0A0A0A">Histórico de relatórios</text>
+  
+  <rect x="350" y="540" width="600" height="60" rx="8" fill="#F5F5F0"/>
+  <text x="370" y="565" font-family="Inter" font-size="15" fill="#0A0A0A">Fevereiro 2026</text>
+  <text x="370" y="585" font-family="Inter" font-size="13" fill="#666666">Gerado em 01/03/2026</text>
+  <text x="850" y="575" font-family="Inter" font-size="13" fill="#16A34A" text-anchor="end">PDF</text>
+  <text x="920" y="575" font-family="Inter" font-size="13" fill="#16A34A" text-anchor="end">Excel</text>
+  
+  <rect x="350" y="615" width="600" height="60" rx="8" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="1"/>
+  <text x="370" y="640" font-family="Inter" font-size="15" fill="#0A0A0A">Janeiro 2026</text>
+  <text x="370" y="660" font-family="Inter" font-size="13" fill="#666666">Gerado em 01/02/2026</text>
+  <text x="850" y="650" font-family="Inter" font-size="13" fill="#16A34A" text-anchor="end">PDF</text>
+  <text x="920" y="650" font-family="Inter" font-size="13" fill="#16A34A" text-anchor="end">Excel</text>
+  
+  <rect x="350" y="690" width="600" height="60" rx="8" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="1"/>
+  <text x="370" y="715" font-family="Inter" font-size="15" fill="#0A0A0A">Dezembro 2025</text>
+  <text x="370" y="735" font-family="Inter" font-size="13" fill="#666666">Gerado em 01/01/2026</text>
+  <text x="850" y="725" font-family="Inter" font-size="13" fill="#16A34A" text-anchor="end">PDF</text>
+  <text x="920" y="725" font-family="Inter" font-size="13" fill="#16A34A" text-anchor="end">Excel</text>
+  
+  <rect x="1020" y="120" width="420" height="520" rx="12" fill="#FFFFFF"/>
+  <text x="1050" y="155" font-family="Inter" font-size="18" font-weight="600" fill="#0A0A0A">Gerar novo relatório</text>
+  
+  <text x="1050" y="195" font-family="Inter" font-size="14" font-weight="500" fill="#0A0A0A">Tipo</text>
+  <circle cx="1060" cy="215" r="5" fill="#16A34A"/>
+  <text x="1080" y="220" font-family="Inter" font-size="15" fill="#0A0A0A">Mensal (recomendado)</text>
+  
+  <circle cx="1060" cy="250" r="5" fill="none" stroke="#E5E5E5" stroke-width="2"/>
+  <text x="1080" y="255" font-family="Inter" font-size="15" fill="#666666">Trimestral</text>
+  
+  <circle cx="1060" cy="285" r="5" fill="none" stroke="#E5E5E5" stroke-width="2"/>
+  <text x="1080" y="290" font-family="Inter" font-size="15" fill="#666666">Anual</text>
+  
+  <text x="1050" y="330" font-family="Inter" font-size="14" font-weight="500" fill="#0A0A0A">Período</text>
+  <rect x="1050" y="340" width="360" height="44" rx="8" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="1"/>
+  <text x="1070" y="367" font-family="Inter" font-size="15" fill="#0A0A0A">Março 2026</text>
+  <polygon points="1390,362 1395,367 1385,367" fill="#0A0A0A"/>
+  
+  <text x="1050" y="415" font-family="Inter" font-size="14" font-weight="500" fill="#0A0A0A">Incluir</text>
+  
+  <rect x="1050" y="425" width="20" height="20" rx="4" fill="#16A34A"/>
+  <path d="M 1055 435 L 1059 439 L 1065 431" stroke="#FFFFFF" stroke-width="2" fill="none"/>
+  <text x="1080" y="441" font-family="Inter" font-size="15" fill="#0A0A0A">Análise com IA</text>
+  
+  <rect x="1050" y="460" width="20" height="20" rx="4" fill="#16A34A"/>
+  <path d="M 1055 470 L 1059 474 L 1065 466" stroke="#FFFFFF" stroke-width="2" fill="none"/>
+  <text x="1080" y="476" font-family="Inter" font-size="15" fill="#0A0A0A">Gráficos detalhados</text>
+  
+  <rect x="1050" y="495" width="20" height="20" rx="4" fill="#16A34A"/>
+  <path d="M 1055 505 L 1059 509 L 1065 501" stroke="#FFFFFF" stroke-width="2" fill="none"/>
+  <text x="1080" y="511" font-family="Inter" font-size="15" fill="#0A0A0A">Comparação com mês anterior</text>
+  
+  <rect x="1050" y="560" width="360" height="52" rx="8" fill="#16A34A"/>
+  <text x="1230" y="591" font-family="Inter" font-size="16" font-weight="700" fill="#FFFFFF" text-anchor="middle">Gerar relatório</text>
+</svg>

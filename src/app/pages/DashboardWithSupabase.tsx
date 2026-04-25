@@ -1,27 +1,58 @@
-import { useState, useEffect } from "react";
-import { useAuth } from "../../lib/auth-context";
-import { Link } from "react-router";
+import { useState, useEffect } from "react"
+import { useAuth } from "../../lib/auth-context"
+import { Link } from "react-router"
 import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-} from "recharts";
-import { ArrowDownRight, ArrowUpRight, Wallet, Plus, PiggyBank } from "lucide-react";
+  LineChart, Line, PieChart, Pie, Cell,
+  Tooltip, ResponsiveContainer, XAxis, YAxis, CartesianGrid,
+} from "recharts"
 import {
-  getTotaisMes,
-  getGastosPorCategoria,
-  getTransacoesMes,
-  getEvolucaoMensal,
-} from "../../lib/queries";
+  ArrowDownRight, ArrowUpRight, Wallet, PiggyBank,
+  Plus, TrendingUp, TrendingDown,
+} from "lucide-react"
+import {
+  getTotaisMes, getGastosPorCategoria,
+  getTransacoesMes, getEvolucaoMensal,
+} from "../../lib/queries"
+import { AddTransactionModal } from "../components/dashboard/AddTransactionModal"
 
-const CATEGORY_COLORS = ["#111111", "#333333", "#555555", "#777777", "#999999", "#BBBBBB"];
+// ─── Helpers ────────────────────────────────────────────────────────────────
+
+const fmt = (v: number) =>
+  new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v)
+
+function fmtDate(dateStr: string) {
+  const d = new Date(dateStr + "T00:00:00")
+  const today = new Date()
+  const yesterday = new Date(today)
+  yesterday.setDate(yesterday.getDate() - 1)
+  if (d.toDateString() === today.toDateString()) return "Hoje"
+  if (d.toDateString() === yesterday.toDateString()) return "Ontem"
+  return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })
+}
+
+function calcularScore(pct: number, gastos: number, renda: number): number {
+  if (renda === 0) return 300
+  const poupancaScore = Math.min(pct * 20, 400) // max 400 pts por poupança
+  const equilibrioScore = gastos / renda < 0.8 ? 300 : gastos / renda < 1 ? 150 : 50
+  const base = 300
+  return Math.round(Math.min(base + poupancaScore + equilibrioScore, 1000))
+}
+
+function scoreColor(score: number) {
+  if (score >= 850) return "#16A34A"
+  if (score >= 700) return "#84CC16"
+  if (score >= 400) return "#F59E0B"
+  return "#EF4444"
+}
+
+function scoreLabel(score: number) {
+  if (score >= 850) return "Excelente"
+  if (score >= 700) return "Ótimo"
+  if (score >= 400) return "Regular"
+  return "Crítico"
+}
+
+const CATEGORY_COLORS = ["#0A0A0A", "#16A34A", "#525252", "#A3A3A3", "#DCFCE7", "#BBF7D0"]
 
 const CATEGORY_ICONS: Record<string, string> = {
   Alimentação: "🍽️",
@@ -29,459 +60,550 @@ const CATEGORY_ICONS: Record<string, string> = {
   Saúde: "🏥",
   Educação: "📚",
   Entretenimento: "🎬",
-};
+  Moradia: "🏠",
+  Lazer: "🎮",
+}
 
 function categoryIcon(nome: string) {
-  return CATEGORY_ICONS[nome] ?? "📦";
+  return CATEGORY_ICONS[nome] ?? "📦"
 }
 
-function formatCurrency(value: number) {
-  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
+// ─── ScoreGauge ──────────────────────────────────────────────────────────────
+
+function ScoreGauge({ score }: { score: number }) {
+  const pct = score / 1000
+  const angle = pct * 180
+  const rad = (angle * Math.PI) / 180
+  const cx = 120, cy = 110, r = 90
+  const x = cx + r * Math.cos(Math.PI - rad)
+  const y = cy - r * Math.sin(Math.PI - rad)
+  const largeArc = angle > 180 ? 1 : 0
+  const color = scoreColor(score)
+
+  const pilares = [
+    { nome: "Poupança", pct: Math.min(pct * 1.2, 1) },
+    { nome: "Equilíbrio", pct: Math.min(pct * 1.1, 1) },
+    { nome: "Consistência", pct: Math.min(pct * 0.9, 1) },
+    { nome: "Reserva", pct: Math.min(pct * 0.8, 1) },
+    { nome: "Metas", pct: Math.min(pct * 0.7, 1) },
+  ]
+
+  return (
+    <div style={{ background: "#FFFFFF", borderRadius: 16, border: "1px solid #E5E5E3", padding: "20px 20px 16px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+      <p style={{ fontSize: 12, fontWeight: 600, color: "#A3A3A3", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 4 }}>
+        Score de Saúde
+      </p>
+
+      <svg viewBox="0 0 240 140" width="100%" style={{ display: "block" }}>
+        {/* Track */}
+        <path
+          d={`M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}`}
+          fill="none" stroke="#F5F5F0" strokeWidth="14" strokeLinecap="round"
+        />
+        {/* Fill */}
+        <path
+          d={`M ${cx - r} ${cy} A ${r} ${r} 0 ${largeArc} 1 ${x} ${y}`}
+          fill="none" stroke={color} strokeWidth="14" strokeLinecap="round"
+        />
+        {/* Dot indicator */}
+        <circle cx={x} cy={y} r="7" fill={color} />
+
+        {/* Score */}
+        <text x={cx} y={cy - 22} textAnchor="middle"
+          style={{ fontSize: 44, fontWeight: "800", fill: "#0A0A0A", fontFamily: "system-ui", letterSpacing: "-2" }}>
+          {score}
+        </text>
+        <text x={cx} y={cy - 4} textAnchor="middle"
+          style={{ fontSize: 11, fill: "#A3A3A3", fontFamily: "system-ui" }}>
+          de 1000
+        </text>
+        <text x={cx} y={cy + 14} textAnchor="middle"
+          style={{ fontSize: 12, fontWeight: "700", fill: color, fontFamily: "system-ui" }}>
+          {scoreLabel(score)}
+        </text>
+
+        <text x={cx - r} y={cy + 22} style={{ fontSize: 9, fill: "#A3A3A3", fontFamily: "system-ui" }}>0</text>
+        <text x={cx + r - 16} y={cy + 22} style={{ fontSize: 9, fill: "#A3A3A3", fontFamily: "system-ui" }}>1000</text>
+      </svg>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 8 }}>
+        {pilares.map((p) => (
+          <div key={p.nome}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
+              <span style={{ fontSize: 11, color: "#525252" }}>{p.nome}</span>
+              <span style={{ fontSize: 11, fontWeight: 600, color: scoreColor(Math.round(p.pct * 1000)) }}>
+                {Math.round(p.pct * 100)}%
+              </span>
+            </div>
+            <div style={{ height: 4, background: "#F5F5F0", borderRadius: 2, overflow: "hidden" }}>
+              <div style={{
+                height: "100%",
+                width: `${p.pct * 100}%`,
+                background: scoreColor(Math.round(p.pct * 1000)),
+                borderRadius: 2,
+                transition: "width 0.8s ease",
+              }} />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
 }
 
-function formatDate(dateStr: string) {
-  const date = new Date(dateStr + "T00:00:00");
-  const today = new Date();
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
-  if (date.toDateString() === today.toDateString()) return "Hoje";
-  if (date.toDateString() === yesterday.toDateString()) return "Ontem";
-  return date.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" });
-}
+// ─── StatCard ────────────────────────────────────────────────────────────────
 
 function StatCard({
-  label,
-  value,
-  sub,
-  icon: Icon,
-  accent,
+  label, value, sub, icon: Icon, iconBg, iconColor, trend,
 }: {
-  label: string;
-  value: string;
-  sub?: string;
-  icon: React.ElementType;
-  accent?: "positive" | "negative" | "neutral";
+  label: string
+  value: string
+  sub?: string
+  icon: React.ElementType
+  iconBg: string
+  iconColor: string
+  trend?: "up" | "down" | "neutral"
 }) {
   return (
-    <div
-      className="bg-white rounded-lg p-5 border border-[#E0E0E0]"
-      style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}
+    <div style={{
+      background: "#FFFFFF",
+      borderRadius: 16,
+      border: "1px solid #E5E5E3",
+      padding: "18px 20px",
+      boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+      transition: "box-shadow 0.2s",
+    }}
+      onMouseOver={(e) => (e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.08)")}
+      onMouseOut={(e) => (e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.04)")}
     >
-      <div className="flex items-start justify-between mb-3">
-        <p
-          style={{ fontSize: 12, fontWeight: 500 }}
-          className="text-[#777777] uppercase tracking-wider"
-        >
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 14 }}>
+        <p style={{ fontSize: 12, fontWeight: 500, color: "#A3A3A3", textTransform: "uppercase", letterSpacing: "0.08em" }}>
           {label}
         </p>
-        <div className="w-8 h-8 rounded-lg bg-[#F5F5F5] flex items-center justify-center">
-          <Icon size={16} className="text-[#333333]" />
+        <div style={{
+          width: 36, height: 36, borderRadius: 10,
+          background: iconBg, display: "flex", alignItems: "center", justifyContent: "center",
+        }}>
+          <Icon size={17} color={iconColor} strokeWidth={2} />
         </div>
       </div>
-      <p
-        style={{ fontSize: 24, fontWeight: 700, letterSpacing: "-0.02em" }}
-        className="text-black"
-      >
+      <p style={{ fontSize: 24, fontWeight: 700, letterSpacing: "-0.025em", color: "#0A0A0A", marginBottom: 4 }}>
         {value}
       </p>
       {sub && (
-        <p
-          style={{ fontSize: 12, fontWeight: 500 }}
-          className={
-            accent === "positive"
-              ? "text-[#388E3C] mt-1"
-              : accent === "negative"
-              ? "text-[#D32F2F] mt-1"
-              : "text-[#777777] mt-1"
-          }
-        >
+        <p style={{
+          fontSize: 12, fontWeight: 500,
+          color: trend === "up" ? "#16A34A" : trend === "down" ? "#EF4444" : "#A3A3A3",
+          display: "flex", alignItems: "center", gap: 4,
+        }}>
+          {trend === "up" && <TrendingUp size={12} />}
+          {trend === "down" && <TrendingDown size={12} />}
           {sub}
         </p>
       )}
     </div>
-  );
+  )
 }
 
-const CustomTooltip = ({ active, payload, label }: any) => {
-  if (active && payload && payload.length) {
-    return (
-      <div
-        className="bg-white border border-[#E0E0E0] rounded-lg p-3 shadow-md"
-        style={{ fontSize: 12 }}
-      >
-        <p className="font-semibold text-black mb-1">{label || payload[0]?.name}</p>
-        {payload.map((p: any) => (
-          <p key={p.name} style={{ color: p.color ?? "#333" }}>
-            {p.name}: {formatCurrency(p.value)}
-          </p>
-        ))}
-      </div>
-    );
-  }
-  return null;
-};
+// ─── Custom Tooltip ──────────────────────────────────────────────────────────
+
+function ChartTooltip({ active, payload, label }: any) {
+  if (!active || !payload?.length) return null
+  return (
+    <div style={{
+      background: "#FFFFFF",
+      border: "1px solid #E5E5E3",
+      borderRadius: 10,
+      padding: "10px 14px",
+      boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
+      fontSize: 12,
+    }}>
+      <p style={{ fontWeight: 600, color: "#0A0A0A", marginBottom: 6 }}>{label}</p>
+      {payload.map((p: any) => (
+        <p key={p.name} style={{ color: p.color, marginBottom: 2 }}>
+          {p.name}: {fmt(p.value)}
+        </p>
+      ))}
+    </div>
+  )
+}
+
+// ─── Main Dashboard ──────────────────────────────────────────────────────────
 
 export default function DashboardWithSupabase() {
-  const { user } = useAuth();
-  const userId = user!.id;
+  const { user } = useAuth()
+  const userId = user!.id
 
-  const [totais, setTotais] = useState({
-    totalGastos: 0,
-    totalRenda: 0,
-    saldoDisponivel: 0,
-    percentualEconomia: 0,
-  });
-  const [categorias, setCategorias] = useState<any[]>([]);
-  const [transacoes, setTransacoes] = useState<any[]>([]);
-  const [evolucao, setEvolucao] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [totais, setTotais] = useState({ totalGastos: 0, totalRenda: 0, saldoDisponivel: 0, percentualEconomia: 0 })
+  const [categorias, setCategorias] = useState<any[]>([])
+  const [transacoes, setTransacoes] = useState<any[]>([])
+  const [evolucao, setEvolucao] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [addModalOpen, setAddModalOpen] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0)
 
-  const userName =
-    user?.user_metadata?.full_name ||
-    user?.email?.split("@")[0] ||
-    "Usuário";
+  const userName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Usuário"
+  const score = calcularScore(totais.percentualEconomia, totais.totalGastos, totais.totalRenda)
 
   useEffect(() => {
-    async function carregar() {
-      setLoading(true);
+    async function load() {
+      setLoading(true)
       try {
-        const [totaisData, categoriasData, transacoesData, evolucaoData] =
-          await Promise.all([
-            getTotaisMes(userId),
-            getGastosPorCategoria(userId),
-            getTransacoesMes(userId),
-            getEvolucaoMensal(userId),
-          ]);
-
-        setTotais(totaisData);
-        setCategorias(categoriasData);
-        setTransacoes(transacoesData.filter((t: any) => t.tipo === "despesa").slice(0, 6));
-        setEvolucao(evolucaoData);
+        const [t, c, tx, ev] = await Promise.all([
+          getTotaisMes(userId),
+          getGastosPorCategoria(userId),
+          getTransacoesMes(userId),
+          getEvolucaoMensal(userId),
+        ])
+        setTotais(t)
+        setCategorias(c)
+        setTransacoes(tx.slice(0, 8))
+        setEvolucao(ev)
       } catch (err) {
-        console.error("Erro ao carregar dashboard:", err);
+        console.error(err)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
     }
-
-    carregar();
-  }, [userId]);
+    load()
+  }, [userId, refreshKey])
 
   if (loading) {
     return (
-      <div className="p-4 lg:p-6 max-w-[1200px] mx-auto flex items-center justify-center min-h-[400px]">
-        <div className="w-6 h-6 border-2 border-black border-t-transparent rounded-full animate-spin" />
+      <div style={{ minHeight: 400, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{
+          width: 28, height: 28,
+          border: "2.5px solid #16A34A",
+          borderTopColor: "transparent",
+          borderRadius: "50%",
+          animation: "spin 0.7s linear infinite",
+        }} />
       </div>
-    );
+    )
   }
 
+  const mesAtual = new Date().toLocaleDateString("pt-BR", { month: "long", year: "numeric" })
+
   return (
-    <div className="p-4 lg:p-6 max-w-[1200px] mx-auto">
+    <div style={{ padding: "20px 20px 24px", maxWidth: 1440, margin: "0 auto", fontFamily: "var(--font-body)" }}
+      className="lg:p-8">
+
       {/* Saudação */}
-      <div className="mb-6">
-        <p style={{ fontSize: 13 }} className="text-[#777777]">
-          {new Date().toLocaleDateString("pt-BR", {
-            weekday: "long",
-            day: "2-digit",
-            month: "long",
-          })}
+      <div style={{ marginBottom: 24 }}>
+        <p style={{ fontSize: 13, color: "#A3A3A3", marginBottom: 4 }}>
+          {new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" })}
         </p>
-        <h2
-          style={{ fontSize: 26, fontWeight: 700 }}
-          className="text-black mt-0.5"
-        >
-          Olá, {userName} 👋
-        </h2>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+          <h2 style={{ fontSize: 24, fontWeight: 700, color: "#0A0A0A", letterSpacing: "-0.02em" }}>
+            Bom dia, {userName} 👋
+          </h2>
+          <button
+            onClick={() => setAddModalOpen(true)}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              fontSize: 13,
+              fontWeight: 700,
+              color: "#FFFFFF",
+              backgroundColor: "#0A0A0A",
+              padding: "9px 18px",
+              borderRadius: 10,
+              border: "none",
+              cursor: "pointer",
+              transition: "background 0.15s",
+            }}
+            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#262626")}
+            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#0A0A0A")}
+          >
+            <Plus size={15} />
+            Nova transação
+          </button>
+        </div>
       </div>
 
-      {/* Cards de resumo */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+      {/* Stats Cards */}
+      <div style={{ display: "grid", gap: 16, marginBottom: 24 }} className="grid grid-cols-2 lg:grid-cols-4">
         <StatCard
-          label="Total de Gastos"
-          value={formatCurrency(totais.totalGastos)}
-          sub="Mês atual"
-          icon={ArrowDownRight}
-          accent="negative"
+          label="Saldo"
+          value={fmt(totais.saldoDisponivel)}
+          sub={mesAtual}
+          icon={Wallet}
+          iconBg="#F5F5F0"
+          iconColor="#525252"
+          trend="neutral"
         />
         <StatCard
-          label="Total de Renda"
-          value={formatCurrency(totais.totalRenda)}
+          label="Receitas"
+          value={fmt(totais.totalRenda)}
           sub="Mês atual"
           icon={ArrowUpRight}
-          accent="positive"
+          iconBg="#DCFCE7"
+          iconColor="#16A34A"
+          trend="up"
         />
         <StatCard
-          label="Saldo Disponível"
-          value={formatCurrency(totais.saldoDisponivel)}
-          sub="Atualizado agora"
-          icon={Wallet}
-          accent="neutral"
+          label="Despesas"
+          value={fmt(totais.totalGastos)}
+          sub={`${totais.totalRenda > 0 ? ((totais.totalGastos / totais.totalRenda) * 100).toFixed(0) : 0}% da renda`}
+          icon={ArrowDownRight}
+          iconBg="#FEE2E2"
+          iconColor="#EF4444"
+          trend="down"
         />
         <StatCard
           label="Economia"
           value={`${totais.percentualEconomia.toFixed(1)}%`}
-          sub="Do total de renda"
+          sub="Da renda total"
           icon={PiggyBank}
-          accent={totais.percentualEconomia > 0 ? "positive" : "neutral"}
+          iconBg="#DCFCE7"
+          iconColor="#16A34A"
+          trend={totais.percentualEconomia > 20 ? "up" : "neutral"}
         />
       </div>
 
-      {/* Gráficos */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-        {/* Evolução mensal */}
-        <div
-          className="bg-white rounded-lg p-5 border border-[#E0E0E0]"
-          style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}
-        >
-          <div className="flex items-center justify-between mb-4">
-            <h3
-              style={{ fontSize: 14, fontWeight: 600 }}
-              className="text-black"
-            >
-              Evolução Mensal
-            </h3>
-            <span
-              className="bg-[#F5F5F5] text-[#333333] rounded-md px-2 py-1"
-              style={{ fontSize: 11, fontWeight: 500 }}
-            >
-              6 meses
-            </span>
+      {/* Main grid */}
+      <div style={{ display: "grid", gap: 20 }} className="grid grid-cols-1 lg:grid-cols-12">
+
+        {/* Left column */}
+        <div className="lg:col-span-8" style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+
+          {/* Evolução mensal — LineChart */}
+          <div style={{
+            background: "#FFFFFF",
+            borderRadius: 16,
+            border: "1px solid #E5E5E3",
+            padding: "20px 24px",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+              <div>
+                <h3 style={{ fontSize: 15, fontWeight: 600, color: "#0A0A0A" }}>Receitas vs Despesas</h3>
+                <p style={{ fontSize: 12, color: "#A3A3A3", marginTop: 2 }}>Últimos 6 meses</p>
+              </div>
+              <span style={{
+                fontSize: 11, fontWeight: 600, color: "#525252",
+                background: "#F5F5F0", borderRadius: 8, padding: "5px 10px",
+              }}>
+                6 meses
+              </span>
+            </div>
+
+            {evolucao.length === 0 ? (
+              <div style={{ height: 220, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                <p style={{ fontSize: 13, color: "#A3A3A3" }}>Sem dados de evolução ainda</p>
+                <Link to="/app/adicionar" style={{ fontSize: 13, fontWeight: 600, color: "#16A34A", textDecoration: "none" }}>
+                  Adicionar primeira transação →
+                </Link>
+              </div>
+            ) : (
+              <>
+                <ResponsiveContainer width="100%" height={220}>
+                  <LineChart data={evolucao} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#F5F5F0" vertical={false} />
+                    <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#A3A3A3" }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 11, fill: "#A3A3A3" }} axisLine={false} tickLine={false}
+                      tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} width={48} />
+                    <Tooltip content={<ChartTooltip />} />
+                    <Line
+                      type="monotone" dataKey="income" name="Receitas"
+                      stroke="#16A34A" strokeWidth={2.5}
+                      dot={{ fill: "#16A34A", r: 3, strokeWidth: 0 }}
+                      activeDot={{ r: 5, strokeWidth: 0 }}
+                    />
+                    <Line
+                      type="monotone" dataKey="expenses" name="Despesas"
+                      stroke="#EF4444" strokeWidth={2.5}
+                      dot={{ fill: "#EF4444", r: 3, strokeWidth: 0 }}
+                      activeDot={{ r: 5, strokeWidth: 0 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+                <div style={{ display: "flex", gap: 20, marginTop: 12 }}>
+                  {[{ cor: "#16A34A", label: "Receitas" }, { cor: "#EF4444", label: "Despesas" }].map((l) => (
+                    <div key={l.label} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <div style={{ width: 20, height: 3, borderRadius: 2, background: l.cor }} />
+                      <span style={{ fontSize: 11, color: "#A3A3A3" }}>{l.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
 
-          {evolucao.length === 0 ? (
-            <div className="h-[200px] flex flex-col items-center justify-center gap-2">
-              <p style={{ fontSize: 13 }} className="text-[#999999]">
-                Sem dados de evolução mensal ainda
-              </p>
-              <Link
-                to="/app/adicionar"
-                style={{ fontSize: 12, fontWeight: 500 }}
-                className="text-black underline underline-offset-2"
-              >
-                Adicione sua primeira transação
+          {/* Transações recentes */}
+          <div style={{
+            background: "#FFFFFF",
+            borderRadius: 16,
+            border: "1px solid #E5E5E3",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+            overflow: "hidden",
+          }}>
+            <div style={{
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+              padding: "16px 20px", borderBottom: "1px solid #F5F5F0",
+            }}>
+              <h3 style={{ fontSize: 15, fontWeight: 600, color: "#0A0A0A" }}>Transações recentes</h3>
+              <Link to="/app/analise" style={{ fontSize: 12, fontWeight: 600, color: "#16A34A", textDecoration: "none" }}>
+                Ver todas →
               </Link>
             </div>
-          ) : (
-            <>
-              <ResponsiveContainer width="100%" height={200}>
-                <BarChart data={evolucao} barGap={4}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#F0F0F0" />
-                  <XAxis
-                    dataKey="month"
-                    tick={{ fontSize: 11, fill: "#777" }}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <YAxis
-                    tick={{ fontSize: 11, fill: "#777" }}
-                    axisLine={false}
-                    tickLine={false}
-                    tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`}
-                  />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Bar
-                    dataKey="income"
-                    name="Renda"
-                    fill="#E0E0E0"
-                    radius={[4, 4, 0, 0]}
-                  />
-                  <Bar
-                    dataKey="expenses"
-                    name="Gastos"
-                    fill="#111111"
-                    radius={[4, 4, 0, 0]}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-              <div className="flex gap-4 mt-3">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 rounded-sm bg-[#111111]" />
-                  <span style={{ fontSize: 11 }} className="text-[#777777]">
-                    Gastos
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 rounded-sm bg-[#E0E0E0]" />
-                  <span style={{ fontSize: 11 }} className="text-[#777777]">
-                    Renda
-                  </span>
-                </div>
+
+            {transacoes.length === 0 ? (
+              <div style={{ padding: "40px 20px", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+                <p style={{ fontSize: 14, color: "#A3A3A3" }}>Nenhuma transação registrada.</p>
+                <Link to="/app/adicionar" style={{
+                  fontSize: 13, fontWeight: 700, color: "#FFFFFF",
+                  background: "#0A0A0A", padding: "10px 20px", borderRadius: 8, textDecoration: "none",
+                }}>
+                  + Adicionar primeira transação
+                </Link>
               </div>
-            </>
-          )}
-        </div>
-
-        {/* Gastos por categoria */}
-        <div
-          className="bg-white rounded-lg p-5 border border-[#E0E0E0]"
-          style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}
-        >
-          <div className="flex items-center justify-between mb-4">
-            <h3
-              style={{ fontSize: 14, fontWeight: 600 }}
-              className="text-black"
-            >
-              Gastos por Categoria
-            </h3>
-            <span
-              className="bg-[#F5F5F5] text-[#333333] rounded-md px-2 py-1"
-              style={{ fontSize: 11, fontWeight: 500 }}
-            >
-              {new Date().toLocaleDateString("pt-BR", {
-                month: "long",
-                year: "numeric",
-              })}
-            </span>
-          </div>
-
-          {categorias.length === 0 ? (
-            <div className="h-[160px] flex items-center justify-center">
-              <p style={{ fontSize: 13 }} className="text-[#999999]">
-                Nenhum gasto registrado este mês
-              </p>
-            </div>
-          ) : (
-            <div className="flex items-center gap-4">
-              <ResponsiveContainer width="55%" height={160}>
-                <PieChart>
-                  <Pie
-                    data={categorias}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={45}
-                    outerRadius={70}
-                    paddingAngle={2}
-                    dataKey="value"
-                  >
-                    {categorias.map((_: any, index: number) => (
-                      <Cell
-                        key={index}
-                        fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]}
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip content={<CustomTooltip />} />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="flex-1 flex flex-col gap-1.5">
-                {categorias.map((item: any, index: number) => (
+            ) : (
+              <div>
+                {transacoes.map((tx: any) => (
                   <div
-                    key={item.name}
-                    className="flex items-center justify-between"
+                    key={tx.id}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: "12px 20px",
+                      borderBottom: "1px solid #F9F9F9",
+                      transition: "background 0.15s",
+                    }}
+                    onMouseOver={(e) => (e.currentTarget.style.background = "#FAFAF9")}
+                    onMouseOut={(e) => (e.currentTarget.style.background = "transparent")}
                   >
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                        style={{
-                          backgroundColor:
-                            CATEGORY_COLORS[index % CATEGORY_COLORS.length],
-                        }}
-                      />
-                      <span
-                        style={{ fontSize: 11 }}
-                        className="text-[#555555]"
-                      >
-                        {item.name}
-                      </span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      <div style={{
+                        width: 38, height: 38, borderRadius: 10,
+                        background: tx.tipo === "receita" ? "#DCFCE7" : "#F5F5F0",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: 16, flexShrink: 0,
+                      }}>
+                        {categoryIcon(tx.categorias?.nome || "")}
+                      </div>
+                      <div>
+                        <p style={{ fontSize: 13, fontWeight: 500, color: "#0A0A0A" }}>
+                          {tx.descricao || "—"}
+                        </p>
+                        <p style={{ fontSize: 11, color: "#A3A3A3", marginTop: 1 }}>
+                          {tx.categorias?.nome || "Outros"} · {fmtDate(tx.data)}
+                        </p>
+                      </div>
                     </div>
-                    <span
-                      style={{ fontSize: 11, fontWeight: 600 }}
-                      className="text-black"
-                    >
-                      {item.percent}%
+                    <span style={{
+                      fontSize: 14, fontWeight: 700,
+                      color: tx.tipo === "receita" ? "#16A34A" : "#EF4444",
+                    }}>
+                      {tx.tipo === "receita" ? "+" : "-"}{fmt(tx.valor)}
                     </span>
                   </div>
                 ))}
               </div>
+            )}
+          </div>
+        </div>
+
+        {/* Right column */}
+        <div className="lg:col-span-4" style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+
+          {/* Score Gauge */}
+          <ScoreGauge score={score} />
+
+          {/* Categoria Donut */}
+          <div style={{
+            background: "#FFFFFF",
+            borderRadius: 16,
+            border: "1px solid #E5E5E3",
+            padding: "20px",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+              <h3 style={{ fontSize: 15, fontWeight: 600, color: "#0A0A0A" }}>Por categoria</h3>
+              <span style={{ fontSize: 11, color: "#A3A3A3" }}>
+                {new Date().toLocaleDateString("pt-BR", { month: "short", year: "numeric" })}
+              </span>
             </div>
-          )}
-        </div>
-      </div>
 
-      {/* Últimas transações */}
-      <div
-        className="bg-white rounded-lg border border-[#E0E0E0]"
-        style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}
-      >
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#F0F0F0]">
-          <h3
-            style={{ fontSize: 14, fontWeight: 600 }}
-            className="text-black"
-          >
-            Últimas Transações
-          </h3>
-          <Link
-            to="/app/analise"
-            className="text-[#555555] hover:text-black transition-colors"
-            style={{ fontSize: 12, fontWeight: 500 }}
-          >
-            Ver todas →
-          </Link>
-        </div>
-
-        {transacoes.length === 0 ? (
-          <div className="px-5 py-10 flex flex-col items-center gap-3">
-            <p
-              style={{ fontSize: 14, fontWeight: 500 }}
-              className="text-[#555555]"
-            >
-              Nenhuma transação ainda.
-            </p>
-            <Link
-              to="/app/adicionar"
-              className="bg-black text-white px-4 py-2 rounded-lg hover:bg-[#333333] transition-colors"
-              style={{ fontSize: 13, fontWeight: 600 }}
-            >
-              + Adicionar primeiro gasto
-            </Link>
-          </div>
-        ) : (
-          <div className="divide-y divide-[#F5F5F5]">
-            {transacoes.map((tx: any) => (
-              <div
-                key={tx.id}
-                className="flex items-center justify-between px-5 py-3.5 hover:bg-[#FAFAFA] transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-[#F5F5F5] flex items-center justify-center text-base">
-                    {categoryIcon(tx.categorias?.nome || "")}
-                  </div>
-                  <div>
-                    <p
-                      style={{ fontSize: 13, fontWeight: 500 }}
-                      className="text-black"
-                    >
-                      {tx.descricao || "—"}
-                    </p>
-                    <p
-                      style={{ fontSize: 11 }}
-                      className="text-[#999999]"
-                    >
-                      {tx.categorias?.nome || "Outros"} ·{" "}
-                      {formatDate(tx.data)}
-                    </p>
-                  </div>
-                </div>
-                <span
-                  style={{ fontSize: 13, fontWeight: 600 }}
-                  className="text-[#D32F2F]"
-                >
-                  -{formatCurrency(tx.valor)}
-                </span>
+            {categorias.length === 0 ? (
+              <div style={{ height: 160, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <p style={{ fontSize: 13, color: "#A3A3A3" }}>Sem gastos este mês</p>
               </div>
-            ))}
+            ) : (
+              <>
+                <ResponsiveContainer width="100%" height={160}>
+                  <PieChart>
+                    <Pie
+                      data={categorias}
+                      cx="50%" cy="50%"
+                      innerRadius={46} outerRadius={70}
+                      paddingAngle={3} dataKey="value"
+                    >
+                      {categorias.map((_: any, i: number) => (
+                        <Cell key={i} fill={CATEGORY_COLORS[i % CATEGORY_COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip content={<ChartTooltip />} />
+                  </PieChart>
+                </ResponsiveContainer>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 7, marginTop: 8 }}>
+                  {categorias.slice(0, 5).map((item: any, i: number) => (
+                    <div key={item.name} style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <div style={{
+                          width: 8, height: 8, borderRadius: "50%", flexShrink: 0,
+                          background: CATEGORY_COLORS[i % CATEGORY_COLORS.length],
+                        }} />
+                        <span style={{ fontSize: 12, color: "#525252" }}>{item.name}</span>
+                      </div>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: "#0A0A0A" }}>
+                        {item.percent}%
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
-        )}
+        </div>
       </div>
 
-      {/* FAB mobile */}
-      <Link
-        to="/app/adicionar"
-        className="lg:hidden fixed bottom-20 right-5 w-14 h-14 bg-black text-white rounded-full flex items-center justify-center shadow-lg hover:bg-[#333333] transition-colors z-10"
-        style={{ boxShadow: "0 4px 16px rgba(0,0,0,0.25)" }}
+      {/* Mobile FAB */}
+      <button
+        className="lg:hidden"
+        onClick={() => setAddModalOpen(true)}
+        style={{
+          position: "fixed",
+          bottom: 80,
+          right: 20,
+          width: 54,
+          height: 54,
+          background: "#0A0A0A",
+          color: "#FFFFFF",
+          borderRadius: "50%",
+          border: "none",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.25)",
+          zIndex: 10,
+          cursor: "pointer",
+          transition: "background 0.15s, transform 0.15s",
+        }}
+        onMouseOver={(e) => { e.currentTarget.style.background = "#262626"; e.currentTarget.style.transform = "scale(1.05)" }}
+        onMouseOut={(e) => { e.currentTarget.style.background = "#0A0A0A"; e.currentTarget.style.transform = "scale(1)" }}
       >
-        <Plus size={24} />
-      </Link>
+        <Plus size={22} />
+      </button>
+
+      <AddTransactionModal
+        open={addModalOpen}
+        onOpenChange={setAddModalOpen}
+        onSuccess={() => setRefreshKey((k) => k + 1)}
+      />
     </div>
-  );
+  )
 }
