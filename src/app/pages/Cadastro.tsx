@@ -97,7 +97,10 @@ export default function Cadastro() {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: nome } },
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        data: { full_name: nome },
+      },
     })
 
     if (error) {

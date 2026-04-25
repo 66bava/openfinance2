@@ -3,7 +3,8 @@ import { useNavigate } from "react-router"
 import { toast } from "sonner"
 import { UtensilsCrossed, Bus, Heart, BookOpen, Clapperboard, Package, CalendarDays, CheckCircle2 } from "lucide-react"
 import { useAuth } from "../../lib/auth-context"
-import { addTransacao, getOrCreateCategoria } from "../../lib/queries"
+import { addTransacao, getOrCreateCategoria, getProfile } from "../../lib/queries"
+import { supabase } from "../../lib/supabase"
 import { valorSchema } from "../../lib/validations"
 
 type Category = "Alimentação" | "Transporte" | "Saúde" | "Educação" | "Entretenimento" | "Outros"
@@ -61,6 +62,28 @@ export default function AddExpense() {
     setIsSubmitting(true)
     try {
       const userId = user!.id
+
+      // Verificar limite de transações para plano Free
+      const profile = await getProfile(userId)
+      if (!profile || profile.plano === "free") {
+        const inicioMes = new Date()
+        inicioMes.setDate(1)
+        const { count } = await supabase
+          .from("transacoes")
+          .select("*", { count: "exact", head: true })
+          .eq("user_id", userId)
+          .gte("data", inicioMes.toISOString().split("T")[0])
+        if ((count ?? 0) >= 30) {
+          toast.error("Limite de 30 transações/mês atingido", {
+            description: "Faça upgrade para Pro para transações ilimitadas.",
+            duration: 5000,
+            action: { label: "Ver planos", onClick: () => navigate("/app/perfil") },
+          })
+          setIsSubmitting(false)
+          return
+        }
+      }
+
       const categoriaId = await getOrCreateCategoria(userId, category as string)
 
       await addTransacao(userId, {

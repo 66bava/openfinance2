@@ -4,6 +4,8 @@ import {
   FileText, Download, FileSpreadsheet, Calendar,
   BarChart2, ArrowDownRight, ArrowUpRight, Wallet, PiggyBank,
 } from "lucide-react";
+import { useFeatureAccess } from "../hooks/useFeatureAccess";
+import { FeatureLock } from "../components/FeatureLock";
 import jsPDF from "jspdf";
 import * as XLSX from "xlsx";
 import { useAuth } from "../../lib/auth-context";
@@ -270,6 +272,19 @@ function generateXLSX(
 }
 
 export default function Reports() {
+  const { hasAccess, loading: accessLoading } = useFeatureAccess("pro");
+
+  if (accessLoading) return (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: 300 }}>
+      <div style={{ width: 24, height: 24, border: "2px solid #E5E5E3", borderTopColor: "#16A34A", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />
+    </div>
+  );
+  if (!hasAccess) return <FeatureLock message="Relatórios em PDF e Excel estão disponíveis apenas no plano Pro." />;
+
+  return <ReportsContent />;
+}
+
+function ReportsContent() {
   const { user } = useAuth();
   const userId = user!.id;
 

@@ -11,6 +11,7 @@ import Cadastro from "./pages/Cadastro"
 import LandingPage from "./pages/LandingPage"
 import Privacidade from "./pages/Privacidade"
 import Termos from "./pages/Termos"
+import Callback from "./pages/Callback"
 
 export const router = createBrowserRouter([
   {
@@ -24,6 +25,10 @@ export const router = createBrowserRouter([
   {
     path: "/cadastro",
     Component: Cadastro,
+  },
+  {
+    path: "/auth/callback",
+    Component: Callback,
   },
   {
     path: "/privacidade",

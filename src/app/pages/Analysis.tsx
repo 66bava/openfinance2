@@ -5,6 +5,8 @@ import {
 } from "recharts";
 import { Link } from "react-router";
 import { useAuth } from "../../lib/auth-context";
+import { useFeatureAccess } from "../hooks/useFeatureAccess";
+import { FeatureLock } from "../components/FeatureLock";
 import {
   getTransacoesPeriodo,
   getEvolucaoMensal,
@@ -76,6 +78,19 @@ function getDateRange(period: Period): { inicio: string; fim: string } {
 }
 
 export default function Analysis() {
+  const { hasAccess, loading: accessLoading } = useFeatureAccess("pro");
+
+  if (accessLoading) return (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: 300 }}>
+      <div style={{ width: 24, height: 24, border: "2px solid #E5E5E3", borderTopColor: "#16A34A", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />
+    </div>
+  );
+  if (!hasAccess) return <FeatureLock message="Análise detalhada de gastos está disponível apenas no plano Pro." />;
+
+  return <AnalysisContent />;
+}
+
+function AnalysisContent() {
   const { user } = useAuth();
   const userId = user!.id;
 

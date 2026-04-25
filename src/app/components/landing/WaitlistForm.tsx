@@ -12,7 +12,9 @@ export default function WaitlistForm({
   showCounter = false,
   fonte = "landing",
 }: Props) {
+  const [nome, setNome] = useState("")
   const [email, setEmail] = useState("")
+  const [telefone, setTelefone] = useState("")
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "exists" | "error">("idle")
   const [message, setMessage] = useState("")
   const [contador, setContador] = useState<number | null>(null)
@@ -30,7 +32,12 @@ export default function WaitlistForm({
     e.preventDefault()
     if (!email.trim()) return
     setStatus("loading")
-    const { error } = await supabase.from("waitlist").insert({ email: email.trim(), fonte })
+    const { error } = await supabase.from("waitlist").insert({
+      email: email.trim().toLowerCase(),
+      nome: nome.trim() || null,
+      telefone: telefone.trim() || null,
+      fonte,
+    })
     if (!error) {
       setStatus("success")
       setMessage("Pronto. Você está na lista.")
@@ -43,17 +50,42 @@ export default function WaitlistForm({
     }
   }
 
+  const inputStyle = (dark: boolean): React.CSSProperties => ({
+    width: "100%",
+    padding: "12px 16px",
+    fontSize: 15,
+    border: `1px solid ${dark ? "#333333" : "#E5E5E3"}`,
+    borderRadius: 8,
+    outline: "none",
+    backgroundColor: dark ? "#1A1A1A" : "#FFFFFF",
+    color: dark ? "#FFFFFF" : "#1A1A1A",
+    fontFamily: "var(--font-body)",
+    boxSizing: "border-box" as const,
+  })
+
   if (status === "success" || status === "exists") {
     return (
-      <p style={{
-        fontSize: 14,
-        fontWeight: 500,
-        color: status === "success"
-          ? (escuro ? "#4ADE80" : "#16A34A")
-          : (escuro ? "rgba(255,255,255,0.6)" : "#6B6B6B"),
+      <div style={{
+        padding: "16px 20px",
+        borderRadius: 10,
+        backgroundColor: escuro ? "rgba(22,163,74,0.15)" : "#F0FDF4",
+        border: `1px solid ${escuro ? "#15803D" : "#BBF7D0"}`,
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
       }}>
-        {message}
-      </p>
+        <span style={{ fontSize: 20 }}>✓</span>
+        <p style={{
+          fontSize: 14,
+          fontWeight: 600,
+          color: status === "success"
+            ? (escuro ? "#4ADE80" : "#16A34A")
+            : (escuro ? "rgba(255,255,255,0.6)" : "#6B6B6B"),
+          margin: 0,
+        }}>
+          {message}
+        </p>
+      </div>
     )
   }
 
@@ -68,53 +100,67 @@ export default function WaitlistForm({
           {contador.toLocaleString("pt-BR")} pessoas já estão na lista.
         </p>
       )}
-      <form
-        onSubmit={handleSubmit}
-        style={{ display: "flex", gap: 8, flexWrap: "wrap" }}
-      >
-        <label htmlFor={`waitlist-email-${fonte}`} className="sr-only">
-          Endereço de email
-        </label>
-        <input
-          id={`waitlist-email-${fonte}`}
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Seu melhor email"
-          required
-          autoComplete="email"
-          style={{
-            flex: 1,
-            minWidth: 200,
-            padding: "12px 16px",
-            fontSize: 15,
-            border: `1px solid ${escuro ? "#333333" : "#E5E5E3"}`,
-            borderRadius: 6,
-            outline: "none",
-            backgroundColor: escuro ? "#1A1A1A" : "#FFFFFF",
-            color: escuro ? "#FFFFFF" : "#1A1A1A",
-            fontFamily: "var(--font-body)",
-          }}
-        />
+      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <div>
+          <label htmlFor={`waitlist-nome-${fonte}`} className="sr-only">Nome</label>
+          <input
+            id={`waitlist-nome-${fonte}`}
+            type="text"
+            value={nome}
+            onChange={(e) => setNome(e.target.value)}
+            placeholder="Seu nome"
+            required
+            autoComplete="name"
+            style={inputStyle(escuro)}
+          />
+        </div>
+        <div>
+          <label htmlFor={`waitlist-email-${fonte}`} className="sr-only">Email</label>
+          <input
+            id={`waitlist-email-${fonte}`}
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Seu melhor email"
+            required
+            autoComplete="email"
+            style={inputStyle(escuro)}
+          />
+        </div>
+        <div>
+          <label htmlFor={`waitlist-tel-${fonte}`} className="sr-only">Telefone</label>
+          <input
+            id={`waitlist-tel-${fonte}`}
+            type="tel"
+            value={telefone}
+            onChange={(e) => setTelefone(e.target.value)}
+            placeholder="(00) 00000-0000"
+            required
+            autoComplete="tel"
+            style={inputStyle(escuro)}
+          />
+        </div>
         <button
           type="submit"
           disabled={status === "loading"}
           style={{
-            padding: "12px 22px",
-            backgroundColor: escuro ? "#FFFFFF" : "#1A1A1A",
-            color: escuro ? "#1A1A1A" : "#FFFFFF",
-            fontSize: 14,
-            fontWeight: 600,
+            padding: "13px 22px",
+            backgroundColor: "#16A34A",
+            color: "#FFFFFF",
+            fontSize: 15,
+            fontWeight: 700,
             border: "none",
-            borderRadius: 6,
+            borderRadius: 8,
             cursor: status === "loading" ? "not-allowed" : "pointer",
-            whiteSpace: "nowrap",
             opacity: status === "loading" ? 0.65 : 1,
             fontFamily: "var(--font-body)",
-            transition: "opacity 0.2s",
+            transition: "background 0.2s, opacity 0.2s",
+            letterSpacing: "-0.01em",
           }}
+          onMouseEnter={(e) => { if (status !== "loading") e.currentTarget.style.backgroundColor = "#15803D" }}
+          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#16A34A" }}
         >
-          {status === "loading" ? "Salvando..." : "Entrar na lista de espera"}
+          {status === "loading" ? "Salvando..." : "Garantir meu acesso"}
         </button>
       </form>
       {status === "error" && (

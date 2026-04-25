@@ -76,6 +76,7 @@ export default function Login() {
         email,
         password,
         options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
           data: {
             full_name: nome,
             phone: telefone,
@@ -124,7 +125,7 @@ export default function Login() {
 
   function onFocus(e: React.FocusEvent<HTMLInputElement>) {
     if (!e.currentTarget.style.borderColor.includes("D32F2F")) {
-      e.currentTarget.style.borderColor = "#111111"
+      e.currentTarget.style.borderColor = "#16A34A"
     }
   }
   function onBlur(e: React.FocusEvent<HTMLInputElement>, hasError: boolean) {
@@ -273,9 +274,9 @@ export default function Login() {
             type="submit"
             disabled={loading}
             className="w-full text-white font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-1"
-            style={{ fontSize: 14, borderRadius: 8, padding: "10px 0", backgroundColor: "#111111" }}
-            onMouseEnter={(e) => { if (!loading) e.currentTarget.style.backgroundColor = "#333333" }}
-            onMouseLeave={(e) => { if (!loading) e.currentTarget.style.backgroundColor = "#111111" }}
+            style={{ fontSize: 14, borderRadius: 8, padding: "11px 0", backgroundColor: isSignUp ? "#16A34A" : "#0A0A0A" }}
+            onMouseEnter={(e) => { if (!loading) e.currentTarget.style.backgroundColor = isSignUp ? "#15803D" : "#262626" }}
+            onMouseLeave={(e) => { if (!loading) e.currentTarget.style.backgroundColor = isSignUp ? "#16A34A" : "#0A0A0A" }}
           >
             {loading
               ? (isSignUp ? "Criando conta..." : "Entrando...")
@@ -288,12 +289,20 @@ export default function Login() {
           <button
             type="button"
             onClick={toggleMode}
-            className="text-black font-semibold underline-offset-2 hover:underline"
-            style={{ fontSize: 13 }}
+            style={{ fontSize: 13, color: "#16A34A", fontWeight: 600, background: "none", border: "none", cursor: "pointer", padding: 0 }}
           >
-            {isSignUp ? "Entre" : "Cadastre-se"}
+            {isSignUp ? "Fazer login" : "Cadastre-se grátis"}
           </button>
         </p>
+
+        {!isSignUp && (
+          <p className="text-center mt-3" style={{ fontSize: 12, color: "#A3A3A3" }}>
+            Ao entrar, você concorda com os{" "}
+            <a href="/termos" target="_blank" style={{ color: "#525252", textDecoration: "underline" }}>Termos</a>
+            {" "}e a{" "}
+            <a href="/privacidade" target="_blank" style={{ color: "#525252", textDecoration: "underline" }}>Privacidade</a>
+          </p>
+        )}
       </div>
     </div>
   )
