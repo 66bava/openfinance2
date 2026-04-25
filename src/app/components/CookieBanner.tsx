@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react"
-import { Link } from "react-router"
 import { X } from "lucide-react"
 
 const STORAGE_KEY = "openfy_cookie_consent"
@@ -49,9 +48,9 @@ export default function CookieBanner() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
         <p style={{ fontSize: 13, color: "#D4D4D4", lineHeight: 1.6, margin: 0 }}>
           Usamos cookies essenciais para manter sua sessão e melhorar sua experiência. Consulte nossa{" "}
-          <Link to="/privacidade" style={{ color: "#4ADE80", textDecoration: "underline" }}>
+          <a href="/privacidade" style={{ color: "#4ADE80", textDecoration: "underline" }}>
             Política de Privacidade
-          </Link>
+          </a>
           .
         </p>
         <button
