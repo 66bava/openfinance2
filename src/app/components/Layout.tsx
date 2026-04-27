@@ -12,6 +12,8 @@ import {
   LogOut,
   Settings,
   ChevronDown,
+  CreditCard,
+  Tag,
 } from "lucide-react"
 import { OFLogo } from "./OFLogo"
 import { Toaster } from "sonner"
@@ -125,6 +127,8 @@ const navItems = [
   { path: "/app/adicionar", label: "Adicionar", icon: PlusCircle },
   { path: "/app/analise", label: "Análise", icon: BarChart2 },
   { path: "/app/relatorios", label: "Relatórios", icon: FileText },
+  { path: "/app/cartoes", label: "Cartões", icon: CreditCard },
+  { path: "/app/categorias", label: "Categorias", icon: Tag },
   { path: "/app/perfil", label: "Perfil", icon: User },
 ]
 
@@ -133,7 +137,16 @@ const pageTitles: Record<string, string> = {
   "/app/adicionar": "Adicionar Transação",
   "/app/analise": "Análise de Gastos",
   "/app/relatorios": "Relatório Mensal",
+  "/app/cartoes": "Meus Cartões",
+  "/app/categorias": "Categorias",
   "/app/perfil": "Meu Perfil",
+}
+
+function getPageTitle(pathname: string): string {
+  if (pageTitles[pathname]) return pageTitles[pathname]
+  if (pathname.startsWith("/app/cartoes") && pathname.includes("/fatura/")) return "Detalhes da Fatura"
+  if (pathname.startsWith("/app/cartoes")) return "Meus Cartões"
+  return "Openfy"
 }
 
 function SidebarContent({
@@ -273,7 +286,7 @@ function SidebarContent({
 export function Layout() {
   const location = useLocation()
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const pageTitle = pageTitles[location.pathname] ?? "Openfy"
+  const pageTitle = getPageTitle(location.pathname)
   const { user } = useAuth()
   const signOut = () => supabase.auth.signOut()
   const [profile, setProfile] = useState<Profile | null>(null)

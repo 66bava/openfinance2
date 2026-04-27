@@ -6,6 +6,9 @@ import AddExpense from "./pages/AddExpense"
 import Analysis from "./pages/Analysis"
 import Reports from "./pages/Reports"
 import Profile from "./pages/Profile"
+import Cartoes from "./pages/Cartoes"
+import FaturaDetalhe from "./pages/FaturaDetalhe"
+import Categorias from "./pages/Categorias"
 import Login from "./pages/login"
 import Cadastro from "./pages/Cadastro"
 import LandingPage from "./pages/LandingPage"
@@ -49,6 +52,9 @@ export const router = createBrowserRouter([
           { path: "adicionar", Component: AddExpense },
           { path: "analise", Component: Analysis },
           { path: "relatorios", Component: Reports },
+          { path: "cartoes", Component: Cartoes },
+          { path: "cartoes/:id/fatura/:mes/:ano", Component: FaturaDetalhe },
+          { path: "categorias", Component: Categorias },
           { path: "perfil", Component: Profile },
         ],
       },

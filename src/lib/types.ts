@@ -24,12 +24,16 @@ export interface AuditLog {
 
 export interface Categoria {
   id: string
-  user_id: string
+  user_id: string | null
   nome: string
   icone: string
   cor: string
   tipo: 'receita' | 'despesa'
   is_padrao: boolean
+  emoji?: string | null
+  descricao?: string | null
+  ativo?: boolean
+  ordem?: number
 }
 
 export interface Transacao {
@@ -41,6 +45,10 @@ export interface Transacao {
   tipo: 'receita' | 'despesa'
   data: string
   categorias?: Categoria
+  cartao_id?: string | null
+  fatura_id?: string | null
+  metodo_pagamento?: 'dinheiro' | 'debito' | 'credito' | 'pix' | 'transferencia' | null
+  confirmado?: boolean
 }
 
 export interface Meta {
@@ -52,3 +60,37 @@ export interface Meta {
   prazo: string
   concluida: boolean
 }
+
+export interface Cartao {
+  id: string
+  user_id: string
+  nome: string
+  tipo: 'credito' | 'debito'
+  bandeira: 'visa' | 'mastercard' | 'elo' | 'amex' | 'hipercard' | 'outro' | null
+  limite: number
+  dia_vencimento: number | null
+  dia_fechamento: number | null
+  cor: string
+  ativo: boolean
+  criado_em: string
+}
+
+export interface Fatura {
+  id: string
+  cartao_id: string
+  user_id: string
+  mes: number
+  ano: number
+  valor_total: number
+  valor_pago: number
+  status: 'aberta' | 'fechada' | 'paga' | 'parcial'
+  data_pagamento: string | null
+  criado_em: string
+  cartoes?: Cartao
+}
+
+export type MetodoPagamento = 'dinheiro' | 'debito' | 'credito' | 'pix' | 'transferencia'
+export type TipoPagamentoFatura = 'total' | 'parcial'
+export type BandeiraCartao = 'visa' | 'mastercard' | 'elo' | 'amex' | 'hipercard' | 'outro'
+export type TipoCartao = 'credito' | 'debito'
+export type StatusFatura = 'aberta' | 'fechada' | 'paga' | 'parcial'
