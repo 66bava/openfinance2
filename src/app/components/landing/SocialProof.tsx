@@ -1,6 +1,22 @@
 import { motion } from "motion/react"
 
-const tecnologias = ["Supabase", "Anthropic Claude", "Stripe", "React", "Vercel"]
+const metricas = [
+  {
+    numero: "200+",
+    label: "na lista de espera",
+    detalhe: "e crescendo",
+  },
+  {
+    numero: "14 dias",
+    label: "trial grátis",
+    detalhe: "sem cartão de crédito",
+  },
+  {
+    numero: "100%",
+    label: "LGPD compliant",
+    detalhe: "seus dados são seus",
+  },
+]
 
 export default function SocialProof() {
   return (
@@ -10,48 +26,51 @@ export default function SocialProof() {
         borderBottom: "1px solid #E5E5E3",
         padding: "48px 24px",
         fontFamily: "var(--font-body)",
-        backgroundColor: "#FFFFFF",
+        backgroundColor: "#FAFAFA",
       }}
     >
-      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-        <p style={{
-          textAlign: "center",
-          fontSize: 12,
-          fontWeight: 600,
-          color: "#A3A3A3",
-          letterSpacing: "0.12em",
-          textTransform: "uppercase",
-          marginBottom: 28,
-        }}>
-          Construído com tecnologia de ponta
-        </p>
+      <div style={{ maxWidth: 900, margin: "0 auto" }}>
         <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.5 }}
           style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "16px 48px",
-            opacity: 0.55,
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: 0,
           }}
+          className="grid grid-cols-1 md:grid-cols-3"
         >
-          {tecnologias.map((nome) => (
-            <span
-              key={nome}
+          {metricas.map((m, i) => (
+            <div
+              key={m.label}
               style={{
-                fontSize: 15,
-                fontWeight: 700,
-                color: "#525252",
-                letterSpacing: "-0.01em",
-                fontFamily: "var(--font-display)",
+                textAlign: "center",
+                padding: "24px 32px",
+                borderRight: i < metricas.length - 1 ? "1px solid #E5E5E3" : "none",
+                borderBottom: "none",
               }}
+              className={i < metricas.length - 1 ? "border-b md:border-b-0 border-[#E5E5E3]" : ""}
             >
-              {nome}
-            </span>
+              <p style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "clamp(28px, 3vw, 40px)",
+                fontWeight: 700,
+                color: "#0A0A0A",
+                letterSpacing: "-0.03em",
+                lineHeight: 1,
+                marginBottom: 6,
+              }}>
+                {m.numero}
+              </p>
+              <p style={{ fontSize: 15, fontWeight: 600, color: "#0A0A0A", marginBottom: 4 }}>
+                {m.label}
+              </p>
+              <p style={{ fontSize: 13, color: "#A3A3A3" }}>
+                {m.detalhe}
+              </p>
+            </div>
           ))}
         </motion.div>
       </div>

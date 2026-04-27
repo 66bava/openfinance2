@@ -201,21 +201,22 @@ export default function Hero() {
                 animation: "pulse 2s infinite",
               }} />
               <span style={{ fontSize: 13, fontWeight: 500, color: "#15803D" }}>
-                Beta aberto · Acesso antecipado
+                Beta fechado · Acesso antecipado disponível
               </span>
             </div>
 
             <h1 style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(36px, 4.5vw, 60px)",
+              fontSize: "clamp(34px, 4.2vw, 58px)",
               fontWeight: 700,
               color: "#0A0A0A",
               letterSpacing: "-0.03em",
-              lineHeight: 1.05,
+              lineHeight: 1.06,
               marginBottom: 24,
             }}>
-              Sua saúde financeira em{" "}
-              <span style={{ color: "#16A34A" }}>tempo real.</span>
+              Descubra se sua vida financeira está{" "}
+              <span style={{ color: "#16A34A" }}>saudável,</span>{" "}
+              e como melhorar.
             </h1>
 
             <p style={{
@@ -225,13 +226,14 @@ export default function Hero() {
               marginBottom: 36,
               maxWidth: 500,
             }}>
-              O primeiro app brasileiro com Score de Saúde Financeira de 0 a 1000. Relatórios com IA, metas gamificadas e plano família.
+              O primeiro app brasileiro com Score de Saúde Financeira de 0 a 1000.
+              Relatórios com IA, metas gamificadas e plano família.
             </p>
 
             <WaitlistForm fonte="hero" showCounter />
 
             <div style={{ display: "flex", flexWrap: "wrap", gap: 20, marginTop: 20 }}>
-              {["Grátis por 14 dias", "Sem cartão de crédito", "Cancele quando quiser"].map((item) => (
+              {["200+ na lista de espera", "Grátis por 14 dias", "Sem cartão de crédito"].map((item) => (
                 <div key={item} style={{ display: "flex", alignItems: "center", gap: 6 }}>
                   <CheckCircle2 size={14} color="#16A34A" />
                   <span style={{ fontSize: 13, color: "#A3A3A3" }}>{item}</span>
