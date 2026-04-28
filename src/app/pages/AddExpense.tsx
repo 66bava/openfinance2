@@ -1,27 +1,18 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { useNavigate } from "react-router"
 import { toast } from "sonner"
 import {
-  UtensilsCrossed, Bus, Heart, BookOpen, Clapperboard, Package,
   CalendarDays, CheckCircle2, Banknote, QrCode, ArrowLeftRight, CreditCard, Smartphone,
+  ChevronDown, Plus,
 } from "lucide-react"
 import { useAuth } from "../../lib/auth-context"
-import { addTransacao, getOrCreateCategoria, getProfile } from "../../lib/queries"
+import { addTransacao, getProfile } from "../../lib/queries"
 import { getCartoes, getFaturaAtual, recalcularFatura } from "../../lib/queries/cartoes"
+import { getCategoriasAtivas, criarCategoria } from "../../lib/queries/categorias"
 import { supabase } from "../../lib/supabase"
 import { valorSchema } from "../../lib/validations"
-import type { Cartao, MetodoPagamento } from "../../lib/types"
-
-type Category = "Alimentação" | "Transporte" | "Saúde" | "Educação" | "Entretenimento" | "Outros"
-
-const categories: { name: Category; icon: React.ElementType; emoji: string }[] = [
-  { name: "Alimentação", icon: UtensilsCrossed, emoji: "🍽️" },
-  { name: "Transporte", icon: Bus, emoji: "🚌" },
-  { name: "Saúde", icon: Heart, emoji: "🏥" },
-  { name: "Educação", icon: BookOpen, emoji: "📚" },
-  { name: "Entretenimento", icon: Clapperboard, emoji: "🎬" },
-  { name: "Outros", icon: Package, emoji: "📦" },
-]
+import ModalNovaCategoria from "../components/categorias/ModalNovaCategoria"
+import type { Cartao, MetodoPagamento, Categoria } from "../../lib/types"
 
 const METODOS: { valor: MetodoPagamento; label: string; icon: React.ElementType }[] = [
   { valor: "dinheiro", label: "Dinheiro", icon: Banknote },
@@ -37,7 +28,7 @@ export default function AddExpense() {
 
   const [amount, setAmount] = useState("")
   const [description, setDescription] = useState("")
-  const [category, setCategory] = useState<Category | "">("")
+  const [categoriaId, setCategoriaId] = useState("")
   const [date, setDate] = useState(new Date().toISOString().split("T")[0])
   const [metodo, setMetodo] = useState<MetodoPagamento | "">("")
   const [cartaoId, setCartaoId] = useState<string>("")
@@ -46,11 +37,47 @@ export default function AddExpense() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Carregar cartões do usuário
+  const [cats, setCats] = useState<Categoria[]>([])
+  const [loadingCats, setLoadingCats] = useState(false)
+  const [catsOpen, setCatsOpen] = useState(false)
+  const [modalNovaCat, setModalNovaCat] = useState(false)
+  const [plano, setPlano] = useState("free")
+  const catRef = useRef<HTMLDivElement>(null)
+
+  const carregarCats = useCallback(async () => {
+    if (!user) return
+    setLoadingCats(true)
+    try {
+      const lista = await getCategoriasAtivas(user.id)
+      setCats(lista)
+    } catch {
+      // silent
+    } finally {
+      setLoadingCats(false)
+    }
+  }, [user])
+
+  // Carregar cartões, plano e categorias do usuário
   useEffect(() => {
     if (!user) return
     getCartoes(user.id).then(setCartoes).catch(console.error)
-  }, [user])
+    getProfile(user.id).then((p) => setPlano(p?.plano ?? "free")).catch(console.error)
+    carregarCats()
+  }, [user, carregarCats])
+
+  // Fechar dropdown ao clicar fora
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (catRef.current && !catRef.current.contains(e.target as Node)) setCatsOpen(false)
+    }
+    document.addEventListener("mousedown", handleClick)
+    return () => document.removeEventListener("mousedown", handleClick)
+  }, [])
+
+  const catsFiltradas = cats.filter((c) => c.tipo === "despesa")
+  const catsPadrao = catsFiltradas.filter((c) => c.is_padrao)
+  const catsMinhas = catsFiltradas.filter((c) => !c.is_padrao && c.user_id === user?.id)
+  const catSelecionada = cats.find((c) => c.id === categoriaId)
 
   // Quando muda o método, ajusta o cartão e confirmado padrão
   useEffect(() => {
@@ -78,11 +105,31 @@ export default function AddExpense() {
     ? (parseInt(amount) / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })
     : ""
 
+  const handleSalvarNovaCat = async (dados: { nome: string; tipo: "receita" | "despesa"; icone: string; cor: string }) => {
+    try {
+      const nova = await criarCategoria(user!.id, plano, dados)
+      setModalNovaCat(false)
+      await carregarCats()
+      setCategoriaId(nova.id)
+      setErrors((prev) => ({ ...prev, category: "" }))
+    } catch (err: unknown) {
+      if (err instanceof Error && err.message === "LIMITE_ATINGIDO") {
+        setModalNovaCat(false)
+        toast.error("Limite de categorias atingido", {
+          description: "Faça upgrade para Pro para criar categorias ilimitadas.",
+          action: { label: "Ver planos", onClick: () => navigate("/app/perfil") },
+        })
+      } else {
+        toast.error("Erro ao criar categoria.")
+      }
+    }
+  }
+
   const validate = () => {
     const errs: Record<string, string> = {}
     const valorResult = valorSchema.safeParse(amount)
     if (!valorResult.success) errs.amount = valorResult.error.issues[0].message
-    if (!category) errs.category = "Selecione uma categoria"
+    if (!categoriaId) errs.category = "Selecione uma categoria"
     if (!date) errs.date = "Selecione uma data"
     if ((metodo === "credito" || metodo === "debito") && !cartaoId && cartoesDoTipo.length > 0) {
       errs.cartao = "Selecione o cartão"
@@ -120,8 +167,6 @@ export default function AddExpense() {
         }
       }
 
-      const categoriaId = await getOrCreateCategoria(userId, category as string)
-
       // Buscar fatura se for crédito com cartão selecionado
       let faturaId: string | null = null
       if (metodo === "credito" && cartaoId) {
@@ -132,7 +177,7 @@ export default function AddExpense() {
 
       await addTransacao(userId, {
         categoria_id: categoriaId,
-        descricao: description || (category as string),
+        descricao: description || catSelecionada?.nome || "",
         valor: parseInt(amount) / 100,
         tipo: "despesa",
         data: date,
@@ -148,7 +193,7 @@ export default function AddExpense() {
       }
 
       toast.success("Gasto registrado com sucesso!", {
-        description: `${category} · R$ ${displayAmount}`,
+        description: `${catSelecionada?.nome ?? ""} · R$ ${displayAmount}`,
         duration: 3500,
       })
 
@@ -201,23 +246,127 @@ export default function AddExpense() {
           <label style={{ fontSize: 12, fontWeight: 500 }} className="text-[#777777] uppercase tracking-wider block mb-3">
             Categoria *
           </label>
-          <div className="grid grid-cols-3 gap-2">
-            {categories.map(({ name, emoji }) => (
-              <button
-                key={name}
-                type="button"
-                onClick={() => { setCategory(name); setErrors((prev) => ({ ...prev, category: "" })) }}
-                className={`flex flex-col items-center gap-2 p-3 rounded-lg border transition-all duration-200 ${
-                  category === name
-                    ? "bg-black border-black text-white"
-                    : "border-[#E0E0E0] text-[#333333] hover:border-[#999999] hover:bg-[#F5F5F5]"
-                }`}
-              >
-                <span style={{ fontSize: 20 }}>{emoji}</span>
-                <span style={{ fontSize: 11, fontWeight: category === name ? 600 : 400 }}>{name}</span>
-              </button>
-            ))}
+
+          <div ref={catRef} style={{ position: "relative" }}>
+            {/* Trigger */}
+            <button
+              type="button"
+              disabled={loadingCats}
+              onClick={() => { if (!loadingCats) setCatsOpen((v) => !v) }}
+              className={`w-full flex items-center justify-between border rounded-md px-3 py-2.5 transition-colors text-left ${
+                errors.category ? "border-[#D32F2F]" : catsOpen ? "border-black" : "border-[#E0E0E0] hover:border-[#999999]"
+              } ${loadingCats ? "bg-[#F5F5F5] cursor-not-allowed" : "bg-white cursor-pointer"}`}
+              style={{ fontSize: 14 }}
+            >
+              {loadingCats ? (
+                <span className="text-[#BBBBBB]">Carregando categorias...</span>
+              ) : catSelecionada ? (
+                <span className="flex items-center gap-2 text-[#0A0A0A]">
+                  <span style={{ fontSize: 18, lineHeight: 1 }}>{catSelecionada.emoji || catSelecionada.icone}</span>
+                  <span>{catSelecionada.nome}</span>
+                </span>
+              ) : (
+                <span className="text-[#BBBBBB]">Selecione uma categoria...</span>
+              )}
+              <ChevronDown
+                size={16}
+                className="text-[#999999] flex-shrink-0"
+                style={{ transform: catsOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}
+              />
+            </button>
+
+            {/* Dropdown panel */}
+            {catsOpen && (
+              <div style={{
+                position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, zIndex: 50,
+                background: "#FFFFFF", border: "1px solid #E0E0E0", borderRadius: 10,
+                boxShadow: "0 8px 24px rgba(0,0,0,0.12)", maxHeight: 280, overflowY: "auto",
+              }}>
+                {/* Grupo: Padrão */}
+                {catsPadrao.length > 0 && (
+                  <div>
+                    <p style={{ fontSize: 10, fontWeight: 600, color: "#A3A3A3", padding: "10px 12px 4px", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                      Padrão
+                    </p>
+                    {catsPadrao.map((c) => (
+                      <button
+                        key={c.id}
+                        type="button"
+                        onClick={() => { setCategoriaId(c.id); setErrors((p) => ({ ...p, category: "" })); setCatsOpen(false) }}
+                        style={{
+                          width: "100%", display: "flex", alignItems: "center", gap: 10,
+                          padding: "9px 12px", border: "none", cursor: "pointer", fontSize: 14,
+                          color: "#0A0A0A", textAlign: "left", transition: "background 0.1s",
+                          background: categoriaId === c.id ? "#F5F5F0" : "transparent",
+                        }}
+                        onMouseEnter={(e) => { if (categoriaId !== c.id) e.currentTarget.style.background = "#F9F9F9" }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = categoriaId === c.id ? "#F5F5F0" : "transparent" }}
+                      >
+                        <span style={{ fontSize: 18, lineHeight: 1, flexShrink: 0 }}>{c.emoji || c.icone}</span>
+                        <span style={{ flex: 1 }}>{c.nome}</span>
+                        {categoriaId === c.id && <span style={{ fontSize: 12, color: "#16A34A" }}>✓</span>}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Grupo: Minhas categorias */}
+                {catsMinhas.length > 0 && (
+                  <div style={{ borderTop: catsPadrao.length > 0 ? "1px solid #F0F0F0" : "none" }}>
+                    <p style={{ fontSize: 10, fontWeight: 600, color: "#A3A3A3", padding: "10px 12px 4px", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                      Minhas categorias
+                    </p>
+                    {catsMinhas.map((c) => (
+                      <button
+                        key={c.id}
+                        type="button"
+                        onClick={() => { setCategoriaId(c.id); setErrors((p) => ({ ...p, category: "" })); setCatsOpen(false) }}
+                        style={{
+                          width: "100%", display: "flex", alignItems: "center", gap: 10,
+                          padding: "9px 12px", border: "none", cursor: "pointer", fontSize: 14,
+                          color: "#0A0A0A", textAlign: "left", transition: "background 0.1s",
+                          background: categoriaId === c.id ? "#F5F5F0" : "transparent",
+                        }}
+                        onMouseEnter={(e) => { if (categoriaId !== c.id) e.currentTarget.style.background = "#F9F9F9" }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = categoriaId === c.id ? "#F5F5F0" : "transparent" }}
+                      >
+                        <span style={{ fontSize: 18, lineHeight: 1, flexShrink: 0 }}>{c.emoji || c.icone}</span>
+                        <span style={{ flex: 1 }}>{c.nome}</span>
+                        {categoriaId === c.id && <span style={{ fontSize: 12, color: "#16A34A" }}>✓</span>}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Empty state */}
+                {catsFiltradas.length === 0 && (
+                  <p style={{ fontSize: 13, color: "#A3A3A3", padding: "14px 12px", textAlign: "center" }}>
+                    Nenhuma categoria encontrada
+                  </p>
+                )}
+
+                {/* Footer: Nova categoria */}
+                <div style={{ borderTop: "1px solid #F0F0F0", padding: "6px" }}>
+                  <button
+                    type="button"
+                    onClick={() => { setCatsOpen(false); setModalNovaCat(true) }}
+                    style={{
+                      width: "100%", display: "flex", alignItems: "center", gap: 8,
+                      padding: "9px 10px", background: "none", border: "none", borderRadius: 8,
+                      cursor: "pointer", fontSize: 13, fontWeight: 600, color: "#16A34A",
+                      transition: "background 0.1s",
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = "#DCFCE7" }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = "none" }}
+                  >
+                    <Plus size={14} />
+                    Criar nova categoria
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
+
           {errors.category && (
             <p style={{ fontSize: 12 }} className="text-[#D32F2F] mt-2">{errors.category}</p>
           )}
@@ -367,6 +516,13 @@ export default function AddExpense() {
           </button>
         </div>
       </form>
+
+      {modalNovaCat && (
+        <ModalNovaCategoria
+          onClose={() => setModalNovaCat(false)}
+          onSalvar={handleSalvarNovaCat}
+        />
+      )}
     </div>
   )
 }
