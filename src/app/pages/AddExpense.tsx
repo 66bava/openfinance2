@@ -262,7 +262,7 @@ export default function AddExpense() {
                 <span className="text-[#BBBBBB]">Carregando categorias...</span>
               ) : catSelecionada ? (
                 <span className="flex items-center gap-2 text-[#0A0A0A]">
-                  <span style={{ fontSize: 18, lineHeight: 1 }}>{catSelecionada.emoji || catSelecionada.icone}</span>
+                  <span style={{ fontSize: 18, lineHeight: 1 }}>{catSelecionada.icone}</span>
                   <span>{catSelecionada.nome}</span>
                 </span>
               ) : (
@@ -302,7 +302,7 @@ export default function AddExpense() {
                         onMouseEnter={(e) => { if (categoriaId !== c.id) e.currentTarget.style.background = "#F9F9F9" }}
                         onMouseLeave={(e) => { e.currentTarget.style.background = categoriaId === c.id ? "#F5F5F0" : "transparent" }}
                       >
-                        <span style={{ fontSize: 18, lineHeight: 1, flexShrink: 0 }}>{c.emoji || c.icone}</span>
+                        <span style={{ fontSize: 18, lineHeight: 1, flexShrink: 0 }}>{c.icone}</span>
                         <span style={{ flex: 1 }}>{c.nome}</span>
                         {categoriaId === c.id && <span style={{ fontSize: 12, color: "#16A34A" }}>✓</span>}
                       </button>
@@ -330,7 +330,7 @@ export default function AddExpense() {
                         onMouseEnter={(e) => { if (categoriaId !== c.id) e.currentTarget.style.background = "#F9F9F9" }}
                         onMouseLeave={(e) => { e.currentTarget.style.background = categoriaId === c.id ? "#F5F5F0" : "transparent" }}
                       >
-                        <span style={{ fontSize: 18, lineHeight: 1, flexShrink: 0 }}>{c.emoji || c.icone}</span>
+                        <span style={{ fontSize: 18, lineHeight: 1, flexShrink: 0 }}>{c.icone}</span>
                         <span style={{ flex: 1 }}>{c.nome}</span>
                         {categoriaId === c.id && <span style={{ fontSize: 12, color: "#16A34A" }}>✓</span>}
                       </button>
