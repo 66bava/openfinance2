@@ -3,7 +3,7 @@ import { useNavigate } from "react-router"
 import { toast } from "sonner"
 import {
   CalendarDays, CheckCircle2, Banknote, QrCode, ArrowLeftRight, CreditCard, Smartphone,
-  ChevronDown, Plus,
+  ChevronDown, Plus, Layers,
 } from "lucide-react"
 import { useAuth } from "../../lib/auth-context"
 import { addTransacao, getProfile } from "../../lib/queries"
@@ -13,6 +13,7 @@ import { supabase } from "../../lib/supabase"
 import { valorSchema } from "../../lib/validations"
 import ModalNovaCategoria from "../components/categorias/ModalNovaCategoria"
 import type { Cartao, MetodoPagamento, Categoria } from "../../lib/types"
+import { useLanguage } from "../../lib/language-context"
 
 const METODOS: { valor: MetodoPagamento; label: string; icon: React.ElementType }[] = [
   { valor: "dinheiro", label: "Dinheiro", icon: Banknote },
@@ -25,6 +26,7 @@ const METODOS: { valor: MetodoPagamento; label: string; icon: React.ElementType 
 export default function AddExpense() {
   const navigate = useNavigate()
   const { user } = useAuth()
+  const { t } = useLanguage()
 
   const [amount, setAmount] = useState("")
   const [description, setDescription] = useState("")
@@ -36,6 +38,8 @@ export default function AddExpense() {
   const [cartoes, setCartoes] = useState<Cartao[]>([])
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [parcelado, setParcelado] = useState(false)
+  const [numParcelas, setNumParcelas] = useState(2)
 
   const [cats, setCats] = useState<Categoria[]>([])
   const [loadingCats, setLoadingCats] = useState(false)
@@ -156,9 +160,10 @@ export default function AddExpense() {
           .select("*", { count: "exact", head: true })
           .eq("user_id", userId)
           .gte("data", inicioMes.toISOString().split("T")[0])
-        if ((count ?? 0) >= 30) {
-          toast.error("Limite de 30 transações/mês atingido", {
-            description: "Faça upgrade para Pro para transações ilimitadas.",
+        const slots = parcelado ? numParcelas : 1
+        if ((count ?? 0) + slots > 30) {
+          toast.error("Limite de transações atingido", {
+            description: `Criação de ${slots} parcela(s) ultrapassaria o limite de 30/mês. Faça upgrade para Pro.`,
             duration: 5000,
             action: { label: "Ver planos", onClick: () => navigate("/app/perfil") },
           })
@@ -167,7 +172,7 @@ export default function AddExpense() {
         }
       }
 
-      // Buscar fatura se for crédito com cartão selecionado
+      // Buscar fatura para a primeira parcela (crédito)
       let faturaId: string | null = null
       if (metodo === "credito" && cartaoId) {
         const agora = new Date()
@@ -175,27 +180,56 @@ export default function AddExpense() {
         faturaId = fatura.id
       }
 
-      await addTransacao(userId, {
-        categoria_id: categoriaId,
-        descricao: description || catSelecionada?.nome || "",
-        valor: parseInt(amount) / 100,
-        tipo: "despesa",
-        data: date,
-        metodo_pagamento: metodo || null,
-        cartao_id: cartaoId || null,
-        fatura_id: faturaId,
-        confirmado,
-      })
+      const baseDate = new Date(date + "T12:00:00")
+      const valorTotal = parseInt(amount) / 100
 
-      // Recalcular fatura se vinculada
-      if (faturaId) {
-        await recalcularFatura(faturaId, userId)
+      if (parcelado && numParcelas > 1) {
+        const grupoId = crypto.randomUUID()
+        const valorParcela = parseFloat((valorTotal / numParcelas).toFixed(2))
+        const descBase = description || catSelecionada?.nome || ""
+
+        for (let i = 0; i < numParcelas; i++) {
+          const d = new Date(baseDate)
+          d.setMonth(d.getMonth() + i)
+          const dataStr = d.toISOString().split("T")[0]
+          await addTransacao(userId, {
+            categoria_id: categoriaId,
+            descricao: `${descBase} (${i + 1}/${numParcelas})`,
+            valor: valorParcela,
+            tipo: "despesa",
+            data: dataStr,
+            metodo_pagamento: metodo || null,
+            cartao_id: cartaoId || null,
+            fatura_id: i === 0 ? faturaId : null,
+            confirmado: i === 0 ? confirmado : false,
+            grupo_parcela: grupoId,
+            parcela_atual: i + 1,
+            total_parcelas: numParcelas,
+          })
+        }
+        if (faturaId) await recalcularFatura(faturaId, userId)
+        toast.success(`${numParcelas}x criadas com sucesso!`, {
+          description: `${catSelecionada?.nome ?? ""} · R$ ${(valorParcela).toLocaleString("pt-BR", { minimumFractionDigits: 2 })} / parcela`,
+          duration: 3500,
+        })
+      } else {
+        await addTransacao(userId, {
+          categoria_id: categoriaId,
+          descricao: description || catSelecionada?.nome || "",
+          valor: valorTotal,
+          tipo: "despesa",
+          data: date,
+          metodo_pagamento: metodo || null,
+          cartao_id: cartaoId || null,
+          fatura_id: faturaId,
+          confirmado,
+        })
+        if (faturaId) await recalcularFatura(faturaId, userId)
+        toast.success("Gasto registrado com sucesso!", {
+          description: `${catSelecionada?.nome ?? ""} · R$ ${displayAmount}`,
+          duration: 3500,
+        })
       }
-
-      toast.success("Gasto registrado com sucesso!", {
-        description: `${catSelecionada?.nome ?? ""} · R$ ${displayAmount}`,
-        duration: 3500,
-      })
 
       navigate("/app")
     } catch (err) {
@@ -369,6 +403,55 @@ export default function AddExpense() {
 
           {errors.category && (
             <p style={{ fontSize: 12 }} className="text-[#D32F2F] mt-2">{errors.category}</p>
+          )}
+        </div>
+
+        {/* Parcelado */}
+        <div className="bg-white rounded-lg border border-[#E0E0E0] p-5" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
+          <label style={{ fontSize: 12, fontWeight: 500 }} className="text-[#777777] uppercase tracking-wider block mb-3">
+            {t("addParcelado")} / {t("addAvista")}
+          </label>
+          <div style={{ display: "flex", gap: 8 }}>
+            {[false, true].map((isParc) => (
+              <button
+                key={String(isParc)}
+                type="button"
+                onClick={() => setParcelado(isParc)}
+                style={{
+                  flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                  padding: "10px 14px", borderRadius: 8, border: "none", cursor: "pointer",
+                  fontSize: 13, fontWeight: 600, transition: "all 0.15s",
+                  background: parcelado === isParc ? "#0A0A0A" : "#F5F5F5",
+                  color: parcelado === isParc ? "#FFFFFF" : "#555555",
+                }}
+              >
+                {isParc ? <Layers size={14} /> : null}
+                {isParc ? t("addParcelado") : t("addAvista")}
+              </button>
+            ))}
+          </div>
+
+          {parcelado && (
+            <div style={{ marginTop: 14 }}>
+              <label style={{ fontSize: 12, fontWeight: 500, color: "#777777", display: "block", marginBottom: 6 }}>
+                {t("addNParcelas")}
+              </label>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <input
+                  type="number"
+                  min={2}
+                  max={48}
+                  value={numParcelas}
+                  onChange={(e) => setNumParcelas(Math.max(2, Math.min(48, parseInt(e.target.value) || 2)))}
+                  className="border border-[#E0E0E0] rounded-md px-3 py-2 outline-none focus:border-black text-black"
+                  style={{ width: 80, fontSize: 15, fontWeight: 700, textAlign: "center" }}
+                />
+                <span style={{ fontSize: 13, color: "#777777" }}>
+                  × {amount ? `R$ ${((parseInt(amount) / 100) / numParcelas).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "—"} / parcela
+                </span>
+              </div>
+              <p style={{ fontSize: 11, color: "#999999", marginTop: 6 }}>{t("addParcelaHint")}</p>
+            </div>
           )}
         </div>
 

@@ -14,6 +14,7 @@ import {
   Tag,
   Sun,
   Moon,
+  TrendingUp,
 } from "lucide-react"
 import { OFLogo } from "./OFLogo"
 import { Toaster } from "sonner"
@@ -164,6 +165,7 @@ function UserMenu({
 const NAV_PATHS = [
   { path: "/app", labelKey: "appDashboard" as const, icon: LayoutDashboard },
   { path: "/app/adicionar", labelKey: "appAdicionar" as const, icon: PlusCircle },
+  { path: "/app/futuro", labelKey: "appFuturo" as const, icon: TrendingUp },
   { path: "/app/analise", labelKey: "appAnalise" as const, icon: BarChart2 },
   { path: "/app/relatorios", labelKey: "appRelatorios" as const, icon: FileText },
   { path: "/app/cartoes", labelKey: "appCartoes" as const, icon: CreditCard },
@@ -303,6 +305,7 @@ export function Layout() {
       "/app/relatorios": t("appTitleRelatorios"),
       "/app/cartoes": t("appTitleCartoes"),
       "/app/categorias": t("appTitleCategorias"),
+      "/app/futuro": t("appTitleFuturo"),
       "/app/perfil": t("appTitlePerfil"),
     }
     if (titleMap[pathname]) return titleMap[pathname]

@@ -49,6 +49,24 @@ export interface Transacao {
   fatura_id?: string | null
   metodo_pagamento?: 'dinheiro' | 'debito' | 'credito' | 'pix' | 'transferencia' | null
   confirmado?: boolean
+  grupo_parcela?: string | null
+  parcela_atual?: number | null
+  total_parcelas?: number | null
+}
+
+export interface Compromisso {
+  id: string
+  user_id: string
+  descricao: string
+  valor: number
+  categoria_id?: string | null
+  categorias?: Categoria
+  tipo: 'financiamento' | 'despesa_fixa' | 'assinatura'
+  dia_vencimento: number
+  data_inicio: string
+  data_fim?: string | null
+  ativo: boolean
+  criado_em: string
 }
 
 export interface Meta {
