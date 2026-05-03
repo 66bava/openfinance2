@@ -1,4 +1,4 @@
-import { Lock } from "lucide-react"
+﻿import { Lock } from "lucide-react"
 import { useNavigate } from "react-router"
 
 interface Props {
@@ -27,12 +27,12 @@ export function FeatureLock({
         display: "flex", alignItems: "center", justifyContent: "center",
         marginBottom: 20,
       }}>
-        <Lock size={28} style={{ color: "#A3A3A3" }} />
+        <Lock size={28} style={{ color: "var(--of-text-muted)" }} />
       </div>
-      <h3 style={{ fontSize: 20, fontWeight: 700, color: "#0A0A0A", marginBottom: 8 }}>
+      <h3 style={{ fontSize: 20, fontWeight: 700, color: "var(--of-text)", marginBottom: 8 }}>
         Recurso bloqueado
       </h3>
-      <p style={{ fontSize: 14, color: "#525252", marginBottom: 28, maxWidth: 360, lineHeight: 1.6 }}>
+      <p style={{ fontSize: 14, color: "var(--of-text-secondary)", marginBottom: 28, maxWidth: 360, lineHeight: 1.6 }}>
         {message}
       </p>
       <button
@@ -40,7 +40,7 @@ export function FeatureLock({
         style={{
           padding: "11px 28px",
           backgroundColor: "#16A34A",
-          color: "#FFFFFF",
+          color: "var(--of-btn-text)",
           fontWeight: 700,
           fontSize: 14,
           border: "none",

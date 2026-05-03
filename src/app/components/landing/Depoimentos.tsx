@@ -1,4 +1,4 @@
-const depoimentos = [
+﻿const depoimentos = [
   {
     texto: "Pela primeira vez eu entendo para onde meu dinheiro vai. O Score me deu um choque de realidade que eu precisava.",
     nome: "Ana Paula",
@@ -23,7 +23,7 @@ export default function Depoimentos() {
   return (
     <section
       style={{
-        backgroundColor: "#F7F7F5",
+        backgroundColor: "var(--of-page-bg)",
         padding: "96px 24px",
         fontFamily: "var(--font-body)",
       }}
@@ -33,7 +33,7 @@ export default function Depoimentos() {
           <p style={{
             fontSize: 12,
             fontWeight: 600,
-            color: "#6B6B6B",
+            color: "var(--of-text-secondary)",
             letterSpacing: "0.12em",
             textTransform: "uppercase",
             marginBottom: 16,
@@ -44,7 +44,7 @@ export default function Depoimentos() {
             fontFamily: "var(--font-display)",
             fontSize: "clamp(26px, 3.2vw, 40px)",
             fontWeight: 400,
-            color: "#1A1A1A",
+            color: "var(--of-text)",
             letterSpacing: "-0.02em",
             lineHeight: 1.2,
           }}>
@@ -57,8 +57,8 @@ export default function Depoimentos() {
             <div
               key={d.nome}
               style={{
-                backgroundColor: "#FFFFFF",
-                border: "1px solid #E5E5E3",
+                backgroundColor: "var(--of-surface)",
+                border: "1px solid var(--of-border)",
                 borderRadius: 8,
                 padding: "32px 28px",
               }}
@@ -77,7 +77,7 @@ export default function Depoimentos() {
 
               <p style={{
                 fontSize: 16,
-                color: "#1A1A1A",
+                color: "var(--of-text)",
                 lineHeight: 1.65,
                 fontStyle: "italic",
                 marginBottom: 28,
@@ -90,8 +90,8 @@ export default function Depoimentos() {
                   width: 36,
                   height: 36,
                   borderRadius: "50%",
-                  backgroundColor: "#1A1A1A",
-                  color: "#FFFFFF",
+                  backgroundColor: "var(--of-btn-bg)",
+                  color: "var(--of-btn-text)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -102,8 +102,8 @@ export default function Depoimentos() {
                   {d.inicial}
                 </div>
                 <div>
-                  <p style={{ fontSize: 14, fontWeight: 600, color: "#1A1A1A" }}>{d.nome}</p>
-                  <p style={{ fontSize: 12, color: "#6B6B6B" }}>{d.info}</p>
+                  <p style={{ fontSize: 14, fontWeight: 600, color: "var(--of-text)" }}>{d.nome}</p>
+                  <p style={{ fontSize: 12, color: "var(--of-text-secondary)" }}>{d.info}</p>
                 </div>
               </div>
             </div>

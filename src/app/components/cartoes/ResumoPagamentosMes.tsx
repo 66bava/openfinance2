@@ -1,4 +1,4 @@
-import type { Fatura, Cartao } from '../../../lib/types'
+﻿import type { Fatura, Cartao } from '../../../lib/types'
 import { AlertCircle } from 'lucide-react'
 
 interface Props {
@@ -17,12 +17,12 @@ function StatCard({
 }) {
   return (
     <div style={{
-      background: '#FFFFFF',
-      border: '1px solid #E5E5E3',
+      background: 'var(--of-surface)',
+      border: '1px solid var(--of-border)',
       borderRadius: 16,
       padding: '20px 22px',
     }}>
-      <p style={{ fontSize: 12, fontWeight: 600, color: '#A3A3A3', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8 }}>
+      <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--of-text-muted)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8 }}>
         {label}
       </p>
       <p style={{
@@ -35,7 +35,7 @@ function StatCard({
       }}>
         {valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
       </p>
-      {sub && <p style={{ fontSize: 12, color: '#A3A3A3' }}>{sub}</p>}
+      {sub && <p style={{ fontSize: 12, color: 'var(--of-text-muted)' }}>{sub}</p>}
     </div>
   )
 }
@@ -57,7 +57,7 @@ export default function ResumoPagamentosMes({ aPagar, jaPago, venceEmBreve }: Pr
             padding: '20px 22px',
           }}
         >
-          <p style={{ fontSize: 12, fontWeight: 600, color: '#A3A3A3', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8 }}>
+          <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--of-text-muted)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8 }}>
             Vence em breve
           </p>
           {venceEmBreve.length === 0 ? (
@@ -69,10 +69,10 @@ export default function ResumoPagamentosMes({ aPagar, jaPago, venceEmBreve }: Pr
               {venceEmBreve.map((f) => (
                 <div key={f.id} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <AlertCircle size={14} color="#D97706" />
-                  <span style={{ fontSize: 13, fontWeight: 600, color: '#0A0A0A' }}>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--of-text)' }}>
                     {(f.cartoes as Cartao | undefined)?.nome ?? '—'}
                   </span>
-                  <span style={{ fontSize: 12, color: '#A3A3A3' }}>
+                  <span style={{ fontSize: 12, color: 'var(--of-text-muted)' }}>
                     {MESES[f.mes - 1]}/{f.ano}
                   </span>
                   <span style={{ fontSize: 13, fontWeight: 600, color: '#DC2626', marginLeft: 'auto' }}>

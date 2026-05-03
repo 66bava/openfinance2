@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+﻿import { useState, useEffect } from "react"
 import { toast } from "sonner"
 import { TrendingUp, AlertTriangle, ExternalLink, ChevronRight, Sparkles, Info } from "lucide-react"
 import { useAuth } from "../../lib/auth-context"
@@ -165,7 +165,7 @@ export default function Investments() {
                     <div>
                       <div className="flex items-center gap-2">
                         <h3 style={{ fontSize: 15, fontWeight: 700 }} className="text-black">{inv.company}</h3>
-                        <span className="px-2 py-0.5 rounded-full" style={{ fontSize: 10, fontWeight: 600, backgroundColor: "#F5F5F5", color: "#555555" }}>
+                        <span className="px-2 py-0.5 rounded-full" style={{ fontSize: 10, fontWeight: 600, backgroundColor: "var(--of-page-bg)", color: "#555555" }}>
                           {inv.ticker}
                         </span>
                       </div>

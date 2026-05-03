@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+﻿import { useState, useEffect } from "react"
 import { Link } from "react-router"
 
 const links = [
@@ -32,10 +32,10 @@ export default function Header() {
           left: 0,
           right: 0,
           zIndex: 200,
-          backgroundColor: "rgba(255,255,255,0.92)",
+          backgroundColor: "var(--of-glass-bg)",
           backdropFilter: "blur(8px)",
           WebkitBackdropFilter: "blur(8px)",
-          borderBottom: rolado ? "1px solid #E5E5E3" : "1px solid transparent",
+          borderBottom: rolado ? "1px solid var(--of-border)" : "1px solid transparent",
           transition: "border-color 0.2s",
           fontFamily: "var(--font-body)",
         }}
@@ -55,7 +55,7 @@ export default function Header() {
             style={{
               fontSize: 17,
               fontWeight: 700,
-              color: "#1A1A1A",
+              color: "var(--of-text)",
               letterSpacing: "-0.02em",
               textDecoration: "none",
             }}
@@ -71,7 +71,7 @@ export default function Header() {
                 href={link.href}
                 style={{
                   fontSize: 14,
-                  color: "#6B6B6B",
+                  color: "var(--of-text-secondary)",
                   textDecoration: "none",
                   transition: "color 0.15s",
                 }}
@@ -85,7 +85,7 @@ export default function Header() {
               to="/login"
               style={{
                 fontSize: 14,
-                color: "#6B6B6B",
+                color: "var(--of-text-secondary)",
                 textDecoration: "none",
                 transition: "color 0.15s",
               }}
@@ -99,8 +99,8 @@ export default function Header() {
               style={{
                 fontSize: 14,
                 fontWeight: 600,
-                color: "#FFFFFF",
-                backgroundColor: "#1A1A1A",
+                color: "var(--of-btn-text)",
+                backgroundColor: "var(--of-btn-bg)",
                 padding: "9px 20px",
                 borderRadius: 6,
                 textDecoration: "none",
@@ -169,7 +169,7 @@ export default function Header() {
               right: 0,
               bottom: 0,
               width: "min(320px, 85vw)",
-              backgroundColor: "#FFFFFF",
+              backgroundColor: "var(--of-surface)",
               padding: "80px 32px 40px",
               display: "flex",
               flexDirection: "column",
@@ -186,10 +186,10 @@ export default function Header() {
                 style={{
                   fontSize: 18,
                   fontWeight: 500,
-                  color: "#1A1A1A",
+                  color: "var(--of-text)",
                   textDecoration: "none",
                   padding: "14px 0",
-                  borderBottom: "1px solid #E5E5E3",
+                  borderBottom: "1px solid var(--of-border)",
                   display: "block",
                 }}
               >
@@ -205,8 +205,8 @@ export default function Header() {
                   padding: "14px",
                   fontSize: 15,
                   fontWeight: 600,
-                  color: "#1A1A1A",
-                  border: "1.5px solid #E5E5E3",
+                  color: "var(--of-text)",
+                  border: "1.5px solid var(--of-border)",
                   borderRadius: 6,
                   textDecoration: "none",
                 }}
@@ -221,8 +221,8 @@ export default function Header() {
                   padding: "14px",
                   fontSize: 15,
                   fontWeight: 600,
-                  color: "#FFFFFF",
-                  backgroundColor: "#1A1A1A",
+                  color: "var(--of-btn-text)",
+                  backgroundColor: "var(--of-btn-bg)",
                   borderRadius: 6,
                   textDecoration: "none",
                 }}

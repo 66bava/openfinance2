@@ -1,4 +1,4 @@
-import { X, Lock, Sparkles, Infinity, Brain, Target } from 'lucide-react'
+﻿import { X, Lock, Sparkles, Infinity, Brain, Target } from 'lucide-react'
 import { useNavigate } from 'react-router'
 
 const BENEFICIOS = [
@@ -27,7 +27,7 @@ export default function ModalUpgradePlano({ onClose }: Props) {
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
       <div style={{
-        background: '#FFFFFF',
+        background: 'var(--of-surface)',
         borderRadius: 20,
         width: '100%',
         maxWidth: 440,
@@ -39,31 +39,31 @@ export default function ModalUpgradePlano({ onClose }: Props) {
           onClick={onClose}
           style={{
             position: 'absolute', top: 16, right: 16,
-            background: 'none', border: 'none', cursor: 'pointer', color: '#A3A3A3', padding: 4,
+            background: 'none', border: 'none', cursor: 'pointer', color: 'var(--of-text-muted)', padding: 4,
           }}
         />
 
         {/* Ícone cadeado */}
         <div style={{
           width: 64, height: 64, borderRadius: '50%',
-          background: '#F5F5F0',
+          background: 'var(--of-page-bg)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           margin: '0 auto 20px',
         }}>
           <Lock size={28} color="#0A0A0A" />
         </div>
 
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#0A0A0A', letterSpacing: '-0.02em', marginBottom: 10 }}>
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--of-text)', letterSpacing: '-0.02em', marginBottom: 10 }}>
           Limite do plano grátis atingido
         </h2>
-        <p style={{ fontSize: 15, color: '#525252', lineHeight: 1.65, marginBottom: 24 }}>
+        <p style={{ fontSize: 15, color: 'var(--of-text-secondary)', lineHeight: 1.65, marginBottom: 24 }}>
           O plano grátis permite até <strong>4 categorias personalizadas</strong>.
           Atualize para o Pro e crie categorias ilimitadas.
         </p>
 
         {/* Benefícios */}
         <div style={{
-          background: '#F5F5F0', borderRadius: 14, padding: '16px 20px',
+          background: 'var(--of-page-bg)', borderRadius: 14, padding: '16px 20px',
           marginBottom: 24, textAlign: 'left',
           display: 'flex', flexDirection: 'column', gap: 12,
         }}>
@@ -75,7 +75,7 @@ export default function ModalUpgradePlano({ onClose }: Props) {
               }}>
                 <Icon size={15} color="#16A34A" />
               </div>
-              <span style={{ fontSize: 14, color: '#0A0A0A', fontWeight: 500 }}>{texto}</span>
+              <span style={{ fontSize: 14, color: 'var(--of-text)', fontWeight: 500 }}>{texto}</span>
             </div>
           ))}
         </div>
@@ -85,7 +85,7 @@ export default function ModalUpgradePlano({ onClose }: Props) {
           onClick={() => { navigate('/app/perfil'); onClose() }}
           style={{
             width: '100%', padding: '14px',
-            background: '#0A0A0A', color: '#FFFFFF',
+            background: 'var(--of-btn-bg)', color: 'var(--of-btn-text)',
             border: 'none', borderRadius: 12,
             fontSize: 15, fontWeight: 700,
             cursor: 'pointer',
@@ -94,7 +94,7 @@ export default function ModalUpgradePlano({ onClose }: Props) {
             transition: 'background 0.15s',
           }}
           onMouseOver={(e) => (e.currentTarget.style.background = '#262626')}
-          onMouseOut={(e) => (e.currentTarget.style.background = '#0A0A0A')}
+          onMouseOut={(e) => (e.currentTarget.style.background = 'var(--of-btn-bg)')}
         >
           Ver plano Pro — R$ 19,90/mês
         </button>
@@ -104,7 +104,7 @@ export default function ModalUpgradePlano({ onClose }: Props) {
           onClick={onClose}
           style={{
             width: '100%', padding: '12px',
-            background: 'transparent', color: '#A3A3A3',
+            background: 'transparent', color: 'var(--of-text-muted)',
             border: 'none', borderRadius: 12,
             fontSize: 14, fontWeight: 500,
             cursor: 'pointer', fontFamily: 'var(--font-body)',

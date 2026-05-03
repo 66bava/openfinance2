@@ -1,17 +1,17 @@
-import { Link } from "react-router"
+﻿import { Link } from "react-router"
 import WaitlistForm from "./WaitlistForm"
 
 type Feature = { texto: string }
 
 function ListaFeatures({ features }: { features: Feature[] }) {
   return (
-    <div style={{ borderTop: "1px solid #E5E5E3", paddingTop: 24, marginBottom: 28 }}>
+    <div style={{ borderTop: "1px solid var(--of-border)", paddingTop: 24, marginBottom: 28 }}>
       {features.map((f) => (
         <p
           key={f.texto}
           style={{
             fontSize: 14,
-            color: "#6B6B6B",
+            color: "var(--of-text-secondary)",
             lineHeight: 1.6,
             marginBottom: 8,
             paddingLeft: 14,
@@ -25,7 +25,7 @@ function ListaFeatures({ features }: { features: Feature[] }) {
             width: 5,
             height: 5,
             borderRadius: "50%",
-            backgroundColor: "#1A1A1A",
+            backgroundColor: "var(--of-btn-bg)",
             opacity: 0.3,
             display: "inline-block",
           }} />
@@ -41,7 +41,7 @@ export default function Planos() {
     <section
       id="planos"
       style={{
-        backgroundColor: "#FFFFFF",
+        backgroundColor: "var(--of-surface)",
         padding: "96px 24px",
         fontFamily: "var(--font-body)",
       }}
@@ -51,7 +51,7 @@ export default function Planos() {
           <p style={{
             fontSize: 12,
             fontWeight: 600,
-            color: "#6B6B6B",
+            color: "var(--of-text-secondary)",
             letterSpacing: "0.12em",
             textTransform: "uppercase",
             marginBottom: 16,
@@ -62,14 +62,14 @@ export default function Planos() {
             fontFamily: "var(--font-display)",
             fontSize: "clamp(26px, 3.2vw, 40px)",
             fontWeight: 400,
-            color: "#1A1A1A",
+            color: "var(--of-text)",
             letterSpacing: "-0.02em",
             lineHeight: 1.2,
             marginBottom: 12,
           }}>
             Escolha seu plano
           </h2>
-          <p style={{ fontSize: 16, color: "#6B6B6B" }}>
+          <p style={{ fontSize: 16, color: "var(--of-text-secondary)" }}>
             Comece grátis. Evolua quando fizer sentido.
           </p>
         </div>
@@ -77,15 +77,15 @@ export default function Planos() {
         <div className="grid md:grid-cols-3 gap-6" style={{ alignItems: "start" }}>
           {/* Plano Grátis */}
           <div style={{
-            backgroundColor: "#FFFFFF",
-            border: "1px solid #E5E5E3",
+            backgroundColor: "var(--of-surface)",
+            border: "1px solid var(--of-border)",
             borderRadius: 8,
             padding: "32px 28px",
           }}>
             <p style={{
               fontSize: 11,
               fontWeight: 600,
-              color: "#6B6B6B",
+              color: "var(--of-text-secondary)",
               letterSpacing: "0.1em",
               textTransform: "uppercase",
               marginBottom: 20,
@@ -95,13 +95,13 @@ export default function Planos() {
             <p style={{
               fontSize: 36,
               fontWeight: 700,
-              color: "#1A1A1A",
+              color: "var(--of-text)",
               letterSpacing: "-0.03em",
               marginBottom: 4,
             }}>
               R$ 0
             </p>
-            <p style={{ fontSize: 14, color: "#6B6B6B", marginBottom: 28 }}>
+            <p style={{ fontSize: 14, color: "var(--of-text-secondary)", marginBottom: 28 }}>
               Para quem quer começar a organizar
             </p>
             <ListaFeatures features={[
@@ -118,8 +118,8 @@ export default function Planos() {
                 padding: "12px 24px",
                 fontSize: 14,
                 fontWeight: 600,
-                color: "#1A1A1A",
-                border: "1.5px solid #E5E5E3",
+                color: "var(--of-text)",
+                border: "1.5px solid var(--of-border)",
                 borderRadius: 6,
                 textDecoration: "none",
                 minHeight: 44,
@@ -127,7 +127,7 @@ export default function Planos() {
                 justifyContent: "center",
                 transition: "border-color 0.15s",
               }}
-              onMouseOver={(e) => (e.currentTarget.style.borderColor = "#1A1A1A")}
+              onMouseOver={(e) => (e.currentTarget.style.borderColor = "var(--of-btn-bg)")}
               onMouseOut={(e) => (e.currentTarget.style.borderColor = "#E5E5E3")}
             >
               Começar agora
@@ -136,8 +136,8 @@ export default function Planos() {
 
           {/* Plano Pro — destaque */}
           <div style={{
-            backgroundColor: "#FFFFFF",
-            border: "2px solid #1A1A1A",
+            backgroundColor: "var(--of-surface)",
+            border: "2px solid var(--of-btn-bg)",
             borderRadius: 8,
             padding: "32px 28px",
             position: "relative",
@@ -147,8 +147,8 @@ export default function Planos() {
               top: -13,
               left: "50%",
               transform: "translateX(-50%)",
-              backgroundColor: "#1A1A1A",
-              color: "#FFFFFF",
+              backgroundColor: "var(--of-btn-bg)",
+              color: "var(--of-btn-text)",
               fontSize: 10,
               fontWeight: 700,
               padding: "4px 14px",
@@ -161,7 +161,7 @@ export default function Planos() {
             <p style={{
               fontSize: 11,
               fontWeight: 600,
-              color: "#1A1A1A",
+              color: "var(--of-text)",
               letterSpacing: "0.1em",
               textTransform: "uppercase",
               marginBottom: 20,
@@ -172,13 +172,13 @@ export default function Planos() {
               <p style={{
                 fontSize: 36,
                 fontWeight: 700,
-                color: "#1A1A1A",
+                color: "var(--of-text)",
                 letterSpacing: "-0.03em",
               }}>
                 R$ 19,90
               </p>
             </div>
-            <p style={{ fontSize: 14, color: "#6B6B6B", marginBottom: 28 }}>
+            <p style={{ fontSize: 14, color: "var(--of-text-secondary)", marginBottom: 28 }}>
               /mês · Para quem leva dinheiro a sério
             </p>
             <ListaFeatures features={[
@@ -199,8 +199,8 @@ export default function Planos() {
                 padding: "12px 24px",
                 fontSize: 14,
                 fontWeight: 700,
-                color: "#FFFFFF",
-                backgroundColor: "#1A1A1A",
+                color: "var(--of-btn-text)",
+                backgroundColor: "var(--of-btn-bg)",
                 borderRadius: 6,
                 textDecoration: "none",
                 minHeight: 44,
@@ -215,15 +215,15 @@ export default function Planos() {
 
           {/* Plano Família */}
           <div style={{
-            backgroundColor: "#FFFFFF",
-            border: "1px solid #E5E5E3",
+            backgroundColor: "var(--of-surface)",
+            border: "1px solid var(--of-border)",
             borderRadius: 8,
             padding: "32px 28px",
           }}>
             <p style={{
               fontSize: 11,
               fontWeight: 600,
-              color: "#6B6B6B",
+              color: "var(--of-text-secondary)",
               letterSpacing: "0.1em",
               textTransform: "uppercase",
               marginBottom: 20,
@@ -233,13 +233,13 @@ export default function Planos() {
             <p style={{
               fontSize: 36,
               fontWeight: 700,
-              color: "#1A1A1A",
+              color: "var(--of-text)",
               letterSpacing: "-0.03em",
               marginBottom: 4,
             }}>
               R$ 34,90
             </p>
-            <p style={{ fontSize: 14, color: "#6B6B6B", marginBottom: 28 }}>
+            <p style={{ fontSize: 14, color: "var(--of-text-secondary)", marginBottom: 28 }}>
               /mês · Para quem cuida de quem ama
             </p>
             <ListaFeatures features={[
@@ -258,14 +258,14 @@ export default function Planos() {
                 padding: "12px 24px",
                 fontSize: 14,
                 fontWeight: 600,
-                color: "#1A1A1A",
-                border: "1.5px solid #E5E5E3",
+                color: "var(--of-text)",
+                border: "1.5px solid var(--of-border)",
                 borderRadius: 6,
                 textDecoration: "none",
                 minHeight: 44,
                 transition: "border-color 0.15s",
               }}
-              onMouseOver={(e) => (e.currentTarget.style.borderColor = "#1A1A1A")}
+              onMouseOver={(e) => (e.currentTarget.style.borderColor = "var(--of-btn-bg)")}
               onMouseOut={(e) => (e.currentTarget.style.borderColor = "#E5E5E3")}
             >
               Assinar Família
@@ -276,7 +276,7 @@ export default function Planos() {
         <p style={{
           textAlign: "center",
           fontSize: 13,
-          color: "#6B6B6B",
+          color: "var(--of-text-secondary)",
           marginTop: 32,
         }}>
           Cancele quando quiser. Sem multa. Sem burocracia.
@@ -287,17 +287,17 @@ export default function Planos() {
           style={{
             marginTop: 56,
             padding: "28px 32px",
-            backgroundColor: "#F7F7F5",
+            backgroundColor: "var(--of-page-bg)",
             borderRadius: 8,
-            border: "1px solid #E5E5E3",
+            border: "1px solid var(--of-border)",
           }}
           className="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
         >
           <div>
-            <p style={{ fontSize: 15, fontWeight: 600, color: "#1A1A1A", marginBottom: 4 }}>
+            <p style={{ fontSize: 15, fontWeight: 600, color: "var(--of-text)", marginBottom: 4 }}>
               Ainda não tem certeza?
             </p>
-            <p style={{ fontSize: 13, color: "#6B6B6B" }}>
+            <p style={{ fontSize: 13, color: "var(--of-text-secondary)" }}>
               Entre na lista de espera e seja avisado sobre novidades.
             </p>
           </div>

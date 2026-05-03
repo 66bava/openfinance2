@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { X } from 'lucide-react'
 import { toast } from 'sonner'
 import { pagarFatura } from '../../../lib/queries/cartoes'
@@ -80,7 +80,7 @@ export default function ModalPagarFatura({ fatura, cartao, userId, onClose, onPa
     >
       <div
         style={{
-          background: '#FFFFFF',
+          background: 'var(--of-surface)',
           borderRadius: '20px 20px 0 0',
           width: '100%',
           maxWidth: 480,
@@ -90,26 +90,26 @@ export default function ModalPagarFatura({ fatura, cartao, userId, onClose, onPa
       >
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-          <h2 style={{ fontSize: 18, fontWeight: 700, color: '#0A0A0A', letterSpacing: '-0.02em' }}>
+          <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--of-text)', letterSpacing: '-0.02em' }}>
             Pagar fatura
           </h2>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#A3A3A3', padding: 4 }}>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--of-text-muted)', padding: 4 }}>
             <X size={20} />
           </button>
         </div>
 
         {/* Info da fatura */}
         <div style={{
-          background: '#F5F5F0',
+          background: 'var(--of-page-bg)',
           borderRadius: 12,
           padding: '16px 18px',
           marginBottom: 20,
         }}>
-          <p style={{ fontSize: 13, color: '#A3A3A3', marginBottom: 4 }}>
+          <p style={{ fontSize: 13, color: 'var(--of-text-muted)', marginBottom: 4 }}>
             {cartao.nome} · {MESES[fatura.mes - 1]}/{fatura.ano}
           </p>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-            <span style={{ fontSize: 28, fontWeight: 700, color: '#0A0A0A', letterSpacing: '-0.03em' }}>
+            <span style={{ fontSize: 28, fontWeight: 700, color: 'var(--of-text)', letterSpacing: '-0.03em' }}>
               {valorFmt(saldoRestante)}
             </span>
             {fatura.valor_pago > 0 && (
@@ -118,7 +118,7 @@ export default function ModalPagarFatura({ fatura, cartao, userId, onClose, onPa
               </span>
             )}
           </div>
-          <p style={{ fontSize: 12, color: '#A3A3A3', marginTop: 4 }}>
+          <p style={{ fontSize: 12, color: 'var(--of-text-muted)', marginTop: 4 }}>
             Total da fatura: {valorFmt(fatura.valor_total)}
           </p>
         </div>
@@ -126,7 +126,7 @@ export default function ModalPagarFatura({ fatura, cartao, userId, onClose, onPa
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
           {/* Tipo de pagamento */}
           <div>
-            <label style={{ fontSize: 12, fontWeight: 600, color: '#525252', letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
+            <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--of-text-secondary)', letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
               Tipo de pagamento
             </label>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
@@ -138,9 +138,9 @@ export default function ModalPagarFatura({ fatura, cartao, userId, onClose, onPa
                   style={{
                     padding: '12px',
                     borderRadius: 10,
-                    border: `2px solid ${tipoPagamento === t ? '#0A0A0A' : '#E5E5E3'}`,
-                    background: tipoPagamento === t ? '#0A0A0A' : '#FFFFFF',
-                    color: tipoPagamento === t ? '#FFFFFF' : '#525252',
+                    border: `2px solid ${tipoPagamento === t ? 'var(--of-btn-bg)' : 'var(--of-border)'}`,
+                    background: tipoPagamento === t ? 'var(--of-btn-bg)' : 'var(--of-surface)',
+                    color: tipoPagamento === t ? 'var(--of-btn-text)' : 'var(--of-text-secondary)',
                     fontSize: 14,
                     fontWeight: 600,
                     cursor: 'pointer',
@@ -157,7 +157,7 @@ export default function ModalPagarFatura({ fatura, cartao, userId, onClose, onPa
           {/* Valor parcial */}
           {tipoPagamento === 'parcial' && (
             <div>
-              <label style={{ fontSize: 12, fontWeight: 600, color: '#525252', letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
+              <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--of-text-secondary)', letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
                 Valor a pagar (R$)
               </label>
               <input
@@ -169,7 +169,7 @@ export default function ModalPagarFatura({ fatura, cartao, userId, onClose, onPa
                 step="0.01"
                 style={{
                   width: '100%', padding: '11px 14px', fontSize: 15,
-                  border: '1.5px solid #E5E5E3', borderRadius: 10, outline: 'none',
+                  border: '1.5px solid var(--of-border)', borderRadius: 10, outline: 'none',
                   boxSizing: 'border-box', fontFamily: 'var(--font-body)',
                 }}
               />
@@ -178,7 +178,7 @@ export default function ModalPagarFatura({ fatura, cartao, userId, onClose, onPa
 
           {/* Data */}
           <div>
-            <label style={{ fontSize: 12, fontWeight: 600, color: '#525252', letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
+            <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--of-text-secondary)', letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
               Data do pagamento
             </label>
             <input
@@ -187,7 +187,7 @@ export default function ModalPagarFatura({ fatura, cartao, userId, onClose, onPa
               onChange={(e) => setData(e.target.value)}
               style={{
                 width: '100%', padding: '11px 14px', fontSize: 15,
-                border: '1.5px solid #E5E5E3', borderRadius: 10, outline: 'none',
+                border: '1.5px solid var(--of-border)', borderRadius: 10, outline: 'none',
                 boxSizing: 'border-box', fontFamily: 'var(--font-body)',
               }}
             />
@@ -195,7 +195,7 @@ export default function ModalPagarFatura({ fatura, cartao, userId, onClose, onPa
 
           {/* Método */}
           <div>
-            <label style={{ fontSize: 12, fontWeight: 600, color: '#525252', letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
+            <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--of-text-secondary)', letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
               Método
             </label>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
@@ -225,7 +225,7 @@ export default function ModalPagarFatura({ fatura, cartao, userId, onClose, onPa
 
           {/* Resumo */}
           <div style={{
-            background: '#0A0A0A',
+            background: 'var(--of-btn-bg)',
             borderRadius: 12,
             padding: '14px 18px',
             display: 'flex',
@@ -233,7 +233,7 @@ export default function ModalPagarFatura({ fatura, cartao, userId, onClose, onPa
             alignItems: 'center',
           }}>
             <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)' }}>Valor a confirmar</span>
-            <span style={{ fontSize: 20, fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.02em' }}>
+            <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--of-btn-text)', letterSpacing: '-0.02em' }}>
               {valorConfirmar > 0 ? valorFmt(valorConfirmar) : '—'}
             </span>
           </div>

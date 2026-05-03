@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+﻿import { useState, useMemo } from 'react'
 import { X, Search } from 'lucide-react'
 import type { Categoria } from '../../../lib/types'
 
@@ -73,7 +73,7 @@ export default function ModalNovaCategoria({ categoriaEditando, onClose, onSalva
     >
       <div
         style={{
-          background: '#FFFFFF',
+          background: 'var(--of-surface)',
           borderRadius: '20px 20px 0 0',
           width: '100%',
           maxWidth: 520,
@@ -85,10 +85,10 @@ export default function ModalNovaCategoria({ categoriaEditando, onClose, onSalva
       >
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-          <h2 style={{ fontSize: 18, fontWeight: 700, color: '#0A0A0A', letterSpacing: '-0.02em' }}>
+          <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--of-text)', letterSpacing: '-0.02em' }}>
             {categoriaEditando ? 'Editar categoria' : 'Nova categoria'}
           </h2>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#A3A3A3', padding: 4 }}>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--of-text-muted)', padding: 4 }}>
             <X size={20} />
           </button>
         </div>
@@ -97,7 +97,7 @@ export default function ModalNovaCategoria({ categoriaEditando, onClose, onSalva
           {/* Preview */}
           <div style={{
             display: 'flex', alignItems: 'center', gap: 14,
-            background: '#F5F5F0', borderRadius: 14, padding: '16px 18px',
+            background: 'var(--of-page-bg)', borderRadius: 14, padding: '16px 18px',
           }}>
             <div style={{
               width: 52, height: 52, borderRadius: 14, background: cor,
@@ -106,7 +106,7 @@ export default function ModalNovaCategoria({ categoriaEditando, onClose, onSalva
               {emoji}
             </div>
             <div>
-              <p style={{ fontSize: 16, fontWeight: 700, color: '#0A0A0A' }}>
+              <p style={{ fontSize: 16, fontWeight: 700, color: 'var(--of-text)' }}>
                 {nome || 'Nome da categoria'}
               </p>
               <span style={{
@@ -121,7 +121,7 @@ export default function ModalNovaCategoria({ categoriaEditando, onClose, onSalva
 
           {/* Nome */}
           <div>
-            <label style={{ fontSize: 12, fontWeight: 600, color: '#525252', letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
+            <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--of-text-secondary)', letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
               Nome da categoria
             </label>
             <input
@@ -145,13 +145,13 @@ export default function ModalNovaCategoria({ categoriaEditando, onClose, onSalva
                 ? <p style={{ fontSize: 12, color: '#DC2626' }}>{erros.nome}</p>
                 : <span />
               }
-              <p style={{ fontSize: 11, color: '#A3A3A3' }}>{nome.length}/30</p>
+              <p style={{ fontSize: 11, color: 'var(--of-text-muted)' }}>{nome.length}/30</p>
             </div>
           </div>
 
           {/* Tipo */}
           <div>
-            <label style={{ fontSize: 12, fontWeight: 600, color: '#525252', letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
+            <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--of-text-secondary)', letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
               Tipo
             </label>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
@@ -178,14 +178,14 @@ export default function ModalNovaCategoria({ categoriaEditando, onClose, onSalva
 
           {/* Emoji */}
           <div>
-            <label style={{ fontSize: 12, fontWeight: 600, color: '#525252', letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
+            <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--of-text-secondary)', letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
               Emoji
             </label>
 
             {/* Busca */}
             <div style={{
               display: 'flex', alignItems: 'center', gap: 8,
-              border: '1.5px solid #E5E5E3', borderRadius: 10, padding: '8px 12px', marginBottom: 12,
+              border: '1.5px solid var(--of-border)', borderRadius: 10, padding: '8px 12px', marginBottom: 12,
             }}>
               <Search size={14} color="#A3A3A3" />
               <input
@@ -220,7 +220,7 @@ export default function ModalNovaCategoria({ categoriaEditando, onClose, onSalva
               ) : (
                 GRUPOS_EMOJI.map((grupo) => (
                   <div key={grupo.grupo} style={{ marginBottom: 12 }}>
-                    <p style={{ fontSize: 11, fontWeight: 600, color: '#A3A3A3', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 6 }}>
+                    <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--of-text-muted)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 6 }}>
                       {grupo.grupo}
                     </p>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
@@ -235,7 +235,7 @@ export default function ModalNovaCategoria({ categoriaEditando, onClose, onSalva
                             transition: 'background 0.1s',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                           }}
-                          onMouseOver={(el) => { if (emoji !== e) el.currentTarget.style.background = '#F5F5F0' }}
+                          onMouseOver={(el) => { if (emoji !== e) el.currentTarget.style.background = 'var(--of-hover)' }}
                           onMouseOut={(el) => { el.currentTarget.style.background = emoji === e ? '#E5E5E3' : 'transparent' }}
                         >
                           {e}
@@ -250,7 +250,7 @@ export default function ModalNovaCategoria({ categoriaEditando, onClose, onSalva
 
           {/* Cor */}
           <div>
-            <label style={{ fontSize: 12, fontWeight: 600, color: '#525252', letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
+            <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--of-text-secondary)', letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
               Cor
             </label>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>

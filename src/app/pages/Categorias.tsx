@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+﻿import { useState, useEffect, useCallback } from 'react'
 import { Plus, Lock } from 'lucide-react'
 import { toast } from 'sonner'
 import { useAuth } from '../../lib/auth-context'
@@ -119,16 +119,16 @@ export default function Categorias() {
       {/* SEÇÃO 1 — Categorias padrão */}
       <section style={{ marginBottom: 40 }}>
         <div style={{ marginBottom: 16 }}>
-          <h2 style={{ fontSize: 15, fontWeight: 700, color: '#0A0A0A', marginBottom: 4 }}>
+          <h2 style={{ fontSize: 15, fontWeight: 700, color: 'var(--of-text)', marginBottom: 4 }}>
             Categorias padrão
           </h2>
-          <p style={{ fontSize: 13, color: '#A3A3A3' }}>
+          <p style={{ fontSize: 13, color: 'var(--of-text-muted)' }}>
             Disponíveis para todos os planos · Não podem ser editadas
           </p>
         </div>
 
         {padrao.length === 0 ? (
-          <p style={{ fontSize: 14, color: '#A3A3A3' }}>Nenhuma categoria padrão encontrada.</p>
+          <p style={{ fontSize: 14, color: 'var(--of-text-muted)' }}>Nenhuma categoria padrão encontrada.</p>
         ) : (
           <div style={{ display: 'grid', gap: 12 }} className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
             {padrao.map((c) => (
@@ -142,14 +142,14 @@ export default function Categorias() {
       <section>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, flexWrap: 'wrap', gap: 10 }}>
           <div>
-            <h2 style={{ fontSize: 15, fontWeight: 700, color: '#0A0A0A', marginBottom: 4 }}>
+            <h2 style={{ fontSize: 15, fontWeight: 700, color: 'var(--of-text)', marginBottom: 4 }}>
               Minhas categorias
             </h2>
             {plano === 'free' ? (
               <p style={{ fontSize: 13, color: atingiuLimite ? '#DC2626' : '#A3A3A3' }}>
                 {contPersonalizadas} de {LIMITE_FREE} criadas
                 {!atingiuLimite && (
-                  <span style={{ color: '#A3A3A3' }}> · </span>
+                  <span style={{ color: 'var(--of-text-muted)' }}> · </span>
                 )}
                 {!atingiuLimite && (
                   <button
@@ -161,7 +161,7 @@ export default function Categorias() {
                 )}
               </p>
             ) : (
-              <p style={{ fontSize: 13, color: '#A3A3A3' }}>
+              <p style={{ fontSize: 13, color: 'var(--of-text-muted)' }}>
                 Categorias ilimitadas · {contPersonalizadas} criadas
               </p>
             )}
@@ -172,9 +172,9 @@ export default function Categorias() {
             style={{
               display: 'flex', alignItems: 'center', gap: 6,
               padding: '9px 16px',
-              background: atingiuLimite ? '#F5F5F0' : '#0A0A0A',
-              color: atingiuLimite ? '#525252' : '#FFFFFF',
-              border: `1px solid ${atingiuLimite ? '#E5E5E3' : 'transparent'}`,
+              background: atingiuLimite ? 'var(--of-page-bg)' : 'var(--of-btn-bg)',
+              color: atingiuLimite ? 'var(--of-text-secondary)' : 'var(--of-btn-text)',
+              border: `1px solid ${atingiuLimite ? 'var(--of-border)' : 'transparent'}`,
               borderRadius: 10, fontSize: 13, fontWeight: 600,
               cursor: 'pointer', fontFamily: 'var(--font-body)',
               transition: 'all 0.15s',
@@ -214,21 +214,21 @@ export default function Categorias() {
 
         {personalizadas.length === 0 ? (
           <div style={{
-            background: '#FAFAFA', border: '1px dashed #E5E5E3',
+            background: 'var(--of-page-bg)', border: '1px dashed var(--of-border)',
             borderRadius: 14, padding: '40px 24px', textAlign: 'center',
           }}>
             <p style={{ fontSize: 28, marginBottom: 10 }}>🏷️</p>
-            <p style={{ fontSize: 15, fontWeight: 600, color: '#0A0A0A', marginBottom: 6 }}>
+            <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--of-text)', marginBottom: 6 }}>
               Nenhuma categoria personalizada ainda
             </p>
-            <p style={{ fontSize: 13, color: '#A3A3A3', marginBottom: 20 }}>
+            <p style={{ fontSize: 13, color: 'var(--of-text-muted)', marginBottom: 20 }}>
               Crie categorias com seu emoji e cor favoritos para organizar melhor seus gastos.
             </p>
             {!atingiuLimite && (
               <button
                 onClick={handleNovaCategoria}
                 style={{
-                  padding: '10px 20px', background: '#0A0A0A', color: '#FFFFFF',
+                  padding: '10px 20px', background: 'var(--of-btn-bg)', color: 'var(--of-btn-text)',
                   border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 600,
                   cursor: 'pointer', fontFamily: 'var(--font-body)',
                 }}

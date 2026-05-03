@@ -1,4 +1,4 @@
-import { motion } from "motion/react"
+﻿import { motion } from "motion/react"
 import { AlertCircle, TrendingDown, Target } from "lucide-react"
 
 const problemas = [
@@ -24,7 +24,7 @@ export default function Problem() {
     <section
       id="recursos"
       style={{
-        backgroundColor: "#FFFFFF",
+        backgroundColor: "var(--of-surface)",
         padding: "96px 24px",
         fontFamily: "var(--font-body)",
       }}

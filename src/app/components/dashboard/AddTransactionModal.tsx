@@ -1,4 +1,4 @@
-import { useState } from "react"
+﻿import { useState } from "react"
 import { toast } from "sonner"
 import { CalendarDays, Loader2, X } from "lucide-react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
@@ -132,16 +132,16 @@ export function AddTransactionModal({ open, onOpenChange, onSuccess }: AddTransa
             maxWidth: 540,
             maxHeight: "90vh",
             overflowY: "auto",
-            backgroundColor: "#FFFFFF",
+            backgroundColor: "var(--of-surface)",
             borderRadius: 16,
-            border: "1px solid #E5E5E3",
+            border: "1px solid var(--of-border)",
             boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
             padding: "28px 28px 24px",
           }}
         >
           {/* Header */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
-            <h2 style={{ fontSize: 20, fontWeight: 700, color: "#0A0A0A", letterSpacing: "-0.02em" }}>
+            <h2 style={{ fontSize: 20, fontWeight: 700, color: "var(--of-text)", letterSpacing: "-0.02em" }}>
               Nova transação
             </h2>
             <DialogPrimitive.Close
@@ -149,9 +149,9 @@ export function AddTransactionModal({ open, onOpenChange, onSuccess }: AddTransa
                 background: "none", border: "none", cursor: "pointer",
                 width: 32, height: 32, borderRadius: 8,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                color: "#A3A3A3", transition: "all 0.15s",
+                color: "var(--of-text-muted)", transition: "all 0.15s",
               }}
-              onMouseOver={(e) => { e.currentTarget.style.color = "#0A0A0A"; e.currentTarget.style.background = "#F5F5F0" }}
+              onMouseOver={(e) => { e.currentTarget.style.color = "#0A0A0A"; e.currentTarget.style.background = "var(--of-hover)" }}
               onMouseOut={(e) => { e.currentTarget.style.color = "#A3A3A3"; e.currentTarget.style.background = "none" }}
             >
               <X size={18} />
@@ -189,7 +189,7 @@ export function AddTransactionModal({ open, onOpenChange, onSuccess }: AddTransa
           <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
             {/* Valor */}
             <div>
-              <label style={{ fontSize: 11, fontWeight: 500, color: "#A3A3A3", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 8 }}>
+              <label style={{ fontSize: 11, fontWeight: 500, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 8 }}>
                 Valor *
               </label>
               <div style={{
@@ -198,7 +198,7 @@ export function AddTransactionModal({ open, onOpenChange, onSuccess }: AddTransa
                 borderRadius: 10, padding: "12px 16px",
                 transition: "border-color 0.15s",
               }}>
-                <span style={{ fontSize: 18, fontWeight: 700, color: "#A3A3A3", marginRight: 8 }}>R$</span>
+                <span style={{ fontSize: 18, fontWeight: 700, color: "var(--of-text-muted)", marginRight: 8 }}>R$</span>
                 <input
                   type="text"
                   inputMode="numeric"
@@ -208,7 +208,7 @@ export function AddTransactionModal({ open, onOpenChange, onSuccess }: AddTransa
                   autoFocus
                   style={{
                     flex: 1, outline: "none", border: "none", background: "transparent",
-                    fontSize: 28, fontWeight: 700, color: "#0A0A0A",
+                    fontSize: 28, fontWeight: 700, color: "var(--of-text)",
                   }}
                 />
               </div>
@@ -217,7 +217,7 @@ export function AddTransactionModal({ open, onOpenChange, onSuccess }: AddTransa
 
             {/* Categoria */}
             <div>
-              <label style={{ fontSize: 11, fontWeight: 500, color: "#A3A3A3", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 8 }}>
+              <label style={{ fontSize: 11, fontWeight: 500, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 8 }}>
                 Categoria *
               </label>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 }}>
@@ -250,7 +250,7 @@ export function AddTransactionModal({ open, onOpenChange, onSuccess }: AddTransa
 
             {/* Descrição */}
             <div>
-              <label style={{ fontSize: 11, fontWeight: 500, color: "#A3A3A3", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 8 }}>
+              <label style={{ fontSize: 11, fontWeight: 500, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 8 }}>
                 Descrição (opcional)
               </label>
               <input
@@ -259,8 +259,8 @@ export function AddTransactionModal({ open, onOpenChange, onSuccess }: AddTransa
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Ex: Supermercado, iFood, Salário..."
                 style={{
-                  width: "100%", border: "1px solid #E5E5E3", borderRadius: 10,
-                  padding: "10px 14px", fontSize: 14, color: "#0A0A0A",
+                  width: "100%", border: "1px solid var(--of-border)", borderRadius: 10,
+                  padding: "10px 14px", fontSize: 14, color: "var(--of-text)",
                   outline: "none", transition: "border-color 0.15s", boxSizing: "border-box",
                 }}
                 onFocus={(e) => (e.currentTarget.style.borderColor = "#0A0A0A")}
@@ -270,7 +270,7 @@ export function AddTransactionModal({ open, onOpenChange, onSuccess }: AddTransa
 
             {/* Data */}
             <div>
-              <label style={{ fontSize: 11, fontWeight: 500, color: "#A3A3A3", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 8 }}>
+              <label style={{ fontSize: 11, fontWeight: 500, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 8 }}>
                 Data *
               </label>
               <div style={{
@@ -279,14 +279,14 @@ export function AddTransactionModal({ open, onOpenChange, onSuccess }: AddTransa
                 borderRadius: 10, padding: "10px 14px",
                 transition: "border-color 0.15s",
               }}>
-                <CalendarDays size={16} style={{ color: "#A3A3A3", marginRight: 8, flexShrink: 0 }} />
+                <CalendarDays size={16} style={{ color: "var(--of-text-muted)", marginRight: 8, flexShrink: 0 }} />
                 <input
                   type="date"
                   value={date}
                   onChange={(e) => { setDate(e.target.value); setErrors((p) => ({ ...p, date: "" })) }}
                   style={{
                     flex: 1, border: "none", outline: "none",
-                    background: "transparent", fontSize: 14, color: "#0A0A0A",
+                    background: "transparent", fontSize: 14, color: "var(--of-text)",
                   }}
                 />
               </div>
@@ -299,9 +299,9 @@ export function AddTransactionModal({ open, onOpenChange, onSuccess }: AddTransa
                 <button
                   type="button"
                   style={{
-                    flex: 1, padding: "12px 0", border: "1px solid #E5E5E3",
+                    flex: 1, padding: "12px 0", border: "1px solid var(--of-border)",
                     borderRadius: 10, fontSize: 14, fontWeight: 600,
-                    color: "#525252", backgroundColor: "#FFFFFF",
+                    color: "var(--of-text-secondary)", backgroundColor: "var(--of-surface)",
                     cursor: "pointer", transition: "all 0.15s",
                   }}
                   onMouseOver={(e) => { e.currentTarget.style.backgroundColor = "#F5F5F0"; e.currentTarget.style.borderColor = "#0A0A0A" }}
@@ -316,7 +316,7 @@ export function AddTransactionModal({ open, onOpenChange, onSuccess }: AddTransa
                 style={{
                   flex: 1, padding: "12px 0", border: "none",
                   borderRadius: 10, fontSize: 14, fontWeight: 600,
-                  color: "#FFFFFF",
+                  color: "var(--of-btn-text)",
                   backgroundColor: submitting ? "#A3A3A3" : (tipo === "receita" ? "#16A34A" : "#0A0A0A"),
                   cursor: submitting ? "not-allowed" : "pointer",
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 8,

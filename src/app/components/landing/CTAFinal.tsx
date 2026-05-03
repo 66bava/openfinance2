@@ -1,11 +1,11 @@
-import { Link } from "react-router"
+﻿import { Link } from "react-router"
 import WaitlistForm from "./WaitlistForm"
 
 export default function CTAFinal() {
   return (
     <section
       style={{
-        backgroundColor: "#0A0A0A",
+        backgroundColor: "var(--of-btn-bg)",
         padding: "112px 24px",
         textAlign: "center",
         fontFamily: "var(--font-body)",
@@ -16,7 +16,7 @@ export default function CTAFinal() {
           fontFamily: "var(--font-display)",
           fontSize: "clamp(28px, 4vw, 48px)",
           fontWeight: 400,
-          color: "#FFFFFF",
+          color: "var(--of-btn-text)",
           letterSpacing: "-0.02em",
           lineHeight: 1.15,
           marginBottom: 20,
@@ -39,8 +39,8 @@ export default function CTAFinal() {
             style={{
               display: "inline-flex",
               alignItems: "center",
-              backgroundColor: "#FFFFFF",
-              color: "#0A0A0A",
+              backgroundColor: "var(--of-surface)",
+              color: "var(--of-text)",
               fontSize: 15,
               fontWeight: 700,
               padding: "14px 32px",

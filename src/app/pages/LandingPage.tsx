@@ -48,8 +48,8 @@ export default function LandingPage() {
       fontFamily: "var(--font-body)",
       WebkitFontSmoothing: "antialiased",
       MozOsxFontSmoothing: "grayscale",
-      backgroundColor: "#FFFFFF",
-      color: "#0A0A0A",
+      backgroundColor: "var(--of-surface)",
+      color: "var(--of-text)",
       overflowX: "hidden",
     }}>
       <Toaster richColors position="top-center" />

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+﻿import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router'
 import { ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
@@ -17,7 +17,7 @@ const MESES = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
 
 const STATUS_CONFIG: Record<string, { label: string; cor: string; bg: string }> = {
   aberta: { label: 'Aberta', cor: '#D97706', bg: '#FEF9C3' },
-  fechada: { label: 'Fechada', cor: '#525252', bg: '#F5F5F0' },
+  fechada: { label: 'Fechada', cor: 'var(--of-text-secondary)', bg: 'var(--of-page-bg)' },
   paga: { label: 'Paga', cor: '#16A34A', bg: '#DCFCE7' },
   parcial: { label: 'Parcial', cor: '#2563EB', bg: '#DBEAFE' },
 }
@@ -82,7 +82,7 @@ export default function FaturaDetalhe() {
   if (!fatura || !cartao) {
     return (
       <div style={{ padding: 24, textAlign: 'center' }}>
-        <p style={{ fontSize: 14, color: '#A3A3A3' }}>Fatura não encontrada.</p>
+        <p style={{ fontSize: 14, color: 'var(--of-text-muted)' }}>Fatura não encontrada.</p>
         <button onClick={() => navigate('/app/cartoes')} style={{ marginTop: 12, fontSize: 14, color: '#16A34A', background: 'none', border: 'none', cursor: 'pointer' }}>
           ← Voltar para cartões
         </button>
@@ -106,7 +106,7 @@ export default function FaturaDetalhe() {
           style={{
             display: 'flex', alignItems: 'center', gap: 6,
             background: 'none', border: 'none', cursor: 'pointer',
-            fontSize: 13, color: '#525252', marginBottom: 16, padding: 0,
+            fontSize: 13, color: 'var(--of-text-secondary)', marginBottom: 16, padding: 0,
             fontFamily: 'var(--font-body)',
           }}
         >
@@ -119,11 +119,11 @@ export default function FaturaDetalhe() {
               <div style={{
                 width: 10, height: 10, borderRadius: '50%', background: cartao.cor, flexShrink: 0,
               }} />
-              <h1 style={{ fontSize: 22, fontWeight: 700, color: '#0A0A0A', letterSpacing: '-0.02em' }}>
+              <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--of-text)', letterSpacing: '-0.02em' }}>
                 {cartao.nome}
               </h1>
             </div>
-            <p style={{ fontSize: 14, color: '#A3A3A3', marginBottom: 8 }}>
+            <p style={{ fontSize: 14, color: 'var(--of-text-muted)', marginBottom: 8 }}>
               Fatura de {MESES[mesNum - 1]} {anoNum}
               {cartao.dia_vencimento ? ` · Vence dia ${cartao.dia_vencimento}` : ''}
             </p>
@@ -152,9 +152,9 @@ export default function FaturaDetalhe() {
           }] : []),
         ].map((item) => (
           <div key={item.label} style={{
-            background: '#FFFFFF', border: '1px solid #E5E5E3', borderRadius: 14, padding: '16px 18px',
+            background: 'var(--of-surface)', border: '1px solid var(--of-border)', borderRadius: 14, padding: '16px 18px',
           }}>
-            <p style={{ fontSize: 11, fontWeight: 600, color: '#A3A3A3', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 6 }}>
+            <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--of-text-muted)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 6 }}>
               {item.label}
             </p>
             <p style={{ fontSize: 20, fontWeight: 700, color: item.cor, letterSpacing: '-0.02em' }}>
@@ -168,14 +168,14 @@ export default function FaturaDetalhe() {
       {fatura.valor_total > 0 && (
         <div style={{ marginBottom: 28 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-            <span style={{ fontSize: 12, color: '#A3A3A3' }}>Progresso do pagamento</span>
+            <span style={{ fontSize: 12, color: 'var(--of-text-muted)' }}>Progresso do pagamento</span>
             <span style={{ fontSize: 12, fontWeight: 700, color: '#16A34A' }}>{pctPago.toFixed(0)}%</span>
           </div>
-          <div style={{ height: 8, background: '#E5E5E3', borderRadius: 4, overflow: 'hidden' }}>
+          <div style={{ height: 8, background: 'var(--of-border)', borderRadius: 4, overflow: 'hidden' }}>
             <div style={{
               height: '100%',
               width: `${pctPago}%`,
-              background: pctPago >= 100 ? '#16A34A' : '#0A0A0A',
+              background: pctPago >= 100 ? '#16A34A' : 'var(--of-btn-bg)',
               borderRadius: 4,
               transition: 'width 0.4s ease',
             }} />
@@ -185,50 +185,50 @@ export default function FaturaDetalhe() {
 
       {/* Transações da fatura */}
       <div>
-        <h2 style={{ fontSize: 15, fontWeight: 600, color: '#0A0A0A', marginBottom: 14 }}>
+        <h2 style={{ fontSize: 15, fontWeight: 600, color: 'var(--of-text)', marginBottom: 14 }}>
           Transações ({transacoes.length})
         </h2>
 
         {transacoes.length === 0 ? (
           <div style={{
-            background: '#FAFAFA', border: '1px dashed #E5E5E3', borderRadius: 14,
+            background: 'var(--of-page-bg)', border: '1px dashed var(--of-border)', borderRadius: 14,
             padding: '32px', textAlign: 'center',
           }}>
-            <p style={{ fontSize: 14, color: '#A3A3A3' }}>
+            <p style={{ fontSize: 14, color: 'var(--of-text-muted)' }}>
               Nenhuma transação nesta fatura ainda.
             </p>
           </div>
         ) : (
-          <div style={{ background: '#FFFFFF', border: '1px solid #E5E5E3', borderRadius: 14, overflow: 'hidden' }}>
+          <div style={{ background: 'var(--of-surface)', border: '1px solid var(--of-border)', borderRadius: 14, overflow: 'hidden' }}>
             {transacoes.map((tx, i) => (
               <div
                 key={tx.id}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 12, padding: '14px 18px',
-                  borderBottom: i < transacoes.length - 1 ? '1px solid #F5F5F5' : 'none',
+                  borderBottom: i < transacoes.length - 1 ? '1px solid var(--of-border-light)' : 'none',
                   cursor: !tx.confirmado ? 'pointer' : 'default',
                 }}
                 onClick={() => !tx.confirmado && handleConfirmar(tx)}
               >
                 <div style={{
-                  width: 36, height: 36, borderRadius: 10, background: '#F5F5F0',
+                  width: 36, height: 36, borderRadius: 10, background: 'var(--of-page-bg)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0,
                 }}>
                   {tx.categorias?.icone || '📦'}
                 </div>
 
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: 14, fontWeight: 600, color: '#0A0A0A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--of-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {tx.descricao}
                   </p>
-                  <p style={{ fontSize: 12, color: '#A3A3A3', marginTop: 2 }}>
+                  <p style={{ fontSize: 12, color: 'var(--of-text-muted)', marginTop: 2 }}>
                     {new Date(tx.data + 'T00:00:00').toLocaleDateString('pt-BR')}
                     {tx.categorias?.nome ? ` · ${tx.categorias.nome}` : ''}
                   </p>
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
-                  <p style={{ fontSize: 15, fontWeight: 700, color: '#0A0A0A' }}>
+                  <p style={{ fontSize: 15, fontWeight: 700, color: 'var(--of-text)' }}>
                     {valorFmt(tx.valor)}
                   </p>
                   <span style={{
@@ -249,7 +249,7 @@ export default function FaturaDetalhe() {
       {fatura.status !== 'paga' && fatura.valor_total > 0 && (
         <div style={{
           position: 'fixed', bottom: 0, left: 0, right: 0,
-          background: '#FFFFFF', borderTop: '1px solid #E5E5E3',
+          background: 'var(--of-surface)', borderTop: '1px solid var(--of-border)',
           padding: '16px 20px 28px',
           display: 'flex', justifyContent: 'center',
           zIndex: 10,

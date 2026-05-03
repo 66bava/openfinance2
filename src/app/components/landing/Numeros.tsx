@@ -1,4 +1,4 @@
-const metricas = [
+﻿const metricas = [
   {
     numero: "73%",
     descricao: "dos brasileiros não sabem quanto gastaram no mês passado",
@@ -21,7 +21,7 @@ export default function Numeros() {
     <section
       id="numeros"
       style={{
-        backgroundColor: "#F7F7F5",
+        backgroundColor: "var(--of-page-bg)",
         padding: "56px 24px",
         fontFamily: "var(--font-body)",
       }}
@@ -39,7 +39,7 @@ export default function Numeros() {
               key={metrica.numero}
               style={{
                 padding: "0 40px",
-                borderRight: i < metricas.length - 1 ? "1px solid #E5E5E3" : "none",
+                borderRight: i < metricas.length - 1 ? "1px solid var(--of-border)" : "none",
                 textAlign: "center",
               }}
               className={i > 0 ? "border-l-0 md:border-l-0" : ""}
@@ -47,7 +47,7 @@ export default function Numeros() {
               <p style={{
                 fontSize: "clamp(36px, 4vw, 52px)",
                 fontWeight: 700,
-                color: "#1A1A1A",
+                color: "var(--of-text)",
                 letterSpacing: "-0.03em",
                 lineHeight: 1,
                 marginBottom: 12,
@@ -57,7 +57,7 @@ export default function Numeros() {
               </p>
               <p style={{
                 fontSize: 14,
-                color: "#6B6B6B",
+                color: "var(--of-text-secondary)",
                 lineHeight: 1.5,
                 maxWidth: 200,
                 margin: "0 auto",

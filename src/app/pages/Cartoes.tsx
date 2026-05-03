@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+﻿import { useState, useEffect, useCallback } from 'react'
 import { Plus, Filter } from 'lucide-react'
 import { toast } from 'sonner'
 import { useAuth } from '../../lib/auth-context'
@@ -122,7 +122,7 @@ export default function Cartoes() {
       {/* Resumo do mês */}
       <div style={{ marginBottom: 32 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-          <h2 style={{ fontSize: 15, fontWeight: 600, color: '#0A0A0A' }}>
+          <h2 style={{ fontSize: 15, fontWeight: 600, color: 'var(--of-text)' }}>
             {MESES[mesSel - 1]} {anoSel}
           </h2>
           <div style={{ display: 'flex', gap: 8 }}>
@@ -134,9 +134,9 @@ export default function Cartoes() {
                 setAnoSel(parseInt(a))
               }}
               style={{
-                padding: '7px 12px', fontSize: 13, border: '1px solid #E5E5E3',
-                borderRadius: 8, background: '#FFFFFF', cursor: 'pointer',
-                fontFamily: 'var(--font-body)', color: '#0A0A0A',
+                padding: '7px 12px', fontSize: 13, border: '1px solid var(--of-border)',
+                borderRadius: 8, background: 'var(--of-surface)', cursor: 'pointer',
+                fontFamily: 'var(--font-body)', color: 'var(--of-text)',
               }}
             >
               {Array.from({ length: 12 }, (_, i) => {
@@ -160,19 +160,19 @@ export default function Cartoes() {
       {/* Meus cartões */}
       <div style={{ marginBottom: 36 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-          <h2 style={{ fontSize: 15, fontWeight: 600, color: '#0A0A0A' }}>
+          <h2 style={{ fontSize: 15, fontWeight: 600, color: 'var(--of-text)' }}>
             Meus cartões
           </h2>
           <button
             onClick={() => setModalNovoAberto(true)}
             style={{
               display: 'flex', alignItems: 'center', gap: 6,
-              padding: '9px 16px', background: '#0A0A0A', color: '#FFFFFF',
+              padding: '9px 16px', background: 'var(--of-btn-bg)', color: 'var(--of-btn-text)',
               border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 600,
               cursor: 'pointer', fontFamily: 'var(--font-body)', transition: 'background 0.15s',
             }}
             onMouseOver={(e) => (e.currentTarget.style.background = '#262626')}
-            onMouseOut={(e) => (e.currentTarget.style.background = '#0A0A0A')}
+            onMouseOut={(e) => (e.currentTarget.style.background = 'var(--of-btn-bg)')}
           >
             <Plus size={16} /> Adicionar cartão
           </button>
@@ -180,20 +180,20 @@ export default function Cartoes() {
 
         {cartoes.length === 0 ? (
           <div style={{
-            background: '#FAFAFA', border: '1px dashed #E5E5E3', borderRadius: 16,
+            background: 'var(--of-page-bg)', border: '1px dashed var(--of-border)', borderRadius: 16,
             padding: '48px 24px', textAlign: 'center',
           }}>
             <p style={{ fontSize: 32, marginBottom: 12 }}>💳</p>
-            <p style={{ fontSize: 15, fontWeight: 600, color: '#0A0A0A', marginBottom: 6 }}>
+            <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--of-text)', marginBottom: 6 }}>
               Nenhum cartão cadastrado
             </p>
-            <p style={{ fontSize: 13, color: '#A3A3A3', marginBottom: 20 }}>
+            <p style={{ fontSize: 13, color: 'var(--of-text-muted)', marginBottom: 20 }}>
               Adicione seus cartões de crédito e débito para controlar as faturas.
             </p>
             <button
               onClick={() => setModalNovoAberto(true)}
               style={{
-                padding: '10px 20px', background: '#0A0A0A', color: '#FFFFFF',
+                padding: '10px 20px', background: 'var(--of-btn-bg)', color: 'var(--of-btn-text)',
                 border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 600,
                 cursor: 'pointer', fontFamily: 'var(--font-body)',
               }}
@@ -226,7 +226,7 @@ export default function Cartoes() {
       {transacoes.length > 0 && (
         <div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 10 }}>
-            <h2 style={{ fontSize: 15, fontWeight: 600, color: '#0A0A0A' }}>
+            <h2 style={{ fontSize: 15, fontWeight: 600, color: 'var(--of-text)' }}>
               Transações do mês
             </h2>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
@@ -237,9 +237,9 @@ export default function Cartoes() {
                 value={filtroCartao}
                 onChange={(e) => setFiltroCartao(e.target.value)}
                 style={{
-                  padding: '6px 10px', fontSize: 13, border: '1px solid #E5E5E3',
-                  borderRadius: 8, background: '#FFFFFF', cursor: 'pointer',
-                  fontFamily: 'var(--font-body)', color: '#0A0A0A',
+                  padding: '6px 10px', fontSize: 13, border: '1px solid var(--of-border)',
+                  borderRadius: 8, background: 'var(--of-surface)', cursor: 'pointer',
+                  fontFamily: 'var(--font-body)', color: 'var(--of-text)',
                 }}
               >
                 <option value="todos">Todos os cartões</option>
@@ -253,9 +253,9 @@ export default function Cartoes() {
                 value={filtroStatus}
                 onChange={(e) => setFiltroStatus(e.target.value as typeof filtroStatus)}
                 style={{
-                  padding: '6px 10px', fontSize: 13, border: '1px solid #E5E5E3',
-                  borderRadius: 8, background: '#FFFFFF', cursor: 'pointer',
-                  fontFamily: 'var(--font-body)', color: '#0A0A0A',
+                  padding: '6px 10px', fontSize: 13, border: '1px solid var(--of-border)',
+                  borderRadius: 8, background: 'var(--of-surface)', cursor: 'pointer',
+                  fontFamily: 'var(--font-body)', color: 'var(--of-text)',
                 }}
               >
                 <option value="todos">Todos os status</option>
@@ -265,9 +265,9 @@ export default function Cartoes() {
             </div>
           </div>
 
-          <div style={{ background: '#FFFFFF', border: '1px solid #E5E5E3', borderRadius: 16, overflow: 'hidden' }}>
+          <div style={{ background: 'var(--of-surface)', border: '1px solid var(--of-border)', borderRadius: 16, overflow: 'hidden' }}>
             {txsFiltradas.length === 0 ? (
-              <p style={{ padding: '32px', textAlign: 'center', fontSize: 14, color: '#A3A3A3' }}>
+              <p style={{ padding: '32px', textAlign: 'center', fontSize: 14, color: 'var(--of-text-muted)' }}>
                 Nenhuma transação encontrada com os filtros selecionados.
               </p>
             ) : (
@@ -279,13 +279,13 @@ export default function Cartoes() {
                     style={{
                       display: 'flex', alignItems: 'center', gap: 12,
                       padding: '14px 18px',
-                      borderBottom: i < txsFiltradas.length - 1 ? '1px solid #F5F5F5' : 'none',
+                      borderBottom: i < txsFiltradas.length - 1 ? '1px solid var(--of-border-light)' : 'none',
                     }}
                   >
                     {/* Emoji categoria */}
                     <div style={{
                       width: 36, height: 36, borderRadius: 10,
-                      background: '#F5F5F0', display: 'flex', alignItems: 'center',
+                      background: 'var(--of-page-bg)', display: 'flex', alignItems: 'center',
                       justifyContent: 'center', fontSize: 16, flexShrink: 0,
                     }}>
                       {tx.categorias?.icone || '📦'}
@@ -293,23 +293,23 @@ export default function Cartoes() {
 
                     {/* Descrição */}
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontSize: 14, fontWeight: 600, color: '#0A0A0A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--of-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {tx.descricao}
                       </p>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
-                        <p style={{ fontSize: 12, color: '#A3A3A3' }}>
+                        <p style={{ fontSize: 12, color: 'var(--of-text-muted)' }}>
                           {new Date(tx.data + 'T00:00:00').toLocaleDateString('pt-BR')}
                         </p>
                         {cartaoTx && (
                           <>
                             <span style={{ fontSize: 12, color: '#E5E5E3' }}>·</span>
-                            <span style={{ fontSize: 12, color: '#A3A3A3' }}>{cartaoTx.nome}</span>
+                            <span style={{ fontSize: 12, color: 'var(--of-text-muted)' }}>{cartaoTx.nome}</span>
                           </>
                         )}
                         {tx.categorias?.nome && (
                           <>
                             <span style={{ fontSize: 12, color: '#E5E5E3' }}>·</span>
-                            <span style={{ fontSize: 12, color: '#A3A3A3' }}>{tx.categorias.nome}</span>
+                            <span style={{ fontSize: 12, color: 'var(--of-text-muted)' }}>{tx.categorias.nome}</span>
                           </>
                         )}
                       </div>
@@ -328,7 +328,7 @@ export default function Cartoes() {
                             onClick={() => handleConfirmarTx(tx)}
                             style={{
                               fontSize: 11, fontWeight: 600, padding: '3px 8px',
-                              background: '#0A0A0A', color: '#FFFFFF',
+                              background: 'var(--of-btn-bg)', color: 'var(--of-btn-text)',
                               border: 'none', borderRadius: 20, cursor: 'pointer',
                               fontFamily: 'var(--font-body)',
                             }}

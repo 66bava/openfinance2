@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+﻿import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import {
   FileText, Download, FileSpreadsheet, Calendar,
@@ -562,7 +562,7 @@ function ReportsContent() {
                       <td className="py-2.5">
                         <span
                           className="px-2 py-0.5 rounded"
-                          style={{ fontSize: 10, fontWeight: 500, backgroundColor: "#F5F5F5", color: "#555555" }}
+                          style={{ fontSize: 10, fontWeight: 500, backgroundColor: "var(--of-page-bg)", color: "#555555" }}
                         >
                           {tx.categorias?.nome || "Outros"}
                         </span>

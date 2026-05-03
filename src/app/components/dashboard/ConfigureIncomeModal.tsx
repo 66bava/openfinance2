@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+﻿import { useState, useEffect } from "react"
 import { toast } from "sonner"
 import { Plus, X, Loader2 } from "lucide-react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
@@ -99,9 +99,9 @@ export function ConfigureIncomeModal({ open, onOpenChange, onSuccess }: Configur
   }
 
   const inputStyle: React.CSSProperties = {
-    border: "1px solid #E5E5E3", borderRadius: 8,
-    padding: "9px 12px", fontSize: 14, color: "#0A0A0A",
-    outline: "none", backgroundColor: "#FFFFFF",
+    border: "1px solid var(--of-border)", borderRadius: 8,
+    padding: "9px 12px", fontSize: 14, color: "var(--of-text)",
+    outline: "none", backgroundColor: "var(--of-surface)",
     transition: "border-color 0.15s",
     width: "100%", boxSizing: "border-box",
   }
@@ -126,9 +126,9 @@ export function ConfigureIncomeModal({ open, onOpenChange, onSuccess }: Configur
             maxWidth: 480,
             maxHeight: "90vh",
             overflowY: "auto",
-            backgroundColor: "#FFFFFF",
+            backgroundColor: "var(--of-surface)",
             borderRadius: 16,
-            border: "1px solid #E5E5E3",
+            border: "1px solid var(--of-border)",
             boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
             padding: "28px",
           }}
@@ -136,10 +136,10 @@ export function ConfigureIncomeModal({ open, onOpenChange, onSuccess }: Configur
           {/* Header */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
             <div>
-              <h2 style={{ fontSize: 20, fontWeight: 700, color: "#0A0A0A", letterSpacing: "-0.02em" }}>
+              <h2 style={{ fontSize: 20, fontWeight: 700, color: "var(--of-text)", letterSpacing: "-0.02em" }}>
                 Renda mensal
               </h2>
-              <p style={{ fontSize: 13, color: "#A3A3A3", marginTop: 2 }}>
+              <p style={{ fontSize: 13, color: "var(--of-text-muted)", marginTop: 2 }}>
                 Configure suas fontes de renda
               </p>
             </div>
@@ -148,9 +148,9 @@ export function ConfigureIncomeModal({ open, onOpenChange, onSuccess }: Configur
                 background: "none", border: "none", cursor: "pointer",
                 width: 32, height: 32, borderRadius: 8, flexShrink: 0,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                color: "#A3A3A3", transition: "all 0.15s",
+                color: "var(--of-text-muted)", transition: "all 0.15s",
               }}
-              onMouseOver={(e) => { e.currentTarget.style.color = "#0A0A0A"; e.currentTarget.style.background = "#F5F5F0" }}
+              onMouseOver={(e) => { e.currentTarget.style.color = "#0A0A0A"; e.currentTarget.style.background = "var(--of-hover)" }}
               onMouseOut={(e) => { e.currentTarget.style.color = "#A3A3A3"; e.currentTarget.style.background = "none" }}
             >
               <X size={18} />
@@ -165,19 +165,19 @@ export function ConfigureIncomeModal({ open, onOpenChange, onSuccess }: Configur
             <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
               {/* Renda principal */}
               <div>
-                <label style={{ fontSize: 11, fontWeight: 500, color: "#A3A3A3", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 8 }}>
+                <label style={{ fontSize: 11, fontWeight: 500, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 8 }}>
                   Renda principal (salário)
                 </label>
-                <div style={{ display: "flex", alignItems: "center", border: "1px solid #E5E5E3", borderRadius: 10, padding: "10px 14px", transition: "border-color 0.15s" }}
+                <div style={{ display: "flex", alignItems: "center", border: "1px solid var(--of-border)", borderRadius: 10, padding: "10px 14px", transition: "border-color 0.15s" }}
                   onFocus={() => {}} >
-                  <span style={{ fontSize: 15, fontWeight: 600, color: "#A3A3A3", marginRight: 8 }}>R$</span>
+                  <span style={{ fontSize: 15, fontWeight: 600, color: "var(--of-text-muted)", marginRight: 8 }}>R$</span>
                   <input
                     type="text"
                     inputMode="decimal"
                     value={rendaPrincipal}
                     onChange={(e) => setRendaPrincipal(e.target.value)}
                     placeholder="0,00"
-                    style={{ flex: 1, border: "none", outline: "none", background: "transparent", fontSize: 22, fontWeight: 700, color: "#0A0A0A" }}
+                    style={{ flex: 1, border: "none", outline: "none", background: "transparent", fontSize: 22, fontWeight: 700, color: "var(--of-text)" }}
                     onFocus={(e) => { e.currentTarget.parentElement!.style.borderColor = "#0A0A0A" }}
                     onBlur={(e) => { e.currentTarget.parentElement!.style.borderColor = "#E5E5E3" }}
                   />
@@ -187,7 +187,7 @@ export function ConfigureIncomeModal({ open, onOpenChange, onSuccess }: Configur
               {/* Fontes extras */}
               {fontes.length > 0 && (
                 <div>
-                  <label style={{ fontSize: 11, fontWeight: 500, color: "#A3A3A3", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 10 }}>
+                  <label style={{ fontSize: 11, fontWeight: 500, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 10 }}>
                     Outras fontes
                   </label>
                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -202,23 +202,23 @@ export function ConfigureIncomeModal({ open, onOpenChange, onSuccess }: Configur
                             <option key={t.value} value={t.value}>{t.label}</option>
                           ))}
                         </select>
-                        <div style={{ display: "flex", alignItems: "center", border: "1px solid #E5E5E3", borderRadius: 8, padding: "9px 12px", flex: 1, transition: "border-color 0.15s" }}>
-                          <span style={{ fontSize: 13, fontWeight: 500, color: "#A3A3A3", marginRight: 4 }}>R$</span>
+                        <div style={{ display: "flex", alignItems: "center", border: "1px solid var(--of-border)", borderRadius: 8, padding: "9px 12px", flex: 1, transition: "border-color 0.15s" }}>
+                          <span style={{ fontSize: 13, fontWeight: 500, color: "var(--of-text-muted)", marginRight: 4 }}>R$</span>
                           <input
                             type="text"
                             inputMode="decimal"
                             value={fonte.valor}
                             onChange={(e) => updateFonte(fonte.id, "valor", e.target.value)}
                             placeholder="0,00"
-                            style={{ flex: 1, border: "none", outline: "none", background: "transparent", fontSize: 14, color: "#0A0A0A" }}
+                            style={{ flex: 1, border: "none", outline: "none", background: "transparent", fontSize: 14, color: "var(--of-text)" }}
                           />
                         </div>
                         <button
                           type="button"
                           onClick={() => removeFonte(fonte.id)}
                           style={{
-                            width: 32, height: 36, border: "1px solid #E5E5E3", borderRadius: 8,
-                            background: "#FFFFFF", cursor: "pointer", color: "#A3A3A3",
+                            width: 32, height: 36, border: "1px solid var(--of-border)", borderRadius: 8,
+                            background: "var(--of-surface)", cursor: "pointer", color: "var(--of-text-muted)",
                             display: "flex", alignItems: "center", justifyContent: "center",
                             transition: "all 0.15s", flexShrink: 0,
                           }}
@@ -240,8 +240,8 @@ export function ConfigureIncomeModal({ open, onOpenChange, onSuccess }: Configur
                 style={{
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
                   padding: "9px 0", border: "1px dashed #E5E5E3", borderRadius: 10,
-                  background: "#FFFFFF", cursor: "pointer", fontSize: 13, fontWeight: 500,
-                  color: "#525252", transition: "all 0.15s",
+                  background: "var(--of-surface)", cursor: "pointer", fontSize: 13, fontWeight: 500,
+                  color: "var(--of-text-secondary)", transition: "all 0.15s",
                 }}
                 onMouseOver={(e) => { e.currentTarget.style.borderColor = "#0A0A0A"; e.currentTarget.style.color = "#0A0A0A" }}
                 onMouseOut={(e) => { e.currentTarget.style.borderColor = "#E5E5E3"; e.currentTarget.style.color = "#525252" }}
@@ -270,12 +270,12 @@ export function ConfigureIncomeModal({ open, onOpenChange, onSuccess }: Configur
                     type="button"
                     style={{
                       flex: 1, padding: "12px 0",
-                      border: "1px solid #E5E5E3", borderRadius: 10,
-                      fontSize: 14, fontWeight: 600, color: "#525252",
-                      background: "#FFFFFF", cursor: "pointer", transition: "all 0.15s",
+                      border: "1px solid var(--of-border)", borderRadius: 10,
+                      fontSize: 14, fontWeight: 600, color: "var(--of-text-secondary)",
+                      background: "var(--of-surface)", cursor: "pointer", transition: "all 0.15s",
                     }}
-                    onMouseOver={(e) => { e.currentTarget.style.background = "#F5F5F0" }}
-                    onMouseOut={(e) => { e.currentTarget.style.background = "#FFFFFF" }}
+                    onMouseOver={(e) => { e.currentTarget.style.background = "var(--of-hover)" }}
+                    onMouseOut={(e) => { e.currentTarget.style.background = "var(--of-surface)" }}
                   >
                     Cancelar
                   </button>
@@ -287,7 +287,7 @@ export function ConfigureIncomeModal({ open, onOpenChange, onSuccess }: Configur
                   style={{
                     flex: 1, padding: "12px 0",
                     border: "none", borderRadius: 10,
-                    fontSize: 14, fontWeight: 600, color: "#FFFFFF",
+                    fontSize: 14, fontWeight: 600, color: "var(--of-btn-text)",
                     backgroundColor: saving ? "#A3A3A3" : "#16A34A",
                     cursor: saving ? "not-allowed" : "pointer",
                     display: "flex", alignItems: "center", justifyContent: "center", gap: 8,

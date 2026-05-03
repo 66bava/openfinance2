@@ -1,4 +1,4 @@
-// Ícones SVG monocromáticos simples
+﻿// Ícones SVG monocromáticos simples
 function IconScore() {
   return (
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -93,7 +93,7 @@ export default function Diferenciais() {
     <section
       id="diferenciais"
       style={{
-        backgroundColor: "#FFFFFF",
+        backgroundColor: "var(--of-surface)",
         padding: "96px 24px",
         fontFamily: "var(--font-body)",
       }}
@@ -103,7 +103,7 @@ export default function Diferenciais() {
           <p style={{
             fontSize: 12,
             fontWeight: 600,
-            color: "#6B6B6B",
+            color: "var(--of-text-secondary)",
             letterSpacing: "0.12em",
             textTransform: "uppercase",
             marginBottom: 16,
@@ -114,7 +114,7 @@ export default function Diferenciais() {
             fontFamily: "var(--font-display)",
             fontSize: "clamp(26px, 3.2vw, 40px)",
             fontWeight: 400,
-            color: "#1A1A1A",
+            color: "var(--of-text)",
             letterSpacing: "-0.02em",
             lineHeight: 1.2,
           }}>
@@ -136,9 +136,9 @@ export default function Diferenciais() {
                 key={item.titulo}
                 style={{
                   padding: "28px 28px",
-                  border: "1px solid #E5E5E3",
+                  border: "1px solid var(--of-border)",
                   borderRadius: 8,
-                  backgroundColor: "#FFFFFF",
+                  backgroundColor: "var(--of-surface)",
                 }}
               >
                 <div style={{ marginBottom: 16 }}>
@@ -147,7 +147,7 @@ export default function Diferenciais() {
                 <h3 style={{
                   fontSize: 16,
                   fontWeight: 600,
-                  color: "#1A1A1A",
+                  color: "var(--of-text)",
                   letterSpacing: "-0.01em",
                   marginBottom: 10,
                   lineHeight: 1.3,
@@ -156,7 +156,7 @@ export default function Diferenciais() {
                 </h3>
                 <p style={{
                   fontSize: 14,
-                  color: "#6B6B6B",
+                  color: "var(--of-text-secondary)",
                   lineHeight: 1.65,
                 }}>
                   {item.texto}

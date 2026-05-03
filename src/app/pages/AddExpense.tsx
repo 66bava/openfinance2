@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react"
+﻿import { useState, useEffect, useRef, useCallback } from "react"
 import { useNavigate } from "react-router"
 import { toast } from "sonner"
 import {
@@ -279,13 +279,13 @@ export default function AddExpense() {
             {catsOpen && (
               <div style={{
                 position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, zIndex: 50,
-                background: "#FFFFFF", border: "1px solid #E0E0E0", borderRadius: 10,
+                background: "var(--of-surface)", border: "1px solid #E0E0E0", borderRadius: 10,
                 boxShadow: "0 8px 24px rgba(0,0,0,0.12)", maxHeight: 280, overflowY: "auto",
               }}>
                 {/* Grupo: Padrão */}
                 {catsPadrao.length > 0 && (
                   <div>
-                    <p style={{ fontSize: 10, fontWeight: 600, color: "#A3A3A3", padding: "10px 12px 4px", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                    <p style={{ fontSize: 10, fontWeight: 600, color: "var(--of-text-muted)", padding: "10px 12px 4px", textTransform: "uppercase", letterSpacing: "0.06em" }}>
                       Padrão
                     </p>
                     {catsPadrao.map((c) => (
@@ -296,7 +296,7 @@ export default function AddExpense() {
                         style={{
                           width: "100%", display: "flex", alignItems: "center", gap: 10,
                           padding: "9px 12px", border: "none", cursor: "pointer", fontSize: 14,
-                          color: "#0A0A0A", textAlign: "left", transition: "background 0.1s",
+                          color: "var(--of-text)", textAlign: "left", transition: "background 0.1s",
                           background: categoriaId === c.id ? "#F5F5F0" : "transparent",
                         }}
                         onMouseEnter={(e) => { if (categoriaId !== c.id) e.currentTarget.style.background = "#F9F9F9" }}
@@ -312,8 +312,8 @@ export default function AddExpense() {
 
                 {/* Grupo: Minhas categorias */}
                 {catsMinhas.length > 0 && (
-                  <div style={{ borderTop: catsPadrao.length > 0 ? "1px solid #F0F0F0" : "none" }}>
-                    <p style={{ fontSize: 10, fontWeight: 600, color: "#A3A3A3", padding: "10px 12px 4px", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                  <div style={{ borderTop: catsPadrao.length > 0 ? "1px solid var(--of-border-light)" : "none" }}>
+                    <p style={{ fontSize: 10, fontWeight: 600, color: "var(--of-text-muted)", padding: "10px 12px 4px", textTransform: "uppercase", letterSpacing: "0.06em" }}>
                       Minhas categorias
                     </p>
                     {catsMinhas.map((c) => (
@@ -324,7 +324,7 @@ export default function AddExpense() {
                         style={{
                           width: "100%", display: "flex", alignItems: "center", gap: 10,
                           padding: "9px 12px", border: "none", cursor: "pointer", fontSize: 14,
-                          color: "#0A0A0A", textAlign: "left", transition: "background 0.1s",
+                          color: "var(--of-text)", textAlign: "left", transition: "background 0.1s",
                           background: categoriaId === c.id ? "#F5F5F0" : "transparent",
                         }}
                         onMouseEnter={(e) => { if (categoriaId !== c.id) e.currentTarget.style.background = "#F9F9F9" }}
@@ -340,13 +340,13 @@ export default function AddExpense() {
 
                 {/* Empty state */}
                 {catsFiltradas.length === 0 && (
-                  <p style={{ fontSize: 13, color: "#A3A3A3", padding: "14px 12px", textAlign: "center" }}>
+                  <p style={{ fontSize: 13, color: "var(--of-text-muted)", padding: "14px 12px", textAlign: "center" }}>
                     Nenhuma categoria encontrada
                   </p>
                 )}
 
                 {/* Footer: Nova categoria */}
-                <div style={{ borderTop: "1px solid #F0F0F0", padding: "6px" }}>
+                <div style={{ borderTop: "1px solid var(--of-border-light)", padding: "6px" }}>
                   <button
                     type="button"
                     onClick={() => { setCatsOpen(false); setModalNovaCat(true) }}
@@ -422,11 +422,11 @@ export default function AddExpense() {
           {metodo === "credito" && (
             <div style={{
               marginTop: 12, display: "flex", alignItems: "center", justifyContent: "space-between",
-              padding: "10px 14px", background: "#F5F5F0", borderRadius: 10,
+              padding: "10px 14px", background: "var(--of-page-bg)", borderRadius: 10,
             }}>
               <div>
-                <p style={{ fontSize: 13, fontWeight: 600, color: "#0A0A0A" }}>Confirmado?</p>
-                <p style={{ fontSize: 11, color: "#A3A3A3" }}>Transações de crédito são pendentes por padrão</p>
+                <p style={{ fontSize: 13, fontWeight: 600, color: "var(--of-text)" }}>Confirmado?</p>
+                <p style={{ fontSize: 11, color: "var(--of-text-muted)" }}>Transações de crédito são pendentes por padrão</p>
               </div>
               <button
                 type="button"
@@ -440,7 +440,7 @@ export default function AddExpense() {
                 <span style={{
                   position: "absolute", top: 2,
                   left: confirmado ? 22 : 2,
-                  width: 20, height: 20, borderRadius: "50%", background: "#FFFFFF",
+                  width: 20, height: 20, borderRadius: "50%", background: "var(--of-surface)",
                   transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
                 }} />
               </button>

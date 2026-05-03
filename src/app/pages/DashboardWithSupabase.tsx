@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+﻿import { useState, useEffect } from "react"
 import { useAuth } from "../../lib/auth-context"
 import { Link } from "react-router"
 import {
@@ -89,8 +89,8 @@ function ScoreGauge({ score }: { score: number }) {
   ]
 
   return (
-    <div style={{ background: "#FFFFFF", borderRadius: 16, border: "1px solid #E5E5E3", padding: "20px 20px 16px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
-      <p style={{ fontSize: 12, fontWeight: 600, color: "#A3A3A3", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 4 }}>
+    <div style={{ background: "var(--of-surface)", borderRadius: 16, border: "1px solid var(--of-border)", padding: "20px 20px 16px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+      <p style={{ fontSize: 12, fontWeight: 600, color: "var(--of-text-muted)", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 4 }}>
         Score de Saúde
       </p>
 
@@ -98,7 +98,7 @@ function ScoreGauge({ score }: { score: number }) {
         {/* Track */}
         <path
           d={`M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}`}
-          fill="none" stroke="#F5F5F0" strokeWidth="14" strokeLinecap="round"
+          fill="none" stroke="var(--of-border)" strokeWidth="14" strokeLinecap="round"
         />
         {/* Fill */}
         <path
@@ -110,11 +110,11 @@ function ScoreGauge({ score }: { score: number }) {
 
         {/* Score */}
         <text x={cx} y={cy - 22} textAnchor="middle"
-          style={{ fontSize: 44, fontWeight: "800", fill: "#0A0A0A", fontFamily: "system-ui", letterSpacing: "-2" }}>
+          style={{ fontSize: 44, fontWeight: "800", fill: "var(--of-text)", fontFamily: "system-ui", letterSpacing: "-2" }}>
           {score}
         </text>
         <text x={cx} y={cy - 4} textAnchor="middle"
-          style={{ fontSize: 11, fill: "#A3A3A3", fontFamily: "system-ui" }}>
+          style={{ fontSize: 11, fill: "var(--of-text-muted)", fontFamily: "system-ui" }}>
           de 1000
         </text>
         <text x={cx} y={cy + 14} textAnchor="middle"
@@ -122,20 +122,20 @@ function ScoreGauge({ score }: { score: number }) {
           {scoreLabel(score)}
         </text>
 
-        <text x={cx - r} y={cy + 22} style={{ fontSize: 9, fill: "#A3A3A3", fontFamily: "system-ui" }}>0</text>
-        <text x={cx + r - 16} y={cy + 22} style={{ fontSize: 9, fill: "#A3A3A3", fontFamily: "system-ui" }}>1000</text>
+        <text x={cx - r} y={cy + 22} style={{ fontSize: 9, fill: "var(--of-text-muted)", fontFamily: "system-ui" }}>0</text>
+        <text x={cx + r - 16} y={cy + 22} style={{ fontSize: 9, fill: "var(--of-text-muted)", fontFamily: "system-ui" }}>1000</text>
       </svg>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 8 }}>
         {pilares.map((p) => (
           <div key={p.nome}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
-              <span style={{ fontSize: 11, color: "#525252" }}>{p.nome}</span>
+              <span style={{ fontSize: 11, color: "var(--of-text-secondary)" }}>{p.nome}</span>
               <span style={{ fontSize: 11, fontWeight: 600, color: scoreColor(Math.round(p.pct * 1000)) }}>
                 {Math.round(p.pct * 100)}%
               </span>
             </div>
-            <div style={{ height: 4, background: "#F5F5F0", borderRadius: 2, overflow: "hidden" }}>
+            <div style={{ height: 4, background: "var(--of-page-bg)", borderRadius: 2, overflow: "hidden" }}>
               <div style={{
                 height: "100%",
                 width: `${p.pct * 100}%`,
@@ -166,9 +166,9 @@ function StatCard({
 }) {
   return (
     <div style={{
-      background: "#FFFFFF",
+      background: "var(--of-surface)",
       borderRadius: 16,
-      border: "1px solid #E5E5E3",
+      border: "1px solid var(--of-border)",
       padding: "18px 20px",
       boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
       transition: "box-shadow 0.2s",
@@ -177,7 +177,7 @@ function StatCard({
       onMouseOut={(e) => (e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.04)")}
     >
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 14 }}>
-        <p style={{ fontSize: 12, fontWeight: 500, color: "#A3A3A3", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+        <p style={{ fontSize: 12, fontWeight: 500, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
           {label}
         </p>
         <div style={{
@@ -187,7 +187,7 @@ function StatCard({
           <Icon size={17} color={iconColor} strokeWidth={2} />
         </div>
       </div>
-      <p style={{ fontSize: 24, fontWeight: 700, letterSpacing: "-0.025em", color: "#0A0A0A", marginBottom: 4 }}>
+      <p style={{ fontSize: 24, fontWeight: 700, letterSpacing: "-0.025em", color: "var(--of-text)", marginBottom: 4 }}>
         {value}
       </p>
       {sub && (
@@ -211,14 +211,14 @@ function ChartTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null
   return (
     <div style={{
-      background: "#FFFFFF",
-      border: "1px solid #E5E5E3",
+      background: "var(--of-surface)",
+      border: "1px solid var(--of-border)",
       borderRadius: 10,
       padding: "10px 14px",
       boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
       fontSize: 12,
     }}>
-      <p style={{ fontWeight: 600, color: "#0A0A0A", marginBottom: 6 }}>{label}</p>
+      <p style={{ fontWeight: 600, color: "var(--of-text)", marginBottom: 6 }}>{label}</p>
       {payload.map((p: any) => (
         <p key={p.name} style={{ color: p.color, marginBottom: 2 }}>
           {p.name}: {fmt(p.value)}
@@ -290,11 +290,11 @@ export default function DashboardWithSupabase() {
 
       {/* Saudação */}
       <div style={{ marginBottom: 24 }}>
-        <p style={{ fontSize: 13, color: "#A3A3A3", marginBottom: 4 }}>
+        <p style={{ fontSize: 13, color: "var(--of-text-muted)", marginBottom: 4 }}>
           {new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" })}
         </p>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: "#0A0A0A", letterSpacing: "-0.02em" }}>
+          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--of-text)", letterSpacing: "-0.02em" }}>
             Bom dia, {userName} 👋
           </h2>
           <button
@@ -305,8 +305,8 @@ export default function DashboardWithSupabase() {
               gap: 6,
               fontSize: 13,
               fontWeight: 700,
-              color: "#FFFFFF",
-              backgroundColor: "#0A0A0A",
+              color: "var(--of-btn-text)",
+              backgroundColor: "var(--of-btn-bg)",
               padding: "9px 18px",
               borderRadius: 10,
               border: "none",
@@ -314,7 +314,7 @@ export default function DashboardWithSupabase() {
               transition: "background 0.15s",
             }}
             onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#262626")}
-            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#0A0A0A")}
+            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "var(--of-btn-bg)")}
           >
             <Plus size={15} />
             Nova transação
@@ -329,8 +329,8 @@ export default function DashboardWithSupabase() {
           value={fmt(totais.saldoDisponivel)}
           sub={mesAtual}
           icon={Wallet}
-          iconBg="#F5F5F0"
-          iconColor="#525252"
+          iconBg="var(--of-page-bg)"
+          iconColor="var(--of-text-secondary)"
           trend="neutral"
         />
         <StatCard
@@ -370,20 +370,20 @@ export default function DashboardWithSupabase() {
 
           {/* Evolução mensal — LineChart */}
           <div style={{
-            background: "#FFFFFF",
+            background: "var(--of-surface)",
             borderRadius: 16,
-            border: "1px solid #E5E5E3",
+            border: "1px solid var(--of-border)",
             padding: "20px 24px",
             boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
           }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
               <div>
-                <h3 style={{ fontSize: 15, fontWeight: 600, color: "#0A0A0A" }}>Receitas vs Despesas</h3>
-                <p style={{ fontSize: 12, color: "#A3A3A3", marginTop: 2 }}>Últimos 6 meses</p>
+                <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--of-text)" }}>Receitas vs Despesas</h3>
+                <p style={{ fontSize: 12, color: "var(--of-text-muted)", marginTop: 2 }}>Últimos 6 meses</p>
               </div>
               <span style={{
-                fontSize: 11, fontWeight: 600, color: "#525252",
-                background: "#F5F5F0", borderRadius: 8, padding: "5px 10px",
+                fontSize: 11, fontWeight: 600, color: "var(--of-text-secondary)",
+                background: "var(--of-page-bg)", borderRadius: 8, padding: "5px 10px",
               }}>
                 6 meses
               </span>
@@ -391,7 +391,7 @@ export default function DashboardWithSupabase() {
 
             {evolucao.length === 0 ? (
               <div style={{ height: 220, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8 }}>
-                <p style={{ fontSize: 13, color: "#A3A3A3" }}>Sem dados de evolução ainda</p>
+                <p style={{ fontSize: 13, color: "var(--of-text-muted)" }}>Sem dados de evolução ainda</p>
                 <Link to="/app/adicionar" style={{ fontSize: 13, fontWeight: 600, color: "#16A34A", textDecoration: "none" }}>
                   Adicionar primeira transação →
                 </Link>
@@ -400,9 +400,9 @@ export default function DashboardWithSupabase() {
               <>
                 <ResponsiveContainer width="100%" height={220}>
                   <LineChart data={evolucao} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#F5F5F0" vertical={false} />
-                    <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#A3A3A3" }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fontSize: 11, fill: "#A3A3A3" }} axisLine={false} tickLine={false}
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--of-border)" vertical={false} />
+                    <XAxis dataKey="month" tick={{ fontSize: 11, fill: "var(--of-text-muted)" }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 11, fill: "var(--of-text-muted)" }} axisLine={false} tickLine={false}
                       tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} width={48} />
                     <Tooltip content={<ChartTooltip />} />
                     <Line
@@ -423,7 +423,7 @@ export default function DashboardWithSupabase() {
                   {[{ cor: "#16A34A", label: "Receitas" }, { cor: "#EF4444", label: "Despesas" }].map((l) => (
                     <div key={l.label} style={{ display: "flex", alignItems: "center", gap: 6 }}>
                       <div style={{ width: 20, height: 3, borderRadius: 2, background: l.cor }} />
-                      <span style={{ fontSize: 11, color: "#A3A3A3" }}>{l.label}</span>
+                      <span style={{ fontSize: 11, color: "var(--of-text-muted)" }}>{l.label}</span>
                     </div>
                   ))}
                 </div>
@@ -433,17 +433,17 @@ export default function DashboardWithSupabase() {
 
           {/* Transações recentes */}
           <div style={{
-            background: "#FFFFFF",
+            background: "var(--of-surface)",
             borderRadius: 16,
-            border: "1px solid #E5E5E3",
+            border: "1px solid var(--of-border)",
             boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
             overflow: "hidden",
           }}>
             <div style={{
               display: "flex", alignItems: "center", justifyContent: "space-between",
-              padding: "16px 20px", borderBottom: "1px solid #F5F5F0",
+              padding: "16px 20px", borderBottom: "1px solid var(--of-border-light)",
             }}>
-              <h3 style={{ fontSize: 15, fontWeight: 600, color: "#0A0A0A" }}>Transações recentes</h3>
+              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--of-text)" }}>Transações recentes</h3>
               <Link to="/app/analise" style={{ fontSize: 12, fontWeight: 600, color: "#16A34A", textDecoration: "none" }}>
                 Ver todas →
               </Link>
@@ -451,10 +451,10 @@ export default function DashboardWithSupabase() {
 
             {transacoes.length === 0 ? (
               <div style={{ padding: "40px 20px", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
-                <p style={{ fontSize: 14, color: "#A3A3A3" }}>Nenhuma transação registrada.</p>
+                <p style={{ fontSize: 14, color: "var(--of-text-muted)" }}>Nenhuma transação registrada.</p>
                 <Link to="/app/adicionar" style={{
-                  fontSize: 13, fontWeight: 700, color: "#FFFFFF",
-                  background: "#0A0A0A", padding: "10px 20px", borderRadius: 8, textDecoration: "none",
+                  fontSize: 13, fontWeight: 700, color: "var(--of-btn-text)",
+                  background: "var(--of-btn-bg)", padding: "10px 20px", borderRadius: 8, textDecoration: "none",
                 }}>
                   + Adicionar primeira transação
                 </Link>
@@ -469,26 +469,26 @@ export default function DashboardWithSupabase() {
                       alignItems: "center",
                       justifyContent: "space-between",
                       padding: "12px 20px",
-                      borderBottom: "1px solid #F9F9F9",
+                      borderBottom: "1px solid var(--of-border-light)",
                       transition: "background 0.15s",
                     }}
-                    onMouseOver={(e) => (e.currentTarget.style.background = "#FAFAF9")}
+                    onMouseOver={(e) => (e.currentTarget.style.background = "var(--of-hover)")}
                     onMouseOut={(e) => (e.currentTarget.style.background = "transparent")}
                   >
                     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                       <div style={{
                         width: 38, height: 38, borderRadius: 10,
-                        background: tx.tipo === "receita" ? "#DCFCE7" : "#F5F5F0",
+                        background: tx.tipo === "receita" ? "#DCFCE7" : "var(--of-page-bg)",
                         display: "flex", alignItems: "center", justifyContent: "center",
                         fontSize: 16, flexShrink: 0,
                       }}>
                         {categoryIcon(tx.categorias?.nome || "")}
                       </div>
                       <div>
-                        <p style={{ fontSize: 13, fontWeight: 500, color: "#0A0A0A" }}>
+                        <p style={{ fontSize: 13, fontWeight: 500, color: "var(--of-text)" }}>
                           {tx.descricao || "—"}
                         </p>
-                        <p style={{ fontSize: 11, color: "#A3A3A3", marginTop: 1 }}>
+                        <p style={{ fontSize: 11, color: "var(--of-text-muted)", marginTop: 1 }}>
                           {tx.categorias?.nome || "Outros"} · {fmtDate(tx.data)}
                         </p>
                       </div>
@@ -514,22 +514,22 @@ export default function DashboardWithSupabase() {
 
           {/* Categoria Donut */}
           <div style={{
-            background: "#FFFFFF",
+            background: "var(--of-surface)",
             borderRadius: 16,
-            border: "1px solid #E5E5E3",
+            border: "1px solid var(--of-border)",
             padding: "20px",
             boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
           }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-              <h3 style={{ fontSize: 15, fontWeight: 600, color: "#0A0A0A" }}>Por categoria</h3>
-              <span style={{ fontSize: 11, color: "#A3A3A3" }}>
+              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--of-text)" }}>Por categoria</h3>
+              <span style={{ fontSize: 11, color: "var(--of-text-muted)" }}>
                 {new Date().toLocaleDateString("pt-BR", { month: "short", year: "numeric" })}
               </span>
             </div>
 
             {categorias.length === 0 ? (
               <div style={{ height: 160, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <p style={{ fontSize: 13, color: "#A3A3A3" }}>Sem gastos este mês</p>
+                <p style={{ fontSize: 13, color: "var(--of-text-muted)" }}>Sem gastos este mês</p>
               </div>
             ) : (
               <>
@@ -557,9 +557,9 @@ export default function DashboardWithSupabase() {
                           width: 8, height: 8, borderRadius: "50%", flexShrink: 0,
                           background: CATEGORY_COLORS[i % CATEGORY_COLORS.length],
                         }} />
-                        <span style={{ fontSize: 12, color: "#525252" }}>{item.name}</span>
+                        <span style={{ fontSize: 12, color: "var(--of-text-secondary)" }}>{item.name}</span>
                       </div>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: "#0A0A0A" }}>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: "var(--of-text)" }}>
                         {item.percent}%
                       </span>
                     </div>
@@ -581,8 +581,8 @@ export default function DashboardWithSupabase() {
           right: 20,
           width: 54,
           height: 54,
-          background: "#0A0A0A",
-          color: "#FFFFFF",
+          background: "var(--of-btn-bg)",
+          color: "var(--of-btn-text)",
           borderRadius: "50%",
           border: "none",
           display: "flex",
@@ -594,7 +594,7 @@ export default function DashboardWithSupabase() {
           transition: "background 0.15s, transform 0.15s",
         }}
         onMouseOver={(e) => { e.currentTarget.style.background = "#262626"; e.currentTarget.style.transform = "scale(1.05)" }}
-        onMouseOut={(e) => { e.currentTarget.style.background = "#0A0A0A"; e.currentTarget.style.transform = "scale(1)" }}
+        onMouseOut={(e) => { e.currentTarget.style.background = "var(--of-btn-bg)"; e.currentTarget.style.transform = "scale(1)" }}
       >
         <Plus size={22} />
       </button>

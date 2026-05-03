@@ -1,4 +1,4 @@
-import { motion } from "motion/react"
+﻿import { motion } from "motion/react"
 import { Brain, Zap } from "lucide-react"
 
 function ScoreVisual() {
@@ -101,7 +101,7 @@ export default function Solution() {
               backgroundColor: "#09090B",
               borderRadius: 16,
               padding: "40px",
-              color: "#FFFFFF",
+              color: "var(--of-btn-text)",
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",
@@ -129,7 +129,7 @@ export default function Solution() {
                 fontFamily: "var(--font-display)",
                 fontSize: 28,
                 fontWeight: 400,
-                color: "#FFFFFF",
+                color: "var(--of-btn-text)",
                 marginBottom: 12,
                 lineHeight: 1.2,
               }}>
@@ -152,7 +152,7 @@ export default function Solution() {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.1 }}
               style={{
-                backgroundColor: "#FFFFFF",
+                backgroundColor: "var(--of-surface)",
                 border: "1px solid #F4F4F5",
                 borderRadius: 16,
                 padding: "32px",
@@ -191,7 +191,7 @@ export default function Solution() {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
               style={{
-                backgroundColor: "#FFFFFF",
+                backgroundColor: "var(--of-surface)",
                 border: "1px solid #F4F4F5",
                 borderRadius: 16,
                 padding: "32px",

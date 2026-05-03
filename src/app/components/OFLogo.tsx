@@ -1,4 +1,4 @@
-interface OFLogoProps {
+﻿interface OFLogoProps {
   size?: "sm" | "md" | "lg"
   variant?: "icon" | "horizontal"
 }
@@ -36,7 +36,7 @@ export function OFLogo({ size = "md", variant = "horizontal" }: OFLogoProps) {
           fontSize: s.text,
           fontWeight: 700,
           letterSpacing: "-0.02em",
-          color: "#0A0A0A",
+          color: "var(--of-text)",
           fontFamily: "var(--font-display)",
         }}>
           Openfy

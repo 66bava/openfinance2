@@ -1,4 +1,4 @@
-import type { Cartao, Fatura } from '../../../lib/types'
+﻿import type { Cartao, Fatura } from '../../../lib/types'
 
 function BandeiraIcon({ bandeira }: { bandeira: Cartao['bandeira'] }) {
   const base: React.CSSProperties = {
@@ -95,7 +95,7 @@ export default function CardCartao({ cartao, fatura, onVerFatura, onPagarFatura 
             <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginBottom: 2 }}>
               Limite
             </p>
-            <p style={{ fontSize: 20, fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.03em' }}>
+            <p style={{ fontSize: 20, fontWeight: 700, color: 'var(--of-btn-text)', letterSpacing: '-0.03em' }}>
               {cartao.limite.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
             </p>
           </div>
@@ -135,7 +135,7 @@ export default function CardCartao({ cartao, fatura, onVerFatura, onPagarFatura 
               <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', marginBottom: 2 }}>
                 Fatura atual
               </p>
-              <p style={{ fontSize: 15, fontWeight: 700, color: '#FFFFFF' }}>
+              <p style={{ fontSize: 15, fontWeight: 700, color: 'var(--of-btn-text)' }}>
                 {fatura.valor_total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
               </p>
             </div>
@@ -150,18 +150,18 @@ export default function CardCartao({ cartao, fatura, onVerFatura, onPagarFatura 
           style={{
             flex: 1,
             padding: '10px',
-            background: '#FFFFFF',
-            border: '1px solid #E5E5E3',
+            background: 'var(--of-surface)',
+            border: '1px solid var(--of-border)',
             borderRadius: 10,
             fontSize: 13,
             fontWeight: 600,
-            color: '#0A0A0A',
+            color: 'var(--of-text)',
             cursor: 'pointer',
             transition: 'background 0.15s',
             fontFamily: 'var(--font-body)',
           }}
-          onMouseOver={(e) => (e.currentTarget.style.background = '#F5F5F0')}
-          onMouseOut={(e) => (e.currentTarget.style.background = '#FFFFFF')}
+          onMouseOver={(e) => (e.currentTarget.style.background = 'var(--of-hover)')}
+          onMouseOut={(e) => (e.currentTarget.style.background = 'var(--of-surface)')}
         >
           {isCredito ? 'Ver fatura' : 'Ver gastos'}
         </button>
@@ -177,7 +177,7 @@ export default function CardCartao({ cartao, fatura, onVerFatura, onPagarFatura 
               borderRadius: 10,
               fontSize: 13,
               fontWeight: 600,
-              color: '#FFFFFF',
+              color: 'var(--of-btn-text)',
               cursor: 'pointer',
               transition: 'background 0.15s',
               fontFamily: 'var(--font-body)',

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+﻿import { useState, useEffect } from "react"
 import { X } from "lucide-react"
 
 const STORAGE_KEY = "openfy_cookie_consent"
@@ -35,7 +35,7 @@ export default function CookieBanner() {
         transform: "translateX(-50%)",
         width: "calc(100% - 40px)",
         maxWidth: 560,
-        background: "#0A0A0A",
+        background: "var(--of-btn-bg)",
         borderRadius: 14,
         padding: "18px 20px",
         zIndex: 9999,
@@ -58,7 +58,7 @@ export default function CookieBanner() {
           aria-label="Fechar"
           style={{
             background: "none", border: "none", cursor: "pointer",
-            color: "#A3A3A3", flexShrink: 0, padding: 2, display: "flex",
+            color: "var(--of-text-muted)", flexShrink: 0, padding: 2, display: "flex",
           }}
         >
           <X size={16} />
@@ -70,7 +70,7 @@ export default function CookieBanner() {
           style={{
             flex: 1, padding: "9px 0", border: "1px solid #404040",
             borderRadius: 8, fontSize: 13, fontWeight: 500,
-            color: "#A3A3A3", background: "transparent", cursor: "pointer",
+            color: "var(--of-text-muted)", background: "transparent", cursor: "pointer",
           }}
         >
           Apenas essenciais
@@ -80,7 +80,7 @@ export default function CookieBanner() {
           style={{
             flex: 1, padding: "9px 0", border: "none",
             borderRadius: 8, fontSize: 13, fontWeight: 600,
-            color: "#0A0A0A", background: "#4ADE80", cursor: "pointer",
+            color: "var(--of-text)", background: "#4ADE80", cursor: "pointer",
           }}
         >
           Aceitar todos

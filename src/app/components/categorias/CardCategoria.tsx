@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { Pencil, Trash2 } from 'lucide-react'
 import type { Categoria } from '../../../lib/types'
 
@@ -17,7 +17,7 @@ export default function CardCategoria({ categoria, onEditar, onDeletar }: Props)
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       style={{
-        background: '#FFFFFF',
+        background: 'var(--of-surface)',
         border: `1px solid ${hover && !isPadrao ? '#0A0A0A' : '#E5E5E3'}`,
         borderRadius: 14,
         padding: '18px',
@@ -41,7 +41,7 @@ export default function CardCategoria({ categoria, onEditar, onDeletar }: Props)
           {categoria.icone || '📦'}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ fontSize: 14, fontWeight: 700, color: '#0A0A0A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--of-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {categoria.nome}
           </p>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
@@ -55,7 +55,7 @@ export default function CardCategoria({ categoria, onEditar, onDeletar }: Props)
             {isPadrao && (
               <span style={{
                 fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 20,
-                background: '#F5F5F0', color: '#A3A3A3',
+                background: 'var(--of-page-bg)', color: 'var(--of-text-muted)',
               }}>
                 Padrão
               </span>
@@ -76,12 +76,12 @@ export default function CardCategoria({ categoria, onEditar, onDeletar }: Props)
               title="Editar"
               style={{
                 width: 30, height: 30, borderRadius: 8,
-                background: '#F5F5F0', border: 'none', cursor: 'pointer',
+                background: 'var(--of-page-bg)', border: 'none', cursor: 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 transition: 'background 0.15s',
               }}
               onMouseOver={(e) => (e.currentTarget.style.background = '#E5E5E3')}
-              onMouseOut={(e) => (e.currentTarget.style.background = '#F5F5F0')}
+              onMouseOut={(e) => (e.currentTarget.style.background = 'var(--of-hover)')}
             >
               <Pencil size={13} color="#525252" />
             </button>

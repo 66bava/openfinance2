@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { X, CreditCard, Building2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { criarCartao } from '../../../lib/queries/cartoes'
@@ -91,7 +91,7 @@ export default function ModalNovoCartao({ userId, onClose, onSalvo }: Props) {
     >
       <div
         style={{
-          background: '#FFFFFF',
+          background: 'var(--of-surface)',
           borderRadius: '20px 20px 0 0',
           width: '100%',
           maxWidth: 520,
@@ -103,10 +103,10 @@ export default function ModalNovoCartao({ userId, onClose, onSalvo }: Props) {
       >
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-          <h2 style={{ fontSize: 18, fontWeight: 700, color: '#0A0A0A', letterSpacing: '-0.02em' }}>
+          <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--of-text)', letterSpacing: '-0.02em' }}>
             Novo cartão
           </h2>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#A3A3A3', padding: 4 }}>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--of-text-muted)', padding: 4 }}>
             <X size={20} />
           </button>
         </div>
@@ -114,7 +114,7 @@ export default function ModalNovoCartao({ userId, onClose, onSalvo }: Props) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           {/* Nome */}
           <div>
-            <label style={{ fontSize: 12, fontWeight: 600, color: '#525252', letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
+            <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--of-text-secondary)', letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
               Nome do cartão
             </label>
             <input
@@ -134,7 +134,7 @@ export default function ModalNovoCartao({ userId, onClose, onSalvo }: Props) {
 
           {/* Tipo */}
           <div>
-            <label style={{ fontSize: 12, fontWeight: 600, color: '#525252', letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
+            <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--of-text-secondary)', letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
               Tipo
             </label>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
@@ -146,9 +146,9 @@ export default function ModalNovoCartao({ userId, onClose, onSalvo }: Props) {
                   style={{
                     padding: '14px',
                     borderRadius: 12,
-                    border: `2px solid ${tipo === val ? '#0A0A0A' : '#E5E5E3'}`,
-                    background: tipo === val ? '#0A0A0A' : '#FFFFFF',
-                    color: tipo === val ? '#FFFFFF' : '#525252',
+                    border: `2px solid ${tipo === val ? 'var(--of-btn-bg)' : 'var(--of-border)'}`,
+                    background: tipo === val ? 'var(--of-btn-bg)' : 'var(--of-surface)',
+                    color: tipo === val ? 'var(--of-btn-text)' : 'var(--of-text-secondary)',
                     cursor: 'pointer',
                     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
                     fontFamily: 'var(--font-body)',
@@ -164,7 +164,7 @@ export default function ModalNovoCartao({ userId, onClose, onSalvo }: Props) {
 
           {/* Bandeira */}
           <div>
-            <label style={{ fontSize: 12, fontWeight: 600, color: '#525252', letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
+            <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--of-text-secondary)', letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
               Bandeira
             </label>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
@@ -176,9 +176,9 @@ export default function ModalNovoCartao({ userId, onClose, onSalvo }: Props) {
                   style={{
                     padding: '8px 14px',
                     borderRadius: 8,
-                    border: `2px solid ${bandeira === b.valor ? '#0A0A0A' : '#E5E5E3'}`,
-                    background: bandeira === b.valor ? '#0A0A0A' : '#FFFFFF',
-                    color: bandeira === b.valor ? '#FFFFFF' : '#525252',
+                    border: `2px solid ${bandeira === b.valor ? 'var(--of-btn-bg)' : 'var(--of-border)'}`,
+                    background: bandeira === b.valor ? 'var(--of-btn-bg)' : 'var(--of-surface)',
+                    color: bandeira === b.valor ? 'var(--of-btn-text)' : 'var(--of-text-secondary)',
                     fontSize: 13,
                     fontWeight: 600,
                     cursor: 'pointer',
@@ -196,7 +196,7 @@ export default function ModalNovoCartao({ userId, onClose, onSalvo }: Props) {
           {tipo === 'credito' && (
             <>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 600, color: '#525252', letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
+                <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--of-text-secondary)', letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
                   Limite (R$)
                 </label>
                 <input
@@ -208,7 +208,7 @@ export default function ModalNovoCartao({ userId, onClose, onSalvo }: Props) {
                   step="0.01"
                   style={{
                     width: '100%', padding: '11px 14px', fontSize: 15,
-                    border: '1.5px solid #E5E5E3', borderRadius: 10, outline: 'none',
+                    border: '1.5px solid var(--of-border)', borderRadius: 10, outline: 'none',
                     boxSizing: 'border-box', fontFamily: 'var(--font-body)',
                   }}
                 />
@@ -216,7 +216,7 @@ export default function ModalNovoCartao({ userId, onClose, onSalvo }: Props) {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <div>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: '#525252', letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--of-text-secondary)', letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
                     Dia vencimento
                   </label>
                   <input
@@ -234,7 +234,7 @@ export default function ModalNovoCartao({ userId, onClose, onSalvo }: Props) {
                   {erros.diaVencimento && <p style={{ fontSize: 12, color: '#DC2626', marginTop: 4 }}>{erros.diaVencimento}</p>}
                 </div>
                 <div>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: '#525252', letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--of-text-secondary)', letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
                     Dia fechamento
                   </label>
                   <input
@@ -257,7 +257,7 @@ export default function ModalNovoCartao({ userId, onClose, onSalvo }: Props) {
 
           {/* Cor */}
           <div>
-            <label style={{ fontSize: 12, fontWeight: 600, color: '#525252', letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
+            <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--of-text-secondary)', letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
               Cor do cartão
             </label>
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
@@ -312,8 +312,8 @@ export default function ModalNovoCartao({ userId, onClose, onSalvo }: Props) {
             disabled={salvando}
             style={{
               padding: '14px',
-              background: salvando ? '#E5E5E3' : '#0A0A0A',
-              color: salvando ? '#A3A3A3' : '#FFFFFF',
+              background: salvando ? 'var(--of-border)' : 'var(--of-btn-bg)',
+              color: salvando ? 'var(--of-text-muted)' : 'var(--of-btn-text)',
               border: 'none',
               borderRadius: 12,
               fontSize: 15,

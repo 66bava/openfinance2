@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+﻿import { useState, useEffect } from "react"
 import { useNavigate } from "react-router"
 import { toast } from "sonner"
 import {
@@ -221,9 +221,9 @@ export default function Profile() {
   ] as const
 
   const cardStyle: React.CSSProperties = {
-    background: "#FFFFFF",
+    background: "var(--of-surface)",
     borderRadius: 16,
-    border: "1px solid #E5E5E3",
+    border: "1px solid var(--of-border)",
     marginBottom: 16,
     overflow: "hidden",
     boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
@@ -235,7 +235,7 @@ export default function Profile() {
     borderRadius: 8,
     padding: "10px 12px",
     fontSize: 14,
-    color: "#0A0A0A",
+    color: "var(--of-text)",
     outline: "none",
     transition: "border-color 0.15s",
     boxSizing: "border-box",
@@ -250,7 +250,7 @@ export default function Profile() {
           <div style={{ position: "relative", display: "inline-block", marginBottom: 12 }}>
             <div style={{
               width: 72, height: 72, borderRadius: "50%",
-              background: "#0A0A0A", color: "#FFFFFF",
+              background: "var(--of-btn-bg)", color: "var(--of-btn-text)",
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: 26, fontWeight: 700, margin: "0 auto",
             }}>
@@ -259,24 +259,24 @@ export default function Profile() {
             <button style={{
               position: "absolute", bottom: 0, right: 0,
               width: 26, height: 26, borderRadius: "50%",
-              background: "#FFFFFF", border: "1px solid #E5E5E3",
+              background: "var(--of-surface)", border: "1px solid var(--of-border)",
               display: "flex", alignItems: "center", justifyContent: "center",
               cursor: "pointer", boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
             }}>
-              <Camera size={12} style={{ color: "#525252" }} />
+              <Camera size={12} style={{ color: "var(--of-text-secondary)" }} />
             </button>
           </div>
-          <h2 style={{ fontSize: 18, fontWeight: 700, color: "#0A0A0A" }}>{displayName}</h2>
-          <p style={{ fontSize: 13, color: "#A3A3A3" }}>{userEmail}</p>
+          <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--of-text)" }}>{displayName}</h2>
+          <p style={{ fontSize: 13, color: "var(--of-text-muted)" }}>{userEmail}</p>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 8 }}>
             {memberSince && (
-              <p style={{ fontSize: 11, color: "#A3A3A3" }}>Membro desde {memberSince}</p>
+              <p style={{ fontSize: 11, color: "var(--of-text-muted)" }}>Membro desde {memberSince}</p>
             )}
             <span style={{
               fontSize: 10, fontWeight: 700, letterSpacing: "0.04em",
               padding: "2px 8px", borderRadius: 10,
-              backgroundColor: plano === "pro" ? "#0A0A0A" : "#F5F5F0",
-              color: plano === "pro" ? "#FFFFFF" : "#525252",
+              backgroundColor: plano === "pro" ? "var(--of-btn-bg)" : "var(--of-badge-free-bg)",
+              color: plano === "pro" ? "var(--of-btn-text)" : "var(--of-badge-free-text)",
             }}>
               {plano === "pro" ? "PRO" : "FREE"}
             </span>
@@ -286,7 +286,7 @@ export default function Profile() {
         {/* Tabs */}
         <div style={{
           display: "flex",
-          background: "#F5F5F0",
+          background: "var(--of-page-bg)",
           borderRadius: 10,
           padding: 4,
           marginBottom: 20,
@@ -302,8 +302,8 @@ export default function Profile() {
                 borderRadius: 7, cursor: "pointer",
                 fontSize: 12, fontWeight: activeTab === key ? 600 : 400,
                 transition: "all 0.15s",
-                backgroundColor: activeTab === key ? "#FFFFFF" : "transparent",
-                color: activeTab === key ? "#0A0A0A" : "#525252",
+                backgroundColor: activeTab === key ? "var(--of-surface)" : "transparent",
+                color: activeTab === key ? "var(--of-text)" : "var(--of-text-secondary)",
                 boxShadow: activeTab === key ? "0 1px 4px rgba(0,0,0,0.08)" : "none",
                 whiteSpace: "nowrap",
               }}
@@ -319,19 +319,19 @@ export default function Profile() {
             <div style={cardStyle}>
               <div style={{
                 display: "flex", alignItems: "center", justifyContent: "space-between",
-                padding: "16px 20px", borderBottom: "1px solid #F5F5F0",
+                padding: "16px 20px", borderBottom: "1px solid var(--of-border-light)",
               }}>
-                <h3 style={{ fontSize: 14, fontWeight: 600, color: "#0A0A0A" }}>Dados Pessoais</h3>
+                <h3 style={{ fontSize: 14, fontWeight: 600, color: "var(--of-text)" }}>Dados Pessoais</h3>
                 {!editing ? (
                   <button
                     onClick={() => { setTempForm(form); setEditing(true) }}
                     style={{
                       display: "flex", alignItems: "center", gap: 6,
                       background: "none", border: "none", cursor: "pointer",
-                      fontSize: 12, fontWeight: 500, color: "#525252", transition: "color 0.15s",
+                      fontSize: 12, fontWeight: 500, color: "var(--of-text-secondary)", transition: "color 0.15s",
                     }}
-                    onMouseOver={(e) => (e.currentTarget.style.color = "#0A0A0A")}
-                    onMouseOut={(e) => (e.currentTarget.style.color = "#525252")}
+                    onMouseOver={(e) => (e.currentTarget.style.color = "var(--of-text)")}
+                    onMouseOut={(e) => (e.currentTarget.style.color = "var(--of-text-secondary)")}
                   >
                     <Edit3 size={13} />
                     Editar
@@ -343,9 +343,9 @@ export default function Profile() {
                       disabled={saving}
                       style={{
                         display: "flex", alignItems: "center", gap: 4,
-                        padding: "5px 12px", border: "1px solid #E5E5E3",
+                        padding: "5px 12px", border: "1px solid var(--of-border)",
                         borderRadius: 7, fontSize: 12, fontWeight: 500,
-                        color: "#525252", background: "#FFFFFF", cursor: "pointer",
+                        color: "var(--of-text-secondary)", background: "var(--of-surface)", cursor: "pointer",
                       }}
                     >
                       <X size={12} /> Cancelar
@@ -357,7 +357,7 @@ export default function Profile() {
                         display: "flex", alignItems: "center", gap: 4,
                         padding: "5px 12px", border: "none",
                         borderRadius: 7, fontSize: 12, fontWeight: 600,
-                        color: "#FFFFFF", background: "#0A0A0A", cursor: "pointer",
+                        color: "var(--of-btn-text)", background: "var(--of-btn-bg)", cursor: "pointer",
                       }}
                     >
                       {saving
@@ -378,9 +378,9 @@ export default function Profile() {
                 ].map(({ label, field, type, placeholder }, idx, arr) => (
                   <div key={field} style={{
                     padding: "14px 20px",
-                    borderBottom: idx < arr.length - 1 ? "1px solid #F5F5F0" : "none",
+                    borderBottom: idx < arr.length - 1 ? "1px solid var(--of-border-light)" : "none",
                   }}>
-                    <label style={{ fontSize: 11, fontWeight: 500, color: "#A3A3A3", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>
+                    <label style={{ fontSize: 11, fontWeight: 500, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>
                       {label}
                     </label>
                     {editing ? (
@@ -397,7 +397,7 @@ export default function Profile() {
                             ...inputStyle,
                             borderColor: fieldErrors[field] ? "#EF4444" : "#E0E0E0",
                           }}
-                          onFocus={(e) => (e.currentTarget.style.borderColor = fieldErrors[field] ? "#EF4444" : "#0A0A0A")}
+                          onFocus={(e) => (e.currentTarget.style.borderColor = fieldErrors[field] ? "#EF4444" : "var(--of-text)")}
                           onBlur={(e) => (e.currentTarget.style.borderColor = fieldErrors[field] ? "#EF4444" : "#E0E0E0")}
                         />
                         {fieldErrors[field] && (
@@ -405,7 +405,7 @@ export default function Profile() {
                         )}
                       </>
                     ) : (
-                      <p style={{ fontSize: 14, fontWeight: 500, color: "#0A0A0A" }}>
+                      <p style={{ fontSize: 14, fontWeight: 500, color: "var(--of-text)" }}>
                         {field === "data_nascimento"
                           ? form.data_nascimento
                             ? new Date(form.data_nascimento + "T00:00:00").toLocaleDateString("pt-BR")
@@ -416,20 +416,20 @@ export default function Profile() {
                     )}
                   </div>
                 ))}
-                <div style={{ padding: "14px 20px", borderTop: "1px solid #F5F5F0" }}>
-                  <label style={{ fontSize: 11, fontWeight: 500, color: "#A3A3A3", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>
+                <div style={{ padding: "14px 20px", borderTop: "1px solid var(--of-border-light)" }}>
+                  <label style={{ fontSize: 11, fontWeight: 500, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>
                     Email
                   </label>
-                  <p style={{ fontSize: 14, fontWeight: 500, color: "#0A0A0A" }}>{userEmail}</p>
+                  <p style={{ fontSize: 14, fontWeight: 500, color: "var(--of-text)" }}>{userEmail}</p>
                 </div>
               </div>
             </div>
 
             {/* Renda mensal */}
             <div style={cardStyle}>
-              <div style={{ padding: "16px 20px", borderBottom: "1px solid #F5F5F0" }}>
-                <h3 style={{ fontSize: 14, fontWeight: 600, color: "#0A0A0A" }}>Renda Mensal</h3>
-                <p style={{ fontSize: 12, color: "#A3A3A3", marginTop: 2 }}>
+              <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--of-border-light)" }}>
+                <h3 style={{ fontSize: 14, fontWeight: 600, color: "var(--of-text)" }}>Renda Mensal</h3>
+                <p style={{ fontSize: 12, color: "var(--of-text-muted)", marginTop: 2 }}>
                   Configure para análises e score mais precisos
                 </p>
               </div>
@@ -475,8 +475,8 @@ export default function Profile() {
                 <div style={{ padding: "20px", background: "#F0FDF4", border: "1px solid #BBF7D0", borderRadius: 12, marginBottom: 16 }}>
                   <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 12 }}>
                     <div>
-                      <h3 style={{ fontSize: 18, fontWeight: 700, color: "#0A0A0A" }}>Openfy Pro</h3>
-                      <p style={{ fontSize: 12, color: "#A3A3A3", marginTop: 2 }}>R$ 19,90/mês</p>
+                      <h3 style={{ fontSize: 18, fontWeight: 700, color: "var(--of-text)" }}>Openfy Pro</h3>
+                      <p style={{ fontSize: 12, color: "var(--of-text-muted)", marginTop: 2 }}>R$ 19,90/mês</p>
                     </div>
                     <span style={{
                       fontSize: 10, fontWeight: 700, letterSpacing: "0.04em",
@@ -494,17 +494,17 @@ export default function Profile() {
                   ].map((feature) => (
                     <div key={feature} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
                       <Check size={14} style={{ color: "#16A34A", flexShrink: 0 }} />
-                      <span style={{ fontSize: 13, color: "#525252" }}>{feature}</span>
+                      <span style={{ fontSize: 13, color: "var(--of-text-secondary)" }}>{feature}</span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div style={{ padding: "20px", background: "#F5F5F0", borderRadius: 12, marginBottom: 16 }}>
-                  <h3 style={{ fontSize: 16, fontWeight: 700, color: "#0A0A0A", marginBottom: 4 }}>Plano Free</h3>
-                  <p style={{ fontSize: 13, color: "#A3A3A3", marginBottom: 16 }}>Você está usando o plano gratuito</p>
-                  <div style={{ padding: "16px", background: "#0A0A0A", borderRadius: 10, color: "#FFFFFF" }}>
+                <div style={{ padding: "20px", background: "var(--of-page-bg)", borderRadius: 12, marginBottom: 16 }}>
+                  <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--of-text)", marginBottom: 4 }}>Plano Free</h3>
+                  <p style={{ fontSize: 13, color: "var(--of-text-muted)", marginBottom: 16 }}>Você está usando o plano gratuito</p>
+                  <div style={{ padding: "16px", background: "var(--of-btn-bg)", borderRadius: 10, color: "var(--of-btn-text)" }}>
                     <p style={{ fontSize: 13, fontWeight: 700, marginBottom: 4 }}>Upgrade para Pro</p>
-                    <p style={{ fontSize: 12, color: "#A3A3A3", marginBottom: 12 }}>
+                    <p style={{ fontSize: 12, color: "var(--of-text-muted)", marginBottom: 12 }}>
                       IA + Score completo + relatórios ilimitados
                     </p>
                     <a
@@ -529,33 +529,33 @@ export default function Profile() {
         {activeTab === "preferencias" && (
           <>
             <div style={cardStyle}>
-              <div style={{ padding: "16px 20px", borderBottom: "1px solid #F5F5F0" }}>
-                <h3 style={{ fontSize: 14, fontWeight: 600, color: "#0A0A0A" }}>Meta de Economia</h3>
-                <p style={{ fontSize: 12, color: "#A3A3A3", marginTop: 2 }}>Meta mensal de economia (R$)</p>
+              <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--of-border-light)" }}>
+                <h3 style={{ fontSize: 14, fontWeight: 600, color: "var(--of-text)" }}>Meta de Economia</h3>
+                <p style={{ fontSize: 12, color: "var(--of-text-muted)", marginTop: 2 }}>Meta mensal de economia (R$)</p>
               </div>
               <div style={{ padding: "20px", display: "flex", gap: 12 }}>
-                <div style={{ display: "flex", alignItems: "center", border: "1px solid #E5E5E3", borderRadius: 10, padding: "10px 14px", flex: 1, transition: "border-color 0.15s" }}>
-                  <span style={{ fontSize: 15, fontWeight: 600, color: "#A3A3A3", marginRight: 8 }}>R$</span>
+                <div style={{ display: "flex", alignItems: "center", border: "1px solid var(--of-border)", borderRadius: 10, padding: "10px 14px", flex: 1, transition: "border-color 0.15s" }}>
+                  <span style={{ fontSize: 15, fontWeight: 600, color: "var(--of-text-muted)", marginRight: 8 }}>R$</span>
                   <input
                     type="text"
                     inputMode="decimal"
                     value={metaEconomia}
                     onChange={(e) => setMetaEconomia(e.target.value)}
                     placeholder="0,00"
-                    style={{ flex: 1, border: "none", outline: "none", fontSize: 18, fontWeight: 700, color: "#0A0A0A", background: "transparent" }}
-                    onFocus={(e) => { e.currentTarget.parentElement!.style.borderColor = "#0A0A0A" }}
-                    onBlur={(e) => { e.currentTarget.parentElement!.style.borderColor = "#E5E5E3" }}
+                    style={{ flex: 1, border: "none", outline: "none", fontSize: 18, fontWeight: 700, color: "var(--of-text)", background: "transparent" }}
+                    onFocus={(e) => { e.currentTarget.parentElement!.style.borderColor = "var(--of-text)" }}
+                    onBlur={(e) => { e.currentTarget.parentElement!.style.borderColor = "var(--of-border)" }}
                   />
                 </div>
                 <button
                   onClick={handleSaveMeta}
                   style={{
                     padding: "0 20px", border: "none", borderRadius: 10,
-                    fontSize: 13, fontWeight: 600, color: "#FFFFFF",
-                    background: "#0A0A0A", cursor: "pointer", transition: "background 0.15s",
+                    fontSize: 13, fontWeight: 600, color: "var(--of-btn-text)",
+                    background: "var(--of-btn-bg)", cursor: "pointer", transition: "background 0.15s",
                   }}
                   onMouseOver={(e) => (e.currentTarget.style.background = "#262626")}
-                  onMouseOut={(e) => (e.currentTarget.style.background = "#0A0A0A")}
+                  onMouseOut={(e) => (e.currentTarget.style.background = "var(--of-btn-bg)")}
                 >
                   Salvar
                 </button>
@@ -563,8 +563,8 @@ export default function Profile() {
             </div>
 
             <div style={cardStyle}>
-              <div style={{ padding: "16px 20px", borderBottom: "1px solid #F5F5F0" }}>
-                <h3 style={{ fontSize: 14, fontWeight: 600, color: "#0A0A0A" }}>Configurações</h3>
+              <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--of-border-light)" }}>
+                <h3 style={{ fontSize: 14, fontWeight: 600, color: "var(--of-text)" }}>Configurações</h3>
               </div>
 
               {[
@@ -579,14 +579,14 @@ export default function Profile() {
                       style={{
                         position: "relative", width: 44, height: 24, borderRadius: 12,
                         border: "none", cursor: "pointer", transition: "background 0.2s",
-                        backgroundColor: notifications ? "#0A0A0A" : "#E5E5E3",
+                        backgroundColor: notifications ? "var(--of-btn-bg)" : "var(--of-border)",
                         flexShrink: 0,
                       }}
                     >
                       <span style={{
                         position: "absolute", top: 2, left: 2,
                         width: 20, height: 20, borderRadius: "50%",
-                        background: "#FFFFFF", boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+                        background: "var(--of-surface)", boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
                         transition: "transform 0.2s",
                         transform: notifications ? "translateX(20px)" : "translateX(0)",
                       }} />
@@ -599,7 +599,7 @@ export default function Profile() {
                     <select
                       value={currency}
                       onChange={(e) => setCurrency(e.target.value)}
-                      style={{ border: "1px solid #E5E5E3", borderRadius: 7, padding: "5px 8px", fontSize: 12, color: "#0A0A0A", outline: "none" }}
+                      style={{ border: "1px solid var(--of-border)", borderRadius: 7, padding: "5px 8px", fontSize: 12, color: "var(--of-text)", outline: "none" }}
                     >
                       <option value="BRL">R$ BRL</option>
                       <option value="USD">$ USD</option>
@@ -613,7 +613,7 @@ export default function Profile() {
                     <select
                       value={language}
                       onChange={(e) => setLanguage(e.target.value)}
-                      style={{ border: "1px solid #E5E5E3", borderRadius: 7, padding: "5px 8px", fontSize: 12, color: "#0A0A0A", outline: "none" }}
+                      style={{ border: "1px solid var(--of-border)", borderRadius: 7, padding: "5px 8px", fontSize: 12, color: "var(--of-text)", outline: "none" }}
                     >
                       <option>Português</option>
                       <option>English</option>
@@ -625,15 +625,15 @@ export default function Profile() {
                 <div key={label} style={{
                   display: "flex", alignItems: "center", justifyContent: "space-between",
                   padding: "14px 20px",
-                  borderBottom: idx < arr.length - 1 ? "1px solid #F5F5F0" : "none",
+                  borderBottom: idx < arr.length - 1 ? "1px solid var(--of-border-light)" : "none",
                 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                    <div style={{ width: 32, height: 32, background: "#F5F5F0", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <Icon size={15} style={{ color: "#525252" }} />
+                    <div style={{ width: 32, height: 32, background: "var(--of-page-bg)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <Icon size={15} style={{ color: "var(--of-text-secondary)" }} />
                     </div>
                     <div>
-                      <p style={{ fontSize: 13, fontWeight: 500, color: "#0A0A0A" }}>{label}</p>
-                      <p style={{ fontSize: 11, color: "#A3A3A3" }}>{sub}</p>
+                      <p style={{ fontSize: 13, fontWeight: 500, color: "var(--of-text)" }}>{label}</p>
+                      <p style={{ fontSize: 11, color: "var(--of-text-muted)" }}>{sub}</p>
                     </div>
                   </div>
                   {control}
@@ -645,15 +645,15 @@ export default function Profile() {
                 padding: "14px 20px",
               }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <div style={{ width: 32, height: 32, background: "#F5F5F0", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <Shield size={15} style={{ color: "#525252" }} />
+                  <div style={{ width: 32, height: 32, background: "var(--of-page-bg)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Shield size={15} style={{ color: "var(--of-text-secondary)" }} />
                   </div>
                   <div>
-                    <p style={{ fontSize: 13, fontWeight: 500, color: "#0A0A0A" }}>Segurança</p>
-                    <p style={{ fontSize: 11, color: "#A3A3A3" }}>Autenticação e privacidade</p>
+                    <p style={{ fontSize: 13, fontWeight: 500, color: "var(--of-text)" }}>Segurança</p>
+                    <p style={{ fontSize: 11, color: "var(--of-text-muted)" }}>Autenticação e privacidade</p>
                   </div>
                 </div>
-                <ChevronRight size={16} style={{ color: "#A3A3A3" }} />
+                <ChevronRight size={16} style={{ color: "var(--of-text-muted)" }} />
               </div>
             </div>
           </>
@@ -663,21 +663,21 @@ export default function Profile() {
         {activeTab === "seguranca" && (
           <>
             <div style={cardStyle}>
-              <div style={{ padding: "16px 20px", borderBottom: "1px solid #F5F5F0" }}>
-                <h3 style={{ fontSize: 14, fontWeight: 600, color: "#0A0A0A" }}>Alterar Senha</h3>
+              <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--of-border-light)" }}>
+                <h3 style={{ fontSize: 14, fontWeight: 600, color: "var(--of-text)" }}>Alterar Senha</h3>
               </div>
               <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: 12 }}>
                 {["Senha atual", "Nova senha", "Confirmar nova senha"].map((label) => (
                   <div key={label}>
-                    <label style={{ fontSize: 11, fontWeight: 500, color: "#A3A3A3", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>
+                    <label style={{ fontSize: 11, fontWeight: 500, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>
                       {label}
                     </label>
                     <input
                       type="password"
                       placeholder="••••••••"
                       style={inputStyle}
-                      onFocus={(e) => (e.currentTarget.style.borderColor = "#0A0A0A")}
-                      onBlur={(e) => (e.currentTarget.style.borderColor = "#E0E0E0")}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = "var(--of-text)")}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = "var(--of-border)")}
                     />
                   </div>
                 ))}
@@ -685,11 +685,11 @@ export default function Profile() {
                   style={{
                     alignSelf: "flex-start", padding: "10px 24px",
                     border: "none", borderRadius: 8, fontSize: 13, fontWeight: 600,
-                    color: "#FFFFFF", background: "#0A0A0A", cursor: "pointer",
+                    color: "var(--of-btn-text)", background: "var(--of-btn-bg)", cursor: "pointer",
                     transition: "background 0.15s",
                   }}
                   onMouseOver={(e) => (e.currentTarget.style.background = "#262626")}
-                  onMouseOut={(e) => (e.currentTarget.style.background = "#0A0A0A")}
+                  onMouseOut={(e) => (e.currentTarget.style.background = "var(--of-btn-bg)")}
                 >
                   Atualizar senha
                 </button>
@@ -703,9 +703,9 @@ export default function Profile() {
           <>
             {/* Consentimentos */}
             <div style={cardStyle}>
-              <div style={{ padding: "16px 20px", borderBottom: "1px solid #F5F5F0" }}>
-                <h3 style={{ fontSize: 14, fontWeight: 600, color: "#0A0A0A" }}>Consentimentos LGPD</h3>
-                <p style={{ fontSize: 12, color: "#A3A3A3", marginTop: 2 }}>
+              <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--of-border-light)" }}>
+                <h3 style={{ fontSize: 14, fontWeight: 600, color: "var(--of-text)" }}>Consentimentos LGPD</h3>
+                <p style={{ fontSize: 12, color: "var(--of-text-muted)", marginTop: 2 }}>
                   Gerencie suas preferências de privacidade
                 </p>
               </div>
@@ -716,8 +716,8 @@ export default function Profile() {
                   padding: "14px 16px", background: "#F0FDF4", border: "1px solid #BBF7D0", borderRadius: 10,
                 }}>
                   <div>
-                    <p style={{ fontSize: 13, fontWeight: 600, color: "#0A0A0A" }}>Política de Privacidade e Termos</p>
-                    <p style={{ fontSize: 11, color: "#525252", marginTop: 2 }}>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: "var(--of-text)" }}>Política de Privacidade e Termos</p>
+                    <p style={{ fontSize: 11, color: "var(--of-text-secondary)", marginTop: 2 }}>
                       Aceito em: {profile?.data_consentimento
                         ? new Date(profile.data_consentimento).toLocaleDateString("pt-BR")
                         : "—"} · v{profile?.versao_politica ?? "1.0"}
@@ -731,11 +731,11 @@ export default function Profile() {
                 {/* Marketing toggle */}
                 <div style={{
                   display: "flex", alignItems: "center", justifyContent: "space-between",
-                  padding: "14px 16px", background: "#F5F5F0", border: "1px solid #E5E5E3", borderRadius: 10,
+                  padding: "14px 16px", background: "var(--of-page-bg)", border: "1px solid var(--of-border)", borderRadius: 10,
                 }}>
                   <div>
-                    <p style={{ fontSize: 13, fontWeight: 600, color: "#0A0A0A" }}>E-mails de marketing</p>
-                    <p style={{ fontSize: 11, color: "#525252", marginTop: 2 }}>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: "var(--of-text)" }}>E-mails de marketing</p>
+                    <p style={{ fontSize: 11, color: "var(--of-text-secondary)", marginTop: 2 }}>
                       Dicas financeiras e novidades do Openfy
                     </p>
                   </div>
@@ -745,14 +745,14 @@ export default function Profile() {
                     style={{
                       position: "relative", width: 44, height: 24, borderRadius: 12,
                       border: "none", cursor: "pointer", transition: "background 0.2s",
-                      backgroundColor: marketingToggle ? "#0A0A0A" : "#E5E5E3",
+                      backgroundColor: marketingToggle ? "var(--of-btn-bg)" : "var(--of-border)",
                       flexShrink: 0,
                     }}
                   >
                     <span style={{
                       position: "absolute", top: 2, left: 2,
                       width: 20, height: 20, borderRadius: "50%",
-                      background: "#FFFFFF", boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+                      background: "var(--of-surface)", boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
                       transition: "transform 0.2s",
                       transform: marketingToggle ? "translateX(20px)" : "translateX(0)",
                     }} />
@@ -770,10 +770,10 @@ export default function Profile() {
                 {/* Exportar */}
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                    <Download size={14} style={{ color: "#525252" }} />
-                    <p style={{ fontSize: 13, fontWeight: 600, color: "#0A0A0A" }}>Exportar meus dados</p>
+                    <Download size={14} style={{ color: "var(--of-text-secondary)" }} />
+                    <p style={{ fontSize: 13, fontWeight: 600, color: "var(--of-text)" }}>Exportar meus dados</p>
                   </div>
-                  <p style={{ fontSize: 12, color: "#A3A3A3", marginBottom: 12 }}>
+                  <p style={{ fontSize: 12, color: "var(--of-text-muted)", marginBottom: 12 }}>
                     Baixe todos os seus dados (perfil, transações, metas) em formato JSON — direito garantido pela LGPD.
                   </p>
                   <button
@@ -781,14 +781,14 @@ export default function Profile() {
                     disabled={exportando}
                     style={{
                       display: "flex", alignItems: "center", gap: 8,
-                      padding: "9px 20px", border: "1px solid #E5E5E3",
+                      padding: "9px 20px", border: "1px solid var(--of-border)",
                       borderRadius: 8, fontSize: 13, fontWeight: 500,
-                      color: exportando ? "#A3A3A3" : "#525252",
-                      background: "#FFFFFF", cursor: exportando ? "not-allowed" : "pointer",
+                      color: exportando ? "var(--of-text-muted)" : "var(--of-text-secondary)",
+                      background: "var(--of-surface)", cursor: exportando ? "not-allowed" : "pointer",
                     }}
                   >
                     {exportando
-                      ? <span style={{ width: 14, height: 14, border: "1.5px solid #A3A3A3", borderTopColor: "#525252", borderRadius: "50%", display: "inline-block", animation: "spin 0.7s linear infinite" }} />
+                      ? <span style={{ width: 14, height: 14, border: "1.5px solid var(--of-text-muted)", borderTopColor: "var(--of-text-secondary)", borderRadius: "50%", display: "inline-block", animation: "spin 0.7s linear infinite" }} />
                       : <Download size={14} />
                     }
                     {exportando ? "Exportando..." : "Exportar meus dados"}
@@ -801,7 +801,7 @@ export default function Profile() {
                     <Trash2 size={14} style={{ color: "#DC2626" }} />
                     <p style={{ fontSize: 13, fontWeight: 600, color: "#DC2626" }}>Excluir minha conta</p>
                   </div>
-                  <p style={{ fontSize: 12, color: "#A3A3A3", marginBottom: 12 }}>
+                  <p style={{ fontSize: 12, color: "var(--of-text-muted)", marginBottom: 12 }}>
                     Esta ação é <strong>irreversível</strong>. Todos os seus dados serão excluídos permanentemente dos nossos servidores.
                   </p>
 
@@ -821,7 +821,7 @@ export default function Profile() {
                       <p style={{ fontSize: 13, fontWeight: 600, color: "#DC2626", marginBottom: 8 }}>
                         Confirmação necessária
                       </p>
-                      <p style={{ fontSize: 12, color: "#525252", marginBottom: 12 }}>
+                      <p style={{ fontSize: 12, color: "var(--of-text-secondary)", marginBottom: 12 }}>
                         Digite <strong>EXCLUIR</strong> para confirmar a exclusão permanente da sua conta.
                       </p>
                       <input
@@ -841,9 +841,9 @@ export default function Profile() {
                           onClick={() => { setShowDeleteConfirm(false); setDeleteInput("") }}
                           disabled={deletando}
                           style={{
-                            flex: 1, padding: "10px 0", border: "1px solid #E5E5E3",
+                            flex: 1, padding: "10px 0", border: "1px solid var(--of-border)",
                             borderRadius: 8, fontSize: 13, fontWeight: 500,
-                            color: "#525252", background: "#FFFFFF", cursor: "pointer",
+                            color: "var(--of-text-secondary)", background: "var(--of-surface)", cursor: "pointer",
                           }}
                         >
                           Cancelar
@@ -854,8 +854,8 @@ export default function Profile() {
                           style={{
                             flex: 1, padding: "10px 0", border: "none",
                             borderRadius: 8, fontSize: 13, fontWeight: 600,
-                            color: "#FFFFFF",
-                            background: deleteInput === "EXCLUIR" ? "#DC2626" : "#E5E5E3",
+                            color: "var(--of-btn-text)",
+                            background: deleteInput === "EXCLUIR" ? "#DC2626" : "var(--of-border)",
                             cursor: deleteInput === "EXCLUIR" ? "pointer" : "not-allowed",
                             display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
                           }}
@@ -881,22 +881,22 @@ export default function Profile() {
             onClick={() => setShowLogoutConfirm(true)}
             style={{
               width: "100%", padding: "12px 0",
-              border: "1px solid #E5E5E3", borderRadius: 12,
+              border: "1px solid var(--of-border)", borderRadius: 12,
               fontSize: 14, fontWeight: 600, color: "#DC2626",
-              background: "#FFFFFF", cursor: "pointer",
+              background: "var(--of-surface)", cursor: "pointer",
               display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
               transition: "all 0.15s",
             }}
             onMouseOver={(e) => { e.currentTarget.style.background = "#FEF2F2"; e.currentTarget.style.borderColor = "#DC2626" }}
-            onMouseOut={(e) => { e.currentTarget.style.background = "#FFFFFF"; e.currentTarget.style.borderColor = "#E5E5E3" }}
+            onMouseOut={(e) => { e.currentTarget.style.background = "var(--of-surface)"; e.currentTarget.style.borderColor = "var(--of-border)" }}
           >
             <LogOut size={16} />
             Sair da Conta
           </button>
         ) : (
           <div style={{ ...cardStyle, padding: "20px" }}>
-            <p style={{ fontSize: 14, fontWeight: 600, color: "#0A0A0A", marginBottom: 4 }}>Confirmar saída?</p>
-            <p style={{ fontSize: 13, color: "#A3A3A3", marginBottom: 16 }}>
+            <p style={{ fontSize: 14, fontWeight: 600, color: "var(--of-text)", marginBottom: 4 }}>Confirmar saída?</p>
+            <p style={{ fontSize: 13, color: "var(--of-text-muted)", marginBottom: 16 }}>
               Você será desconectado da sua conta.
             </p>
             <div style={{ display: "flex", gap: 12 }}>
@@ -905,9 +905,9 @@ export default function Profile() {
                 disabled={loggingOut}
                 style={{
                   flex: 1, padding: "11px 0",
-                  border: "1px solid #E5E5E3", borderRadius: 8,
-                  fontSize: 14, fontWeight: 500, color: "#525252",
-                  background: "#FFFFFF", cursor: "pointer",
+                  border: "1px solid var(--of-border)", borderRadius: 8,
+                  fontSize: 14, fontWeight: 500, color: "var(--of-text-secondary)",
+                  background: "var(--of-surface)", cursor: "pointer",
                 }}
               >
                 Cancelar
@@ -933,7 +933,7 @@ export default function Profile() {
           </div>
         )}
 
-        <p style={{ fontSize: 11, textAlign: "center", color: "#A3A3A3", marginTop: 20 }}>
+        <p style={{ fontSize: 11, textAlign: "center", color: "var(--of-text-muted)", marginTop: 20 }}>
           Openfy v1.0.0 · © {new Date().getFullYear()}
         </p>
       </div>
