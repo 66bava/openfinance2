@@ -33,7 +33,7 @@ export default function Solucao() {
   ]
 
   return (
-    <section id="como-funciona" style={{ backgroundColor: "var(--of-btn-bg)", padding: "96px 24px", fontFamily: "var(--font-body)" }}>
+    <section id="como-funciona" style={{ backgroundColor: "var(--of-dark-section)", padding: "96px 24px", fontFamily: "var(--font-body)" }}>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <motion.div
           initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
@@ -45,7 +45,7 @@ export default function Solucao() {
           </span>
           <h2 style={{
             fontFamily: "var(--font-display)", fontSize: "clamp(28px, 3.5vw, 44px)",
-            fontWeight: 700, color: "var(--of-btn-text)", letterSpacing: "-0.025em", lineHeight: 1.15, marginBottom: 16,
+            fontWeight: 700, color: "#FFFFFF", letterSpacing: "-0.025em", lineHeight: 1.15, marginBottom: 16,
           }}>
             {t("solucaoH2")}
           </h2>
@@ -72,7 +72,7 @@ export default function Solucao() {
               <div style={{ display: "inline-flex", fontSize: 11, fontWeight: 700, color: "#16A34A", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12, background: "rgba(22,163,74,0.1)", padding: "3px 10px", borderRadius: 20 }}>
                 {p.tag}
               </div>
-              <h3 style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700, color: "var(--of-btn-text)", marginBottom: 14, letterSpacing: "-0.02em", lineHeight: 1.25 }}>
+              <h3 style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700, color: "#FFFFFF", marginBottom: 14, letterSpacing: "-0.02em", lineHeight: 1.25 }}>
                 {p.titulo}
               </h3>
               <p style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", lineHeight: 1.65 }}>{p.descricao}</p>

@@ -101,7 +101,7 @@ export default function Solution() {
               backgroundColor: "#09090B",
               borderRadius: 16,
               padding: "40px",
-              color: "var(--of-btn-text)",
+              color: "#FFFFFF",
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",
@@ -129,7 +129,7 @@ export default function Solution() {
                 fontFamily: "var(--font-display)",
                 fontSize: 28,
                 fontWeight: 400,
-                color: "var(--of-btn-text)",
+                color: "#FFFFFF",
                 marginBottom: 12,
                 lineHeight: 1.2,
               }}>

@@ -15,7 +15,7 @@ function ScoreGaugeLarge({ score = 782 }: { score?: number }) {
       <path d={`M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}`} fill="none" stroke="#F5F5F5" strokeWidth="16" strokeLinecap="round" />
       <path d={`M ${cx - r} ${cy} A ${r} ${r} 0 ${largeArc} 1 ${x} ${y}`} fill="none" stroke="#16A34A" strokeWidth="16" strokeLinecap="round" />
       <circle cx={x} cy={y} r="8" fill="#16A34A" />
-      <text x={cx} y={cy - 20} textAnchor="middle" style={{ fontSize: 52, fontWeight: "800", fill: "var(--of-text)", fontFamily: "system-ui", letterSpacing: "-2" }}>
+      <text x={cx} y={cy - 20} textAnchor="middle" style={{ fontSize: 52, fontWeight: "800", fill: "#FFFFFF", fontFamily: "system-ui", letterSpacing: "-2" }}>
         {score}
       </text>
       <text x={cx} y={cy + 4} textAnchor="middle" style={{ fontSize: 14, fill: "#A3A3A3", fontFamily: "system-ui" }}>de 1000</text>
@@ -40,7 +40,7 @@ export default function ScoreSection() {
   ]
 
   return (
-    <section id="score" style={{ backgroundColor: "var(--of-btn-bg)", padding: "96px 24px", fontFamily: "var(--font-body)" }}>
+    <section id="score" style={{ backgroundColor: "var(--of-dark-section)", padding: "96px 24px", fontFamily: "var(--font-body)" }}>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <motion.div
           initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
@@ -52,7 +52,7 @@ export default function ScoreSection() {
           </span>
           <h2 style={{
             fontFamily: "var(--font-display)", fontSize: "clamp(28px, 3.5vw, 44px)",
-            fontWeight: 700, color: "var(--of-btn-text)", letterSpacing: "-0.025em", lineHeight: 1.15, marginBottom: 16,
+            fontWeight: 700, color: "#FFFFFF", letterSpacing: "-0.025em", lineHeight: 1.15, marginBottom: 16,
           }}>
             {t("scoreH2")}
           </h2>
@@ -82,7 +82,7 @@ export default function ScoreSection() {
                 viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.06 }}
               >
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
-                  <span style={{ fontSize: 14, fontWeight: 600, color: "var(--of-btn-text)" }}>{pilar.nome}</span>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: "#FFFFFF" }}>{pilar.nome}</span>
                   <span style={{ fontSize: 13, color: "#16A34A", fontWeight: 600 }}>{Math.round(pilar.pct * 100)}%</span>
                 </div>
                 <div style={{ height: 5, background: "rgba(255,255,255,0.08)", borderRadius: 3, overflow: "hidden" }}>

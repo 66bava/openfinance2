@@ -72,7 +72,7 @@ export default function Features() {
                   <path d="M3 15 L7 8 L11 11 L15 4 L19 6" stroke="#16A34A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
-              <h3 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(22px, 2.5vw, 30px)", fontWeight: 700, color: "var(--of-btn-text)", marginBottom: 16, letterSpacing: "-0.02em" }}>
+              <h3 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(22px, 2.5vw, 30px)", fontWeight: 700, color: "#FFFFFF", marginBottom: 16, letterSpacing: "-0.02em" }}>
                 {t("featScore1Title")}
               </h3>
               <p style={{ fontSize: 15, color: "rgba(255,255,255,0.55)", marginBottom: 24, lineHeight: 1.65 }}>
@@ -99,7 +99,7 @@ export default function Features() {
             style={{ background: "var(--of-surface)", border: "1px solid var(--of-border)", borderRadius: 20, padding: 40, transition: "box-shadow 0.2s" }}
             whileHover={{ boxShadow: "0 8px 32px rgba(0,0,0,0.08)" }}
           >
-            <div style={{ width: 44, height: 44, background: "#DCFCE7", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
+            <div style={{ width: 44, height: 44, background: "var(--of-upgrade-bg)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
               <Sparkles size={20} color="#16A34A" />
             </div>
             <h3 style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700, color: "var(--of-text)", marginBottom: 12, letterSpacing: "-0.02em" }}>
@@ -115,7 +115,7 @@ export default function Features() {
             style={{ background: "var(--of-surface)", border: "1px solid var(--of-border)", borderRadius: 20, padding: 40, transition: "box-shadow 0.2s" }}
             whileHover={{ boxShadow: "0 8px 32px rgba(0,0,0,0.08)" }}
           >
-            <div style={{ width: 44, height: 44, background: "#DCFCE7", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
+            <div style={{ width: 44, height: 44, background: "var(--of-upgrade-bg)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
               <Target size={20} color="#16A34A" />
             </div>
             <h3 style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700, color: "var(--of-text)", marginBottom: 12, letterSpacing: "-0.02em" }}>
@@ -146,7 +146,7 @@ export default function Features() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               {familyMembers.map((p) => (
                 <div key={p.nome} style={{ background: "var(--of-surface)", padding: "16px", borderRadius: 12, border: "1px solid var(--of-border)" }}>
-                  <div style={{ width: 36, height: 36, borderRadius: "50%", background: "#DCFCE7", marginBottom: 10, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <div style={{ width: 36, height: 36, borderRadius: "50%", background: "var(--of-upgrade-bg)", marginBottom: 10, display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <span style={{ fontSize: 14, fontWeight: 700, color: "#16A34A" }}>{p.nome[0]}</span>
                   </div>
                   <p style={{ fontWeight: 600, fontSize: 13, color: "var(--of-text)", marginBottom: 2 }}>{p.nome}</p>

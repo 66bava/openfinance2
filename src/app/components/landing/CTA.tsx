@@ -86,7 +86,7 @@ export default function CTA() {
             {t("ctaTag")}
           </span>
 
-          <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(32px, 4.5vw, 52px)", fontWeight: 700, color: "var(--of-btn-text)", letterSpacing: "-0.025em", lineHeight: 1.1, marginBottom: 20 }}>
+          <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(32px, 4.5vw, 52px)", fontWeight: 700, color: "#FFFFFF", letterSpacing: "-0.025em", lineHeight: 1.1, marginBottom: 20 }}>
             {t("ctaH2a")}<br />{t("ctaH2b")}
           </h2>
 

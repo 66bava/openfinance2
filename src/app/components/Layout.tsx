@@ -94,7 +94,7 @@ function UserMenu({
       >
         <div style={{
           width: 30, height: 30, borderRadius: "50%",
-          background: "#0A0A0A", color: "#FFFFFF",
+          background: "var(--of-btn-bg)", color: "var(--of-btn-text)",
           display: "flex", alignItems: "center", justifyContent: "center",
           fontSize: 12, fontWeight: 700, flexShrink: 0,
         }}>
@@ -256,7 +256,7 @@ function SidebarContent({
       }}>
         <div style={{
           width: 34, height: 34, borderRadius: "50%",
-          background: "#0A0A0A", color: "#FFFFFF",
+          background: "var(--of-btn-bg)", color: "var(--of-btn-text)",
           display: "flex", alignItems: "center", justifyContent: "center",
           fontSize: 13, fontWeight: 700, flexShrink: 0,
         }}>

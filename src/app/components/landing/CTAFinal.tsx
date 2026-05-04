@@ -5,7 +5,7 @@ export default function CTAFinal() {
   return (
     <section
       style={{
-        backgroundColor: "var(--of-btn-bg)",
+        backgroundColor: "var(--of-dark-section)",
         padding: "112px 24px",
         textAlign: "center",
         fontFamily: "var(--font-body)",
@@ -16,7 +16,7 @@ export default function CTAFinal() {
           fontFamily: "var(--font-display)",
           fontSize: "clamp(28px, 4vw, 48px)",
           fontWeight: 400,
-          color: "var(--of-btn-text)",
+          color: "#FFFFFF",
           letterSpacing: "-0.02em",
           lineHeight: 1.15,
           marginBottom: 20,

@@ -95,7 +95,7 @@ export default function Founder() {
               <span style={{ fontSize: 20 }}>🇧🇷</span>
               <p style={{ fontSize: 14, color: "rgba(255,255,255,0.7)", lineHeight: 1.5 }}>
                 {t("founderBrazil")}{" "}
-                <strong style={{ color: "var(--of-btn-text)" }}>{t("founderBrazilBold")}</strong>
+                <strong style={{ color: "#FFFFFF" }}>{t("founderBrazilBold")}</strong>
               </p>
             </div>
           </motion.div>

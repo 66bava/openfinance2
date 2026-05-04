@@ -3,10 +3,13 @@ import { Link } from "react-router"
 import { motion } from "motion/react"
 import { Check } from "lucide-react"
 import { useLanguage } from "../../../lib/language-context"
+import { useTheme } from "../../../lib/theme-context"
 
 export default function Pricing() {
   const [anual, setAnual] = useState(false)
   const { t } = useLanguage()
+  const { theme } = useTheme()
+  const isDark = theme === "dark"
 
   const planos = [
     {
@@ -79,7 +82,7 @@ export default function Pricing() {
               }}
             >
               {t("pricingAnnual")}
-              <span style={{ fontSize: 11, fontWeight: 700, color: "#16A34A", background: "#DCFCE7", padding: "2px 8px", borderRadius: 10 }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "var(--of-upgrade-title)", background: "var(--of-upgrade-bg)", padding: "2px 8px", borderRadius: 10 }}>
                 {t("pricingAnnualBadge")}
               </span>
             </button>
@@ -93,7 +96,7 @@ export default function Pricing() {
               initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.08 }}
               style={{
-                background: plano.destaque ? "#0A0A0A" : "var(--of-surface)",
+                background: plano.destaque ? (isDark ? "#1a2820" : "#0A0A0A") : "var(--of-surface)",
                 border: plano.destaque ? "2px solid #16A34A" : "1px solid var(--of-border)",
                 borderRadius: 20, padding: 32, position: "relative", display: "flex", flexDirection: "column",
               }}
