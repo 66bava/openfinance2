@@ -39,12 +39,20 @@ export async function criarCompromisso(
   return data
 }
 
-export async function removerCompromisso(id: string): Promise<void> {
-  const { error } = await supabase.from('compromissos').delete().eq('id', id)
+export async function removerCompromisso(id: string, userId: string): Promise<void> {
+  const { error } = await supabase
+    .from('compromissos')
+    .delete()
+    .eq('id', id)
+    .eq('user_id', userId)
   if (error) throw error
 }
 
-export async function inativarCompromisso(id: string): Promise<void> {
-  const { error } = await supabase.from('compromissos').update({ ativo: false }).eq('id', id)
+export async function inativarCompromisso(id: string, userId: string): Promise<void> {
+  const { error } = await supabase
+    .from('compromissos')
+    .update({ ativo: false })
+    .eq('id', id)
+    .eq('user_id', userId)
   if (error) throw error
 }

@@ -195,6 +195,9 @@ export async function pagarFatura(
   const fatura = await getFaturaById(faturaId, userId)
   if (!fatura) throw new Error('Fatura não encontrada')
 
+  if (!Number.isFinite(valorPago) || valorPago <= 0) throw new Error('Valor inválido')
+  if (tipo === 'parcial' && valorPago > fatura.valor_total) throw new Error('Valor excede o total da fatura')
+
   const novoStatus = tipo === 'total' ? 'paga' : 'parcial'
   const valorFinal = tipo === 'total' ? fatura.valor_total : valorPago
 

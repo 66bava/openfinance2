@@ -162,7 +162,7 @@ export default function Futuro() {
   async function handleRemover(id: string) {
     if (!confirm("Remover este compromisso?")) return
     try {
-      await removerCompromisso(id)
+      await removerCompromisso(id, user!.id)
       toast.success("Compromisso removido.")
       carregar()
     } catch {

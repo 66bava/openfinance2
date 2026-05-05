@@ -20,6 +20,8 @@ export default function Login() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [betaFechado, setBetaFechado] = useState(false)
+  const [termosAceitos, setTermosAceitos] = useState(false)
+  const [termosErro, setTermosErro] = useState(false)
 
   useEffect(() => {
     supabase
@@ -47,6 +49,8 @@ export default function Login() {
     setServerError(null)
     setSuccessMessage(null)
     setFieldErrors({})
+    setTermosAceitos(false)
+    setTermosErro(false)
   }
 
   function validateFields() {
@@ -76,6 +80,12 @@ export default function Login() {
     setServerError(null)
     setSuccessMessage(null)
 
+    if (!termosAceitos) {
+      setTermosErro(true)
+      return
+    }
+    setTermosErro(false)
+
     const errs = validateFields()
     if (Object.keys(errs).length > 0) {
       setFieldErrors(errs)
@@ -85,7 +95,6 @@ export default function Login() {
     setLoading(true)
 
     if (isSignUp) {
-      // Verificar whitelist se beta fechado
       if (betaFechado) {
         const { data: betaCheck, error: betaErr } = await supabase
           .rpc("check_beta_access", { p_email: email.toLowerCase().trim() })
@@ -132,6 +141,9 @@ export default function Login() {
           plano: "free",
           renda_mensal: 0,
           meta_economia: 0,
+          consentimento_politica: true,
+          data_consentimento: new Date().toISOString(),
+          versao_politica: "1.0",
         }, { onConflict: "id" })
 
         if (betaFechado) {
@@ -144,11 +156,20 @@ export default function Login() {
       return
     }
 
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password })
     if (signInError) {
       setServerError(signInError.message)
       setLoading(false)
       return
+    }
+
+    // Registra aceite dos termos ao fazer login (se ainda não registrado)
+    if (signInData.user) {
+      supabase.from("profiles").update({
+        consentimento_politica: true,
+        data_consentimento: new Date().toISOString(),
+        versao_politica: "1.0",
+      }).eq("id", signInData.user.id).then(() => {})
     }
 
     navigate("/app")
@@ -186,7 +207,6 @@ export default function Login() {
           </p>
         </div>
 
-        {/* Aviso beta fechado */}
         {isSignUp && betaFechado && (
           <div style={{
             display: "flex", alignItems: "flex-start", gap: 8,
@@ -318,6 +338,43 @@ export default function Login() {
             )}
           </div>
 
+          {/* Aceite obrigatório de termos */}
+          <div style={{
+            padding: "12px 14px",
+            borderRadius: 8,
+            border: termosErro ? "1px solid #D32F2F" : "1px solid #E0E0E0",
+            background: termosErro ? "#FEF2F2" : "#FAFAFA",
+            transition: "border-color 0.15s, background 0.15s",
+          }}>
+            <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer" }}>
+              <input
+                type="checkbox"
+                checked={termosAceitos}
+                onChange={(e) => {
+                  setTermosAceitos(e.target.checked)
+                  if (e.target.checked) setTermosErro(false)
+                }}
+                style={{ marginTop: 2, width: 15, height: 15, cursor: "pointer", accentColor: "#16A34A", flexShrink: 0 }}
+              />
+              <span style={{ fontSize: 12, color: termosErro ? "#D32F2F" : "#555555", lineHeight: 1.55 }}>
+                Li e aceito os{" "}
+                <a href="/termos" target="_blank" style={{ color: "#16A34A", fontWeight: 600, textDecoration: "underline" }}>
+                  Termos de Uso
+                </a>{" "}
+                e a{" "}
+                <a href="/privacidade" target="_blank" style={{ color: "#16A34A", fontWeight: 600, textDecoration: "underline" }}>
+                  Política de Privacidade
+                </a>{" "}
+                do Openfy. *
+              </span>
+            </label>
+            {termosErro && (
+              <p style={{ fontSize: 11, color: "#D32F2F", marginTop: 6, marginLeft: 25 }}>
+                Você precisa aceitar os termos para continuar.
+              </p>
+            )}
+          </div>
+
           {serverError && (
             <p style={{ fontSize: 13 }} className="text-[#D32F2F]">{serverError}</p>
           )}
@@ -349,15 +406,6 @@ export default function Login() {
             {isSignUp ? "Fazer login" : "Cadastre-se grátis"}
           </button>
         </p>
-
-        {!isSignUp && (
-          <p className="text-center mt-3" style={{ fontSize: 12, color: "#A3A3A3" }}>
-            Ao entrar, você concorda com os{" "}
-            <a href="/termos" target="_blank" style={{ color: "#525252", textDecoration: "underline" }}>Termos</a>
-            {" "}e a{" "}
-            <a href="/privacidade" target="_blank" style={{ color: "#525252", textDecoration: "underline" }}>Privacidade</a>
-          </p>
-        )}
       </div>
     </div>
   )

@@ -45,8 +45,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         supabase.from("audit_logs").insert({
           user_id: newUser.id,
           acao: "login",
-          detalhes: { email: newUser.email },
-        });
+          detalhes: {},
+        }).catch(() => {});
       }
 
       if (event === "SIGNED_OUT" && prevUserIdRef.current) {
@@ -54,7 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           user_id: prevUserIdRef.current,
           acao: "logout",
           detalhes: {},
-        });
+        }).catch(() => {});
       }
 
       prevUserIdRef.current = newUser?.id ?? null;

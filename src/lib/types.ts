@@ -12,6 +12,9 @@ export interface Profile {
   consentimento_marketing?: boolean
   data_consentimento?: string | null
   versao_politica?: string
+  notificacoes?: boolean
+  moeda?: string
+  idioma?: string
 }
 
 export interface AuditLog {

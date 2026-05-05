@@ -14,10 +14,7 @@ export async function getTransacoesMes(userId: string) {
     .gte('data', inicio.toISOString().split('T')[0])
     .order('data', { ascending: false })
 
-  if (error) {
-    console.error('Erro ao buscar transações:', error)
-    return []
-  }
+  if (error) return []
   return data || []
 }
 
@@ -34,10 +31,7 @@ export async function getTransacoesPeriodo(
     .lte('data', dataFim)
     .order('data', { ascending: false })
 
-  if (error) {
-    console.error('Erro ao buscar transações por período:', error)
-    return []
-  }
+  if (error) return []
   return data || []
 }
 
@@ -119,10 +113,7 @@ export async function getEvolucaoMensal(userId: string, meses = 6) {
     .gte('data', dataInicio.toISOString().split('T')[0])
     .order('data', { ascending: true })
 
-  if (error) {
-    console.error('Erro ao buscar evolução mensal:', error)
-    return []
-  }
+  if (error) return []
 
   const mesesMap: Record<string, { month: string; income: number; expenses: number }> = {}
 
@@ -157,10 +148,7 @@ export async function addTransacao(
     .select()
     .single()
 
-  if (error) {
-    console.error('Erro ao adicionar transação:', error)
-    throw error
-  }
+  if (error) throw error
   return data
 }
 
@@ -170,7 +158,7 @@ export async function getOrCreateCategoria(
   userId: string,
   nome: string
 ): Promise<string> {
-  const { data } = await supabase
+  const { data: existing } = await supabase
     .from('categorias')
     .select('id')
     .eq('nome', nome)
@@ -178,18 +166,14 @@ export async function getOrCreateCategoria(
     .limit(1)
     .maybeSingle()
 
-  if (data?.id) return data.id
+  if (existing?.id) return existing.id
 
   const { data: nova, error } = await supabase
     .from('categorias')
-    .insert({
-      user_id: userId,
-      nome,
-      tipo: 'despesa',
-      icone: '📦',
-      cor: '#777777',
-      is_padrao: false,
-    })
+    .upsert(
+      { user_id: userId, nome, tipo: 'despesa', icone: '📦', cor: '#777777', is_padrao: false },
+      { onConflict: 'user_id,nome', ignoreDuplicates: false }
+    )
     .select('id')
     .single()
 
@@ -206,10 +190,7 @@ export async function getProfile(userId: string): Promise<Profile | null> {
     .eq('id', userId)
     .maybeSingle()
 
-  if (error) {
-    console.error('Erro ao buscar perfil:', error)
-    return null
-  }
+  if (error) return null
   return data || null
 }
 
@@ -224,9 +205,6 @@ export async function upsertProfile(
     .select()
     .single()
 
-  if (error) {
-    console.error('Erro ao salvar perfil:', error)
-    throw error
-  }
+  if (error) throw error
   return data as Profile
 }

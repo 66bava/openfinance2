@@ -16,6 +16,8 @@ import LandingPage from "./pages/LandingPage"
 import Privacidade from "./pages/Privacidade"
 import Termos from "./pages/Termos"
 import Callback from "./pages/Callback"
+import Obrigado from "./pages/Obrigado"
+import Admin from "./pages/Admin"
 
 export const router = createBrowserRouter([
   {
@@ -41,6 +43,14 @@ export const router = createBrowserRouter([
   {
     path: "/termos",
     Component: Termos,
+  },
+  {
+    path: "/obrigado",
+    Component: Obrigado,
+  },
+  {
+    path: "/admin",
+    Component: Admin,
   },
   {
     path: "/app",

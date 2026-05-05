@@ -173,6 +173,15 @@ const NAV_PATHS = [
   { path: "/app/perfil", labelKey: "appPerfil" as const, icon: User },
 ]
 
+// Apenas os 5 itens mais usados aparecem na bottom nav mobile
+const MOBILE_NAV_PATHS = [
+  { path: "/app", labelKey: "appDashboard" as const, icon: LayoutDashboard },
+  { path: "/app/adicionar", labelKey: "appAdicionar" as const, icon: PlusCircle },
+  { path: "/app/futuro", labelKey: "appFuturo" as const, icon: TrendingUp },
+  { path: "/app/analise", labelKey: "appAnalise" as const, icon: BarChart2 },
+  { path: "/app/perfil", labelKey: "appPerfil" as const, icon: User },
+]
+
 function SidebarContent({
   displayName,
   userEmail,
@@ -361,8 +370,18 @@ export function Layout() {
           justifyContent: "space-between", padding: "0 20px",
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <button className="lg:hidden" onClick={() => setSidebarOpen(true)}
-              style={{ background: "none", border: "none", cursor: "pointer", padding: 4, color: "var(--of-text-secondary)" }}>
+            <button
+              className="lg:hidden"
+              onClick={() => setSidebarOpen(true)}
+              aria-label="Abrir menu"
+              style={{
+                background: "none", border: "none", cursor: "pointer",
+                padding: 8, color: "var(--of-text-secondary)",
+                minWidth: 44, minHeight: 44,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                touchAction: "manipulation",
+              }}
+            >
               <Menu size={22} />
             </button>
             <h1 style={{ fontSize: 16, fontWeight: 600, color: "var(--of-text)" }}>{pageTitle}</h1>
@@ -401,28 +420,41 @@ export function Layout() {
           </div>
         </header>
 
-        <main style={{ flex: 1, overflowY: "auto", paddingBottom: 72 }} className="lg:pb-6">
+        <main style={{ flex: 1, overflowY: "auto", paddingBottom: "calc(56px + env(safe-area-inset-bottom, 8px))" }} className="lg:pb-6">
           <Outlet />
         </main>
 
-        <nav className="lg:hidden" style={{
-          position: "fixed", bottom: 0, left: 0, right: 0,
-          backgroundColor: "var(--of-surface)", borderTop: "1px solid var(--of-border)",
-          zIndex: 20, display: "flex", alignItems: "center", padding: "0 4px",
-        }}>
-          {NAV_PATHS.map(({ path, labelKey, icon: Icon }) => (
-            <NavLink key={path} to={path} end={path === "/app"}
+        <nav
+          className="lg:hidden"
+          role="navigation"
+          aria-label="Navegação principal"
+          style={{
+            position: "fixed", bottom: 0, left: 0, right: 0,
+            backgroundColor: "var(--of-surface)", borderTop: "1px solid var(--of-border)",
+            zIndex: 20, display: "flex", alignItems: "stretch",
+            paddingBottom: "env(safe-area-inset-bottom, 0px)",
+          }}
+        >
+          {MOBILE_NAV_PATHS.map(({ path, labelKey, icon: Icon }) => (
+            <NavLink
+              key={path}
+              to={path}
+              end={path === "/app"}
+              aria-label={t(labelKey)}
               style={({ isActive }) => ({
                 flex: 1, display: "flex", flexDirection: "column",
-                alignItems: "center", gap: 3, padding: "10px 4px",
+                alignItems: "center", justifyContent: "center", gap: 3,
+                padding: "10px 2px 8px", minHeight: 56,
                 textDecoration: "none",
                 color: isActive ? "var(--of-nav-active-border)" : "var(--of-text-muted)",
-                fontSize: 10, fontWeight: isActive ? 600 : 400,
-              })}>
+                fontSize: 10, fontWeight: isActive ? 700 : 400,
+                touchAction: "manipulation",
+              })}
+            >
               {({ isActive }) => (
                 <>
-                  <Icon size={21} strokeWidth={isActive ? 2.5 : 1.8} />
-                  {t(labelKey)}
+                  <Icon size={22} strokeWidth={isActive ? 2.5 : 1.8} />
+                  <span style={{ letterSpacing: isActive ? "0.02em" : 0 }}>{t(labelKey)}</span>
                 </>
               )}
             </NavLink>
