@@ -4,4 +4,4 @@ Disallow: /app/
 Disallow: /admin
 Disallow: /auth/
 
-Sitemap: https://openfy.com.br/sitemap.xml
+Sitemap: https://useopenfy.com.br/sitemap.xml
