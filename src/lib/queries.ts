@@ -89,7 +89,7 @@ export function calcularCategorias(transacoes: any[]) {
     .map(([nome, valor]) => ({
       name: nome,
       value: valor,
-      percent: ((valor / total) * 100).toFixed(1),
+      percent: parseFloat(((valor / total) * 100).toFixed(1)),
     }))
     .sort((a, b) => b.value - a.value)
 }
