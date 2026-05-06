@@ -1,4 +1,5 @@
-const OPENAI_URL = "https://api.openai.com/v1/chat/completions"
+const GEMINI_URL =
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
 
 export interface ScoreContext {
   score: number
@@ -10,8 +11,8 @@ export interface ScoreContext {
 }
 
 export async function analisarScore(ctx: ScoreContext): Promise<string> {
-  const apiKey = import.meta.env.VITE_OPENAI_API_KEY
-  if (!apiKey) throw new Error("Configure VITE_OPENAI_API_KEY no arquivo .env.local")
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY
+  if (!apiKey) throw new Error("Configure VITE_GEMINI_API_KEY no arquivo .env.local")
 
   const catStr = ctx.categorias.slice(0, 5).map((c) => `${c.name} (${c.percent}%)`).join(", ")
 
@@ -35,17 +36,12 @@ Use português brasileiro simples. Formate assim:
 2. [ação concreta]
 3. [ação concreta]`
 
-  const res = await fetch(OPENAI_URL, {
+  const res = await fetch(`${GEMINI_URL}?key=${apiKey}`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "gpt-4o-mini",
-      messages: [{ role: "user", content: prompt }],
-      max_tokens: 400,
-      temperature: 0.7,
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { maxOutputTokens: 400, temperature: 0.7 },
     }),
   })
 
@@ -55,5 +51,5 @@ Use português brasileiro simples. Formate assim:
   }
 
   const data = await res.json()
-  return data.choices?.[0]?.message?.content ?? "Não foi possível gerar a análise."
+  return data.candidates?.[0]?.content?.parts?.[0]?.text ?? "Não foi possível gerar a análise."
 }
