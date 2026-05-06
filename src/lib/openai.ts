@@ -1,5 +1,4 @@
-const GEMINI_URL =
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
+const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 export interface ScoreContext {
   score: number
@@ -11,8 +10,8 @@ export interface ScoreContext {
 }
 
 export async function analisarScore(ctx: ScoreContext): Promise<string> {
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY
-  if (!apiKey) throw new Error("Configure VITE_GEMINI_API_KEY no arquivo .env.local")
+  const apiKey = import.meta.env.VITE_GROQ_API_KEY
+  if (!apiKey) throw new Error("Configure VITE_GROQ_API_KEY no arquivo .env.local")
 
   const catStr = ctx.categorias.slice(0, 5).map((c) => `${c.name} (${c.percent}%)`).join(", ")
 
@@ -36,12 +35,17 @@ Use português brasileiro simples. Formate assim:
 2. [ação concreta]
 3. [ação concreta]`
 
-  const res = await fetch(`${GEMINI_URL}?key=${apiKey}`, {
+  const res = await fetch(GROQ_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
     body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { maxOutputTokens: 400, temperature: 0.7 },
+      model: "llama-3.3-70b-versatile",
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 400,
+      temperature: 0.7,
     }),
   })
 
@@ -51,5 +55,5 @@ Use português brasileiro simples. Formate assim:
   }
 
   const data = await res.json()
-  return data.candidates?.[0]?.content?.parts?.[0]?.text ?? "Não foi possível gerar a análise."
+  return data.choices?.[0]?.message?.content ?? "Não foi possível gerar a análise."
 }
