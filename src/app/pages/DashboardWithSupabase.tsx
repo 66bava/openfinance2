@@ -14,6 +14,7 @@ import {
   getTransacoesMes, getEvolucaoMensal,
 } from "../../lib/queries"
 import { AddTransactionModal } from "../components/dashboard/AddTransactionModal"
+import { ScoreAdvisor } from "../components/dashboard/ScoreAdvisor"
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -511,6 +512,16 @@ export default function DashboardWithSupabase() {
 
           {/* Score Gauge */}
           <ScoreGauge score={score} />
+
+          {/* Score Advisor IA */}
+          <ScoreAdvisor
+            score={score}
+            scoreLabel={scoreLabel(score)}
+            totalGastos={totais.totalGastos}
+            totalRenda={totais.totalRenda}
+            percentualEconomia={totais.percentualEconomia}
+            categorias={categorias}
+          />
 
           {/* Categoria Donut */}
           <div style={{
