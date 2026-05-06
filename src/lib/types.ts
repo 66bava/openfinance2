@@ -8,6 +8,8 @@ export interface Profile {
   meta_economia: number
   avatar_url?: string
   plano: string
+  score?: number | null
+  onboarding_completo?: boolean | null
   consentimento_politica?: boolean
   consentimento_marketing?: boolean
   data_consentimento?: string | null

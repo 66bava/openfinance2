@@ -10,6 +10,8 @@ import Cartoes from "./pages/Cartoes"
 import FaturaDetalhe from "./pages/FaturaDetalhe"
 import Categorias from "./pages/Categorias"
 import Futuro from "./pages/Futuro"
+import Familia from "./pages/Familia"
+import Onboarding from "./pages/Onboarding"
 import Login from "./pages/login"
 import Cadastro from "./pages/Cadastro"
 import LandingPage from "./pages/LandingPage"
@@ -61,6 +63,7 @@ export const router = createBrowserRouter([
     path: "/app",
     Component: ProtectedRoute,
     children: [
+      { path: "onboarding", Component: Onboarding },
       {
         Component: Layout,
         children: [
@@ -72,6 +75,7 @@ export const router = createBrowserRouter([
           { path: "cartoes/:id/fatura/:mes/:ano", Component: FaturaDetalhe },
           { path: "categorias", Component: Categorias },
           { path: "futuro", Component: Futuro },
+          { path: "familia", Component: Familia },
           { path: "perfil", Component: Profile },
         ],
       },

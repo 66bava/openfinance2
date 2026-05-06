@@ -277,6 +277,10 @@ const i18n = {
     planProDisplay: "Pro",
     planFamiliaDisplay: "Família",
 
+    // FAMILIA - nav & title
+    appFamilia: "Família",
+    appTitleFamilia: "Plano Família",
+
     // FUTURO - nav & title
     appFuturo: "Futuro",
     appTitleFuturo: "Gastos Futuros",
@@ -571,6 +575,9 @@ const i18n = {
     planProDisplay: "Pro",
     planFamiliaDisplay: "Family",
 
+    appFamilia: "Family",
+    appTitleFamilia: "Family Plan",
+
     appFuturo: "Future",
     appTitleFuturo: "Future Expenses",
 
@@ -861,6 +868,9 @@ const i18n = {
     planFreeDisplay: "Gratis",
     planProDisplay: "Pro",
     planFamiliaDisplay: "Familia",
+
+    appFamilia: "Familia",
+    appTitleFamilia: "Plan Familia",
 
     appFuturo: "Futuro",
     appTitleFuturo: "Gastos Futuros",

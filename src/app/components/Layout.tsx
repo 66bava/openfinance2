@@ -15,6 +15,7 @@ import {
   Sun,
   Moon,
   TrendingUp,
+  Users,
 } from "lucide-react"
 import { OFLogo } from "./OFLogo"
 import { Toaster } from "sonner"
@@ -105,7 +106,7 @@ function UserMenu({
             {displayName.length > 16 ? displayName.slice(0, 16) + "…" : displayName}
           </p>
           <p style={{ fontSize: 10, color: "var(--of-text-muted)" }}>
-            Plano {plano === "free" ? "Free" : plano === "pro" ? "Pro" : "Família"}
+            Plano {plano === "familia" ? "Família" : plano === "pro" || plano === "beta" ? "Pro" : "Free"}
           </p>
         </div>
         <ChevronDown size={13} style={{ color: "var(--of-text-muted)", transform: open ? "rotate(180deg)" : "none", transition: "transform 0.15s" }} />
@@ -162,7 +163,7 @@ function UserMenu({
   )
 }
 
-const NAV_PATHS = [
+const BASE_NAV_PATHS = [
   { path: "/app", labelKey: "appDashboard" as const, icon: LayoutDashboard },
   { path: "/app/adicionar", labelKey: "appAdicionar" as const, icon: PlusCircle },
   { path: "/app/futuro", labelKey: "appFuturo" as const, icon: TrendingUp },
@@ -170,10 +171,10 @@ const NAV_PATHS = [
   { path: "/app/relatorios", labelKey: "appRelatorios" as const, icon: FileText },
   { path: "/app/cartoes", labelKey: "appCartoes" as const, icon: CreditCard },
   { path: "/app/categorias", labelKey: "appCategorias" as const, icon: Tag },
+  { path: "/app/familia", labelKey: "appFamilia" as const, icon: Users, planRequired: "familia" as const },
   { path: "/app/perfil", labelKey: "appPerfil" as const, icon: User },
 ]
 
-// Apenas os 5 itens mais usados aparecem na bottom nav mobile
 const MOBILE_NAV_PATHS = [
   { path: "/app", labelKey: "appDashboard" as const, icon: LayoutDashboard },
   { path: "/app/adicionar", labelKey: "appAdicionar" as const, icon: PlusCircle },
@@ -198,6 +199,7 @@ function SidebarContent({
   signOut: () => void
 }) {
   const { t } = useLanguage()
+  const navPaths = BASE_NAV_PATHS.filter((item) => !item.planRequired || plano === item.planRequired)
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <div style={{
@@ -213,7 +215,7 @@ function SidebarContent({
       </div>
 
       <nav style={{ flex: 1, padding: "10px", display: "flex", flexDirection: "column", gap: 2 }}>
-        {NAV_PATHS.map(({ path, labelKey, icon: Icon }) => (
+        {navPaths.map(({ path, labelKey, icon: Icon }) => (
           <NavLink
             key={path}
             to={path}
@@ -279,10 +281,10 @@ function SidebarContent({
             display: "inline-block", marginTop: 2,
             fontSize: 9, fontWeight: 700, letterSpacing: "0.04em",
             padding: "2px 7px", borderRadius: 10,
-            backgroundColor: plano === "pro" ? "var(--of-text)" : "var(--of-badge-free-bg)",
-            color: plano === "pro" ? "var(--of-surface)" : "var(--of-badge-free-text)",
+            backgroundColor: plano === "pro" || plano === "beta" ? "var(--of-text)" : plano === "familia" ? "#15803D" : "var(--of-badge-free-bg)",
+            color: plano === "pro" || plano === "beta" || plano === "familia" ? "var(--of-surface)" : "var(--of-badge-free-text)",
           }}>
-            {plano === "pro" ? t("planProLabel") : t("planFreeLabel")}
+            {plano === "pro" || plano === "beta" ? t("planProLabel") : plano === "familia" ? t("planFamiliaLabel") : t("planFreeLabel")}
           </span>
         </div>
         <button onClick={signOut} title={t("appSignOut")}
@@ -299,12 +301,17 @@ function SidebarContent({
 
 export function Layout() {
   const location = useLocation()
+  const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const { user } = useAuth()
   const { theme, toggleTheme } = useTheme()
   const { t } = useLanguage()
-  const signOut = () => supabase.auth.signOut()
   const [profile, setProfile] = useState<Profile | null>(null)
+
+  const signOut = async () => {
+    await supabase.auth.signOut()
+    navigate("/login", { replace: true })
+  }
 
   function getPageTitle(pathname: string): string {
     const titleMap: Record<string, string> = {
@@ -315,6 +322,7 @@ export function Layout() {
       "/app/cartoes": t("appTitleCartoes"),
       "/app/categorias": t("appTitleCategorias"),
       "/app/futuro": t("appTitleFuturo"),
+      "/app/familia": t("appTitleFamilia"),
       "/app/perfil": t("appTitlePerfil"),
     }
     if (titleMap[pathname]) return titleMap[pathname]
@@ -324,7 +332,13 @@ export function Layout() {
   }
 
   useEffect(() => {
-    if (user) getProfile(user.id).then(setProfile)
+    if (!user) return
+    getProfile(user.id).then((p) => {
+      setProfile(p)
+      if (p && p.onboarding_completo === false) {
+        navigate("/app/onboarding", { replace: true })
+      }
+    })
   }, [user])
 
   const pageTitle = getPageTitle(location.pathname)

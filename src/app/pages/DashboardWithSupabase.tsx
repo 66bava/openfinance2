@@ -7,12 +7,14 @@ import {
 } from "recharts"
 import {
   ArrowDownRight, ArrowUpRight, Wallet, PiggyBank,
-  Plus, TrendingUp, TrendingDown,
+  Plus, TrendingUp, TrendingDown, Users, Check, X,
 } from "lucide-react"
 import {
   getTotaisMes, getGastosPorCategoria,
   getTransacoesMes, getEvolucaoMensal,
+  getProfile,
 } from "../../lib/queries"
+import { getMinhaMembresia, getAdminPerfil, responderConvite } from "../../lib/queries/familia"
 import { AddTransactionModal } from "../components/dashboard/AddTransactionModal"
 import { ScoreAdvisor } from "../components/dashboard/ScoreAdvisor"
 
@@ -242,9 +244,14 @@ export default function DashboardWithSupabase() {
   const [loading, setLoading] = useState(true)
   const [addModalOpen, setAddModalOpen] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
+  const [convitePendente, setConvitePendente] = useState<any>(null)
+  const [adminConvite, setAdminConvite] = useState<any>(null)
+  const [conviteLoading, setConviteLoading] = useState(false)
+  const [dbScore, setDbScore] = useState<number | null>(null)
 
   const userName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Usuário"
-  const score = calcularScore(totais.percentualEconomia, totais.totalGastos, totais.totalRenda)
+  // Usa o score do banco (calculado pelo trigger) quando disponível
+  const score = dbScore ?? calcularScore(totais.percentualEconomia, totais.totalGastos, totais.totalRenda)
 
   useEffect(() => {
     async function load() {
@@ -266,7 +273,30 @@ export default function DashboardWithSupabase() {
         setLoading(false)
       }
     }
+    async function loadConvite() {
+      try {
+        const mem = await getMinhaMembresia(userId)
+        if (mem?.status === "pendente") {
+          setConvitePendente(mem)
+          if (mem.grupo?.admin_id) {
+            const admin = await getAdminPerfil(mem.grupo.admin_id)
+            setAdminConvite(admin)
+          }
+        } else {
+          setConvitePendente(null)
+          setAdminConvite(null)
+        }
+      } catch { /* silent */ }
+    }
+    async function loadScore() {
+      try {
+        const profile = await getProfile(userId)
+        if (profile?.score != null) setDbScore(profile.score)
+      } catch { /* silent */ }
+    }
     load()
+    loadConvite()
+    loadScore()
   }, [userId, refreshKey])
 
   if (loading) {
@@ -288,6 +318,74 @@ export default function DashboardWithSupabase() {
   return (
     <div style={{ padding: "20px 20px 24px", maxWidth: 1440, margin: "0 auto", fontFamily: "var(--font-body)" }}
       className="lg:p-8">
+
+      {/* Banner de convite familiar */}
+      {convitePendente && (
+        <div style={{
+          display: "flex", alignItems: "center", gap: 12,
+          background: "linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%)",
+          border: "1px solid #86EFAC", borderRadius: 12,
+          padding: "14px 18px", marginBottom: 20, flexWrap: "wrap" as const,
+        }}>
+          <div style={{
+            width: 38, height: 38, borderRadius: "50%",
+            background: "#16A34A", flexShrink: 0,
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <Users size={18} style={{ color: "#fff" }} />
+          </div>
+          <div style={{ flex: 1, minWidth: 200 }}>
+            <p style={{ fontSize: 13, fontWeight: 700, color: "#15803D", marginBottom: 2 }}>
+              Convite para grupo familiar
+            </p>
+            <p style={{ fontSize: 12, color: "#166534", lineHeight: 1.4 }}>
+              <strong>{adminConvite?.nome || adminConvite?.email || "Alguém"}</strong> convidou você para o grupo "{convitePendente.grupo?.nome || "Família"}"
+            </p>
+          </div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button
+              onClick={async () => {
+                setConviteLoading(true)
+                try {
+                  await responderConvite(convitePendente.id, false)
+                  setConvitePendente(null)
+                } finally { setConviteLoading(false) }
+              }}
+              disabled={conviteLoading}
+              style={{
+                display: "flex", alignItems: "center", gap: 5,
+                padding: "7px 14px", background: "#fff",
+                color: "#374151", fontWeight: 600, fontSize: 12,
+                border: "1px solid #D1D5DB", borderRadius: 8,
+                cursor: "pointer", transition: "background 0.1s",
+              }}
+            >
+              <X size={13} /> Recusar
+            </button>
+            <button
+              onClick={async () => {
+                setConviteLoading(true)
+                try {
+                  await responderConvite(convitePendente.id, true)
+                  setConvitePendente(null)
+                } finally { setConviteLoading(false) }
+              }}
+              disabled={conviteLoading}
+              style={{
+                display: "flex", alignItems: "center", gap: 5,
+                padding: "7px 14px", background: "#16A34A",
+                color: "#fff", fontWeight: 700, fontSize: 12,
+                border: "none", borderRadius: 8,
+                cursor: "pointer", transition: "background 0.1s",
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "#15803D" }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "#16A34A" }}
+            >
+              <Check size={13} /> Aceitar
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Saudação */}
       <div style={{ marginBottom: 24 }}>
