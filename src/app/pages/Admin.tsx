@@ -4,8 +4,11 @@ import { toast } from "sonner"
 import {
   Users, Settings, BarChart3, Search, Crown, Check, X,
   RefreshCw, Shield, ToggleLeft, ToggleRight, Save, ChevronRight,
-  Star, UserCheck, List,
+  Star, UserCheck, List, TrendingUp, Download, Activity, DollarSign,
 } from "lucide-react"
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
+} from "recharts"
 import { supabase } from "../../lib/supabase"
 import { useAuth } from "../../lib/auth-context"
 import { logAudit } from "../../lib/audit"
@@ -86,7 +89,7 @@ function Avatar({ nome, size = 32 }: { nome: string; size?: number }) {
 
 export default function Admin() {
   const { user, loading: authLoading } = useAuth()
-  const [activeTab, setActiveTab] = useState<"painel" | "usuarios" | "configuracoes">("painel")
+  const [activeTab, setActiveTab] = useState<"painel" | "analytics" | "usuarios" | "configuracoes">("painel")
 
   // Stats
   const [totalUsers, setTotalUsers] = useState(0)
@@ -109,6 +112,12 @@ export default function Admin() {
   const [planFilter, setPlanFilter] = useState<PlanFilter>("todos")
   const [changingPlan, setChangingPlan] = useState<string | null>(null)
   const [changingCargo, setChangingCargo] = useState<string | null>(null)
+
+  // Analytics
+  const [signupsByMonth, setSignupsByMonth] = useState<Array<{ month: string; total: number; pro: number; beta: number }>>([])
+  const [analyticsLoading, setAnalyticsLoading] = useState(false)
+  const [allLogs, setAllLogs] = useState<ActivationLog[]>([])
+  const [allLogsLoading, setAllLogsLoading] = useState(false)
 
   // Configurações
   const [config, setConfig] = useState<SiteConfig>({
@@ -189,6 +198,50 @@ export default function Admin() {
     }
   }, [])
 
+  const loadAnalytics = useCallback(async () => {
+    setAnalyticsLoading(true)
+    try {
+      const { data } = await supabase
+        .from("profiles")
+        .select("criado_em, plano")
+        .order("criado_em", { ascending: true })
+      if (data) {
+        const byMonth: Record<string, { total: number; pro: number; beta: number }> = {}
+        data.forEach((p) => {
+          if (!p.criado_em) return
+          const month = p.criado_em.substring(0, 7)
+          if (!byMonth[month]) byMonth[month] = { total: 0, pro: 0, beta: 0 }
+          byMonth[month].total++
+          if (p.plano === "pro") byMonth[month].pro++
+          if (p.plano === "beta") byMonth[month].beta++
+        })
+        const months = Object.entries(byMonth)
+          .slice(-6)
+          .map(([month, v]) => ({
+            month: new Date(month + "-01").toLocaleDateString("pt-BR", { month: "short", year: "2-digit" }),
+            ...v,
+          }))
+        setSignupsByMonth(months)
+      }
+    } finally {
+      setAnalyticsLoading(false)
+    }
+  }, [])
+
+  const loadAllLogs = useCallback(async () => {
+    setAllLogsLoading(true)
+    try {
+      const { data } = await supabase
+        .from("audit_logs")
+        .select("*")
+        .order("criado_em", { ascending: false })
+        .limit(100)
+      setAllLogs(data ?? [])
+    } finally {
+      setAllLogsLoading(false)
+    }
+  }, [])
+
   useEffect(() => {
     if (!user || user.email !== ADMIN_EMAIL) return
     loadStats()
@@ -199,6 +252,10 @@ export default function Admin() {
     if (activeTab === "usuarios") {
       loadActivationLogs()
       loadAllUsers()
+    }
+    if (activeTab === "analytics") {
+      loadAnalytics()
+      loadAllLogs()
     }
   }, [activeTab])
 
@@ -312,8 +369,27 @@ export default function Admin() {
     background: bg, color,
   })
 
+  const exportCSV = () => {
+    const rows = [
+      "Nome,Email,Plano,Cargo,Cadastro",
+      ...allUsers.map((u) =>
+        `"${u.nome ?? ""}","${u.email}","${u.plano}","${u.cargo ?? ""}","${u.criado_em ? new Date(u.criado_em).toLocaleDateString("pt-BR") : ""}"`
+      ),
+    ]
+    const blob = new Blob([rows.join("\n")], { type: "text/csv;charset=utf-8" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `usuarios-openfy-${new Date().toISOString().slice(0, 10)}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const MRR = proUsers * 19.9
+
   const TABS = [
     { key: "painel", label: "Painel", icon: BarChart3 },
+    { key: "analytics", label: "Analytics", icon: TrendingUp },
     { key: "usuarios", label: "Usuários", icon: Users },
     { key: "configuracoes", label: "Config", icon: Settings },
   ] as const
@@ -459,6 +535,114 @@ export default function Admin() {
           </>
         )}
 
+        {/* ── TAB: Analytics ── */}
+        {activeTab === "analytics" && (
+          <>
+            <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
+              <div>
+                <h2 style={{ fontSize: 18, fontWeight: 700, color: "#111827" }}>Analytics</h2>
+                <p style={{ fontSize: 13, color: "#6B7280", marginTop: 2 }}>Crescimento, receita e atividade da plataforma</p>
+              </div>
+              <button onClick={() => { loadAnalytics(); loadAllLogs() }} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", border: "1px solid #E5E7EB", borderRadius: 8, fontSize: 12, fontWeight: 500, color: "#374151", background: "#FFFFFF", cursor: "pointer" }}>
+                <RefreshCw size={12} /> Atualizar
+              </button>
+            </div>
+
+            {/* Revenue cards */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12, marginBottom: 24 }}>
+              {[
+                { label: "MRR estimado", value: `R$ ${MRR.toFixed(2).replace(".", ",")}`, icon: DollarSign, color: "#16A34A", bg: "#F0FDF4" },
+                { label: "ARR estimado", value: `R$ ${(MRR * 12).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`, icon: TrendingUp, color: "#7C3AED", bg: "#F5F3FF" },
+                { label: "Conversão", value: totalUsers > 0 ? `${Math.round((proUsers / totalUsers) * 100)}%` : "—", icon: Activity, color: "#2563EB", bg: "#EFF6FF" },
+                { label: "Ticket médio", value: proUsers > 0 ? "R$ 19,90" : "—", icon: DollarSign, color: "#D97706", bg: "#FEF3C7" },
+              ].map(({ label, value, icon: Icon, color, bg }) => (
+                <div key={label} style={{ background: bg, borderRadius: 12, padding: "16px 18px", border: "1px solid #E5E7EB" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+                    <Icon size={14} style={{ color }} />
+                    <p style={{ fontSize: 10, fontWeight: 600, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.08em" }}>{label}</p>
+                  </div>
+                  <p style={{ fontSize: 22, fontWeight: 800, color, letterSpacing: "-0.02em" }}>{value}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Signups chart */}
+            <div style={{ ...cardStyle, padding: "20px 20px 16px" }}>
+              <h3 style={{ fontSize: 14, fontWeight: 600, color: "#111827", marginBottom: 16 }}>Cadastros por mês</h3>
+              {analyticsLoading ? (
+                <div style={{ height: 180, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <span style={{ width: 20, height: 20, border: "2px solid #E5E7EB", borderTopColor: "#111", borderRadius: "50%", display: "inline-block", animation: "spin 0.7s linear infinite" }} />
+                </div>
+              ) : signupsByMonth.length === 0 ? (
+                <div style={{ height: 180, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <p style={{ fontSize: 13, color: "#9CA3AF" }}>Sem dados de crescimento ainda.</p>
+                </div>
+              ) : (
+                <>
+                  <ResponsiveContainer width="100%" height={180}>
+                    <BarChart data={signupsByMonth} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" vertical={false} />
+                      <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#9CA3AF" }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fontSize: 11, fill: "#9CA3AF" }} axisLine={false} tickLine={false} allowDecimals={false} />
+                      <Tooltip
+                        contentStyle={{ background: "#FFF", border: "1px solid #E5E7EB", borderRadius: 8, fontSize: 12 }}
+                        cursor={{ fill: "#F9FAFB" }}
+                      />
+                      <Bar dataKey="total" name="Total" fill="#E5E7EB" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="pro" name="Pro" fill="#16A34A" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="beta" name="Beta" fill="#4F46E5" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                  <div style={{ display: "flex", gap: 16, marginTop: 8, flexWrap: "wrap" }}>
+                    {[{ cor: "#E5E7EB", label: "Total" }, { cor: "#16A34A", label: "Pro" }, { cor: "#4F46E5", label: "Beta" }].map((l) => (
+                      <div key={l.label} style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                        <div style={{ width: 10, height: 10, borderRadius: 2, background: l.cor }} />
+                        <span style={{ fontSize: 11, color: "#6B7280" }}>{l.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Full audit log */}
+            <div style={cardStyle}>
+              <div style={{ padding: "16px 20px", borderBottom: "1px solid #F3F4F6", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <h3 style={{ fontSize: 14, fontWeight: 600, color: "#111827" }}>Log de atividade completo</h3>
+                <button onClick={loadAllLogs} style={{ background: "none", border: "none", cursor: "pointer", color: "#6B7280" }}>
+                  <RefreshCw size={14} />
+                </button>
+              </div>
+              {allLogsLoading ? (
+                <div style={{ padding: 32, textAlign: "center" }}>
+                  <span style={{ width: 20, height: 20, border: "2px solid #E5E7EB", borderTopColor: "#111", borderRadius: "50%", display: "inline-block", animation: "spin 0.7s linear infinite" }} />
+                </div>
+              ) : allLogs.length === 0 ? (
+                <div style={{ padding: "24px 20px", textAlign: "center" }}>
+                  <p style={{ fontSize: 13, color: "#9CA3AF" }}>Nenhum log ainda.</p>
+                </div>
+              ) : (
+                allLogs.map((log, idx) => (
+                  <div key={log.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 20px", borderBottom: idx < allLogs.length - 1 ? "1px solid #F9FAFB" : "none" }}>
+                    <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#6B7280", flexShrink: 0 }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontSize: 12, fontWeight: 500, color: "#374151", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        <span style={{ color: "#111827", fontFamily: "monospace" }}>{log.acao}</span>
+                        {(log.detalhes as any)?.target_email && (
+                          <span style={{ color: "#9CA3AF" }}> → {(log.detalhes as any).target_email}</span>
+                        )}
+                      </p>
+                    </div>
+                    <span style={{ fontSize: 11, color: "#D1D5DB", flexShrink: 0 }}>
+                      {new Date(log.criado_em).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
+                    </span>
+                  </div>
+                ))
+              )}
+            </div>
+          </>
+        )}
+
         {/* ── TAB: Usuários ── */}
         {activeTab === "usuarios" && (
           <>
@@ -518,6 +702,14 @@ export default function Admin() {
                   >
                     <RefreshCw size={11} /> Recarregar
                   </button>
+                  {allUsers.length > 0 && (
+                    <button
+                      onClick={exportCSV}
+                      style={{ padding: "6px 12px", border: "1px solid #E5E7EB", borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: "pointer", background: "#FFFFFF", color: "#374151", display: "flex", alignItems: "center", gap: 4 }}
+                    >
+                      <Download size={11} /> Exportar CSV
+                    </button>
+                  )}
                 </div>
 
                 <div style={cardStyle}>

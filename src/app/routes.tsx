@@ -18,6 +18,7 @@ import Termos from "./pages/Termos"
 import Callback from "./pages/Callback"
 import Obrigado from "./pages/Obrigado"
 import Admin from "./pages/Admin"
+import ResetPassword from "./pages/ResetPassword"
 
 export const router = createBrowserRouter([
   {
@@ -51,6 +52,10 @@ export const router = createBrowserRouter([
   {
     path: "/admin",
     Component: Admin,
+  },
+  {
+    path: "/reset-password",
+    Component: ResetPassword,
   },
   {
     path: "/app",

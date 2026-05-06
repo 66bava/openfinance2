@@ -22,6 +22,11 @@ export default function Login() {
   const [betaFechado, setBetaFechado] = useState(false)
   const [termosAceitos, setTermosAceitos] = useState(false)
   const [termosErro, setTermosErro] = useState(false)
+  const [showForgot, setShowForgot] = useState(false)
+  const [forgotEmail, setForgotEmail] = useState("")
+  const [forgotLoading, setForgotLoading] = useState(false)
+  const [forgotSent, setForgotSent] = useState(false)
+  const [forgotError, setForgotError] = useState<string | null>(null)
 
   useEffect(() => {
     supabase
@@ -51,6 +56,21 @@ export default function Login() {
     setFieldErrors({})
     setTermosAceitos(false)
     setTermosErro(false)
+    setShowForgot(false)
+    setForgotSent(false)
+    setForgotError(null)
+  }
+
+  async function handleForgotPassword() {
+    setForgotError(null)
+    if (!forgotEmail.trim()) { setForgotError("Informe seu e-mail."); return }
+    setForgotLoading(true)
+    const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail.trim(), {
+      redirectTo: `${window.location.origin}/reset-password`,
+    })
+    setForgotLoading(false)
+    if (error) { setForgotError(error.message); return }
+    setForgotSent(true)
   }
 
   function validateFields() {
@@ -198,6 +218,69 @@ export default function Login() {
         className="w-full bg-white p-8"
         style={{ maxWidth: isSignUp ? 400 : 360, borderRadius: 12, border: "1px solid #E0E0E0", boxShadow: "0 2px 16px rgba(0,0,0,0.07)" }}
       >
+        {/* ── Esqueceu a senha ── */}
+        {showForgot && (
+          <>
+            <div className="mb-7 text-center">
+              <h1 style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.02em" }} className="text-black">Openfy</h1>
+              <p style={{ fontSize: 13 }} className="text-[#777777] mt-1">Recuperar senha</p>
+            </div>
+
+            {forgotSent ? (
+              <div style={{ textAlign: "center", padding: "8px 0 16px" }}>
+                <div style={{ width: 48, height: 48, borderRadius: "50%", background: "#F0FDF4", display: "inline-flex", alignItems: "center", justifyContent: "center", marginBottom: 12 }}>
+                  <span style={{ fontSize: 22 }}>✉️</span>
+                </div>
+                <p style={{ fontSize: 14, fontWeight: 600, color: "#111", marginBottom: 6 }}>E-mail enviado!</p>
+                <p style={{ fontSize: 13, color: "#777", lineHeight: 1.5 }}>
+                  Verifique sua caixa de entrada e clique no link para criar uma nova senha.
+                </p>
+                <button
+                  onClick={() => { setShowForgot(false); setForgotSent(false) }}
+                  style={{ marginTop: 20, fontSize: 13, color: "#16A34A", background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}
+                >
+                  ← Voltar ao login
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                <p style={{ fontSize: 13, color: "#555", lineHeight: 1.55 }}>
+                  Digite seu e-mail e enviaremos um link para você criar uma nova senha.
+                </p>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  <label style={{ fontSize: 13, fontWeight: 500, color: "#333" }}>E-mail *</label>
+                  <input
+                    type="email"
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter") handleForgotPassword() }}
+                    placeholder="seu@email.com"
+                    style={{ width: "100%", border: "1px solid #E0E0E0", borderRadius: 8, padding: "11px 12px", fontSize: 14, color: "#111", outline: "none", boxSizing: "border-box" }}
+                    onFocus={(e) => (e.currentTarget.style.borderColor = "#16A34A")}
+                    onBlur={(e) => (e.currentTarget.style.borderColor = "#E0E0E0")}
+                  />
+                </div>
+                {forgotError && <p style={{ fontSize: 13, color: "#D32F2F" }}>{forgotError}</p>}
+                <button
+                  onClick={handleForgotPassword}
+                  disabled={forgotLoading}
+                  style={{ width: "100%", padding: "11px 0", background: "#0A0A0A", color: "#FFF", border: "none", borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: forgotLoading ? "not-allowed" : "pointer", opacity: forgotLoading ? 0.6 : 1 }}
+                >
+                  {forgotLoading ? "Enviando..." : "Enviar link de recuperação"}
+                </button>
+                <button
+                  onClick={() => { setShowForgot(false); setForgotError(null) }}
+                  style={{ fontSize: 13, color: "#777", background: "none", border: "none", cursor: "pointer", textAlign: "center" }}
+                >
+                  ← Voltar ao login
+                </button>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* ── Formulário principal ── */}
+        {!showForgot && (<>
         <div className="mb-7 text-center">
           <h1 style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.02em" }} className="text-black">
             Openfy
@@ -313,9 +396,20 @@ export default function Login() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="password" style={{ fontSize: 13, fontWeight: 500 }} className="text-[#333333]">
-              Senha *
-            </label>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <label htmlFor="password" style={{ fontSize: 13, fontWeight: 500 }} className="text-[#333333]">
+                Senha *
+              </label>
+              {!isSignUp && (
+                <button
+                  type="button"
+                  onClick={() => setShowForgot(true)}
+                  style={{ fontSize: 12, color: "#16A34A", background: "none", border: "none", cursor: "pointer", padding: 0, fontWeight: 500 }}
+                >
+                  Esqueceu a senha?
+                </button>
+              )}
+            </div>
             <input
               id="password"
               type="password"
@@ -406,6 +500,7 @@ export default function Login() {
             {isSignUp ? "Fazer login" : "Cadastre-se grátis"}
           </button>
         </p>
+        </>)}
       </div>
     </div>
   )
