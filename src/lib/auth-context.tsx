@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { flushSync } from "react-dom";
 import type { User, Session } from "@supabase/supabase-js";
 import { supabase } from "./supabase";
 
@@ -21,26 +22,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const prevUserIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setUser(data.session?.user ?? null);
-      prevUserIdRef.current = data.session?.user?.id ?? null;
-      setLoading(false);
-    }).catch(() => setLoading(false));
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, newSession) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
       const newUser = newSession?.user ?? null;
 
-      if (event === "INITIAL_SESSION") {
-        setSession(newSession);
-        setUser(newUser);
-        prevUserIdRef.current = newUser?.id ?? null;
-        setLoading(false);
-        return;
-      }
-
+      // Audit logs (fire-and-forget, fora do flushSync para não bloquear)
       if (event === "SIGNED_IN" && newUser && prevUserIdRef.current !== newUser.id) {
         supabase.from("audit_logs").insert({
           user_id: newUser.id,
@@ -48,7 +33,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           detalhes: {},
         }).catch(() => {});
       }
-
       if (event === "SIGNED_OUT" && prevUserIdRef.current) {
         supabase.from("audit_logs").insert({
           user_id: prevUserIdRef.current,
@@ -58,18 +42,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       prevUserIdRef.current = newUser?.id ?? null;
-      setSession(newSession);
-      setUser(newUser);
+
+      // flushSync força o React a aplicar o estado IMEDIATAMENTE e de forma síncrona.
+      // Sem isso, o React 18 batcheia a atualização, então quando signInWithPassword
+      // resolve e navigate("/app") é chamado, user ainda seria null no contexto.
+      flushSync(() => {
+        setSession(newSession);
+        setUser(newUser);
+        setLoading(false);
+      });
     });
 
-    // Re-verifica sessão quando usuário retorna à aba (cross-tab sync)
+    // Sync cross-tab: re-verifica sessão quando usuário retorna à aba
     const handleFocus = () => {
       supabase.auth.getSession().then(({ data }) => {
         const newUser = data.session?.user ?? null;
         if (newUser?.id !== prevUserIdRef.current) {
-          setSession(data.session);
-          setUser(newUser);
           prevUserIdRef.current = newUser?.id ?? null;
+          flushSync(() => {
+            setSession(data.session);
+            setUser(newUser);
+          });
         }
       }).catch(() => {});
     };
