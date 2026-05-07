@@ -313,6 +313,25 @@ const i18n = {
     addAvista: "À vista",
     addNParcelas: "Número de parcelas",
     addParcelaHint: "Será criada 1 transação por parcela nos meses seguintes.",
+
+    // ADD TRANSACTION MODAL
+    modalNovaTransacao: "Nova transação",
+    modalDespesa: "Despesa",
+    modalReceita: "Receita",
+    modalValor: "Valor *",
+    modalCategoria: "Categoria *",
+    modalDescricao: "Descrição (opcional)",
+    modalData: "Data *",
+    modalCancelar: "Cancelar",
+    modalRegistrarDespesa: "Registrar despesa",
+    modalRegistrarReceita: "Registrar receita",
+    modalSalvando: "Salvando...",
+    modalErroValor: "Informe um valor válido",
+    modalErroCategoria: "Selecione uma categoria",
+    modalErroData: "Selecione uma data",
+    modalSuccessDespesa: "Despesa registrada!",
+    modalSuccessReceita: "Receita registrada!",
+    modalErroRegistrar: "Erro ao registrar transação. Tente novamente.",
   },
 
   en: {
@@ -607,6 +626,25 @@ const i18n = {
     addAvista: "One-time",
     addNParcelas: "Number of installments",
     addParcelaHint: "One transaction will be created per installment in the following months.",
+
+    // ADD TRANSACTION MODAL
+    modalNovaTransacao: "New Transaction",
+    modalDespesa: "Expense",
+    modalReceita: "Income",
+    modalValor: "Amount *",
+    modalCategoria: "Category *",
+    modalDescricao: "Description (optional)",
+    modalData: "Date *",
+    modalCancelar: "Cancel",
+    modalRegistrarDespesa: "Register expense",
+    modalRegistrarReceita: "Register income",
+    modalSalvando: "Saving...",
+    modalErroValor: "Enter a valid amount",
+    modalErroCategoria: "Select a category",
+    modalErroData: "Select a date",
+    modalSuccessDespesa: "Expense recorded!",
+    modalSuccessReceita: "Income recorded!",
+    modalErroRegistrar: "Error recording transaction. Try again.",
   },
 
   es: {
@@ -901,6 +939,25 @@ const i18n = {
     addAvista: "Al contado",
     addNParcelas: "Número de cuotas",
     addParcelaHint: "Se creará 1 transacción por cuota en los meses siguientes.",
+
+    // ADD TRANSACTION MODAL
+    modalNovaTransacao: "Nueva transacción",
+    modalDespesa: "Gasto",
+    modalReceita: "Ingreso",
+    modalValor: "Monto *",
+    modalCategoria: "Categoría *",
+    modalDescricao: "Descripción (opcional)",
+    modalData: "Fecha *",
+    modalCancelar: "Cancelar",
+    modalRegistrarDespesa: "Registrar gasto",
+    modalRegistrarReceita: "Registrar ingreso",
+    modalSalvando: "Guardando...",
+    modalErroValor: "Ingresa un monto válido",
+    modalErroCategoria: "Selecciona una categoría",
+    modalErroData: "Selecciona una fecha",
+    modalSuccessDespesa: "¡Gasto registrado!",
+    modalSuccessReceita: "¡Ingreso registrado!",
+    modalErroRegistrar: "Error al registrar la transacción. Inténtalo de nuevo.",
   },
 } as const
 

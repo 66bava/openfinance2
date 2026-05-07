@@ -13,6 +13,7 @@ import { logAudit } from "../../lib/audit"
 import { nomeSchema, telefoneSchema } from "../../lib/validations"
 import type { Profile as ProfileType } from "../../lib/types"
 import { ConfigureIncomeModal } from "../components/dashboard/ConfigureIncomeModal"
+import { ConfigurarSalarioModal } from "../components/dashboard/ConfigurarSalarioModal"
 
 const UPGRADE_TEXT = "Quero+assinar+o+plano+Pro+do+Openfy"
 
@@ -32,6 +33,7 @@ export default function Profile() {
   const [loggingOut, setLoggingOut] = useState(false)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [incomeModalOpen, setIncomeModalOpen] = useState(false)
+  const [salarioModalOpen, setSalarioModalOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<"dados" | "plano" | "preferencias" | "seguranca" | "privacidade">("dados")
 
   const [form, setForm] = useState({ nome: "", telefone: "", data_nascimento: "" })
@@ -568,18 +570,33 @@ export default function Profile() {
                       {rendaMensal > 0 ? fmt(rendaMensal) : "Não configurada"}
                     </p>
                   </div>
-                  <button
-                    onClick={() => setIncomeModalOpen(true)}
-                    style={{
-                      padding: "8px 16px", border: "none", borderRadius: 8,
-                      fontSize: 13, fontWeight: 600, color: "#FFFFFF",
-                      background: "#16A34A", cursor: "pointer", transition: "background 0.15s",
-                    }}
-                    onMouseOver={(e) => (e.currentTarget.style.background = "#15803D")}
-                    onMouseOut={(e) => (e.currentTarget.style.background = "#16A34A")}
-                  >
-                    {rendaMensal > 0 ? "Editar" : "Configurar"}
-                  </button>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                    <button
+                      onClick={() => setIncomeModalOpen(true)}
+                      style={{
+                        padding: "8px 16px", border: "none", borderRadius: 8,
+                        fontSize: 13, fontWeight: 600, color: "#FFFFFF",
+                        background: "#16A34A", cursor: "pointer", transition: "background 0.15s",
+                      }}
+                      onMouseOver={(e) => (e.currentTarget.style.background = "#15803D")}
+                      onMouseOut={(e) => (e.currentTarget.style.background = "#16A34A")}
+                    >
+                      {rendaMensal > 0 ? "Editar" : "Configurar"}
+                    </button>
+                    <button
+                      onClick={() => setSalarioModalOpen(true)}
+                      style={{
+                        padding: "6px 14px", border: "1px solid #BBF7D0", borderRadius: 8,
+                        fontSize: 12, fontWeight: 500, color: "#15803D",
+                        background: "transparent", cursor: "pointer", transition: "all 0.15s",
+                        whiteSpace: "nowrap",
+                      }}
+                      onMouseOver={(e) => { e.currentTarget.style.background = "#DCFCE7" }}
+                      onMouseOut={(e) => { e.currentTarget.style.background = "transparent" }}
+                    >
+                      🔄 Recorrentes
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1125,6 +1142,11 @@ export default function Profile() {
         onSuccess={(total) => {
           setProfile((prev) => prev ? { ...prev, renda_mensal: total } : prev)
         }}
+      />
+
+      <ConfigurarSalarioModal
+        open={salarioModalOpen}
+        onOpenChange={setSalarioModalOpen}
       />
     </>
   )

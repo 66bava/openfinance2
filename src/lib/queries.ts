@@ -164,7 +164,8 @@ export async function addTransacao(
 
 export async function getOrCreateCategoria(
   userId: string,
-  nome: string
+  nome: string,
+  tipo: 'despesa' | 'receita' = 'despesa'
 ): Promise<string> {
   const { data: existing } = await supabase
     .from('categorias')
@@ -179,7 +180,7 @@ export async function getOrCreateCategoria(
   const { data: nova, error } = await supabase
     .from('categorias')
     .upsert(
-      { user_id: userId, nome, tipo: 'despesa', icone: '📦', cor: '#777777', is_padrao: false },
+      { user_id: userId, nome, tipo, icone: '📦', cor: '#777777', is_padrao: false },
       { onConflict: 'user_id,nome', ignoreDuplicates: false }
     )
     .select('id')

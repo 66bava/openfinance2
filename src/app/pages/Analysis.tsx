@@ -16,6 +16,8 @@ import {
   deleteTransacao,
 } from "../../lib/queries";
 import { analisarCategoria } from "../../lib/openai";
+import { verificarIncrementarIaReport } from "../../lib/queries/receitas-recorrentes";
+import { toast } from "sonner";
 
 type Period = "semana" | "mês" | "ano";
 
@@ -117,6 +119,8 @@ function AnalysisContent() {
   const [aiText, setAiText] = useState<string | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
+  const [aiUsado, setAiUsado] = useState<number | null>(null);
+  const [aiLimite, setAiLimite] = useState<number | null>(null);
 
   const dateRange = useMemo(() => getDateRange(period), [period]);
 
@@ -183,10 +187,25 @@ function AnalysisContent() {
     setAiError(null);
     setAiLoading(true);
 
-    const txDaCat = despesas.filter((t: any) => (t.categorias?.nome || "Outros") === cat.name);
-    const topDescricoes = [...new Set(txDaCat.map((t: any) => t.descricao).filter(Boolean))] as string[];
-
     try {
+      // Verifica e incrementa limite semanal
+      const limite = await verificarIncrementarIaReport(userId);
+      setAiUsado(limite.usado);
+      setAiLimite(limite.limite);
+
+      if (!limite.success) {
+        const msg = limite.limite >= 0
+          ? `Limite semanal atingido (${limite.usado}/${limite.limite} análises). Renova na segunda-feira.`
+          : "Limite de análises atingido.";
+        setAiError(msg);
+        toast.error(msg);
+        setAiLoading(false);
+        return;
+      }
+
+      const txDaCat = despesas.filter((t: any) => (t.categorias?.nome || "Outros") === cat.name);
+      const topDescricoes = [...new Set(txDaCat.map((t: any) => t.descricao).filter(Boolean))] as string[];
+
       const result = await analisarCategoria({
         categoria: cat.name,
         valor: cat.value,
@@ -280,7 +299,14 @@ function AnalysisContent() {
 
         {/* Categoria breakdown com IA */}
         <div className="bg-white rounded-lg p-5 border border-[#E0E0E0]" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
-          <h3 className="text-black mb-4" style={{ fontSize: 14, fontWeight: 600 }}>Por Categoria</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-black" style={{ fontSize: 14, fontWeight: 600 }}>Por Categoria</h3>
+            {aiLimite !== null && aiUsado !== null && (
+              <span style={{ fontSize: 11, color: "#9CA3AF" }}>
+                IA: {aiUsado}/{aiLimite < 0 ? "∞" : aiLimite} semana
+              </span>
+            )}
+          </div>
           {categorias.length === 0 ? (
             <p style={{ fontSize: 13 }} className="text-[#999999] text-center mt-8">Sem gastos {periodoLabel[period]}</p>
           ) : (
