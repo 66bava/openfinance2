@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef, useCallback } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { useNavigate } from "react-router"
 import { toast } from "sonner"
 import {
@@ -6,6 +6,7 @@ import {
   ChevronDown, Plus, Layers,
 } from "lucide-react"
 import { useAuth } from "../../lib/auth-context"
+import { useLanguage } from "../../lib/language-context"
 import { addTransacao, getProfile } from "../../lib/queries"
 import { getCartoes, getFaturaAtual, recalcularFatura } from "../../lib/queries/cartoes"
 import { getCategoriasAtivas, criarCategoria } from "../../lib/queries/categorias"
@@ -13,15 +14,45 @@ import { supabase } from "../../lib/supabase"
 import { valorSchema } from "../../lib/validations"
 import ModalNovaCategoria from "../components/categorias/ModalNovaCategoria"
 import type { Cartao, MetodoPagamento, Categoria } from "../../lib/types"
-import { useLanguage } from "../../lib/language-context"
 
-const METODOS: { valor: MetodoPagamento; label: string; icon: React.ElementType }[] = [
-  { valor: "dinheiro", label: "Dinheiro", icon: Banknote },
-  { valor: "pix", label: "PIX", icon: QrCode },
-  { valor: "transferencia", label: "Transferência", icon: ArrowLeftRight },
-  { valor: "debito", label: "Débito", icon: CreditCard },
-  { valor: "credito", label: "Crédito", icon: Smartphone },
+const METODOS: { valor: MetodoPagamento; icon: React.ElementType; labelKey: string }[] = [
+  { valor: "dinheiro", icon: Banknote, labelKey: "Dinheiro" },
+  { valor: "pix", icon: QrCode, labelKey: "PIX" },
+  { valor: "transferencia", icon: ArrowLeftRight, labelKey: "Transferência" },
+  { valor: "debito", icon: CreditCard, labelKey: "Débito" },
+  { valor: "credito", icon: Smartphone, labelKey: "Crédito" },
 ]
+
+const sectionStyle: React.CSSProperties = {
+  background: "var(--of-surface)",
+  borderRadius: 12,
+  border: "1px solid var(--of-border)",
+  padding: "20px",
+  boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+}
+
+const labelStyle: React.CSSProperties = {
+  fontSize: 12,
+  fontWeight: 500,
+  color: "var(--of-text-muted)",
+  textTransform: "uppercase",
+  letterSpacing: "0.06em",
+  display: "block",
+  marginBottom: 10,
+}
+
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  border: "1px solid var(--of-border)",
+  borderRadius: 8,
+  padding: "10px 12px",
+  fontSize: 14,
+  color: "var(--of-text)",
+  background: "transparent",
+  outline: "none",
+  transition: "border-color 0.15s",
+  boxSizing: "border-box",
+}
 
 export default function AddExpense() {
   const navigate = useNavigate()
@@ -61,7 +92,6 @@ export default function AddExpense() {
     }
   }, [user])
 
-  // Carregar cartões, plano e categorias do usuário
   useEffect(() => {
     if (!user) return
     getCartoes(user.id).then(setCartoes).catch(console.error)
@@ -69,7 +99,6 @@ export default function AddExpense() {
     carregarCats()
   }, [user, carregarCats])
 
-  // Fechar dropdown ao clicar fora
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (catRef.current && !catRef.current.contains(e.target as Node)) setCatsOpen(false)
@@ -83,7 +112,6 @@ export default function AddExpense() {
   const catsMinhas = catsFiltradas.filter((c) => !c.is_padrao && c.user_id === user?.id)
   const catSelecionada = cats.find((c) => c.id === categoriaId)
 
-  // Quando muda o método, ajusta o cartão e confirmado padrão
   useEffect(() => {
     if (metodo === "credito") {
       setConfirmado(false)
@@ -133,10 +161,10 @@ export default function AddExpense() {
     const errs: Record<string, string> = {}
     const valorResult = valorSchema.safeParse(amount)
     if (!valorResult.success) errs.amount = valorResult.error.issues[0].message
-    if (!categoriaId) errs.category = "Selecione uma categoria"
-    if (!date) errs.date = "Selecione uma data"
+    if (!categoriaId) errs.category = t("modalErroCategoria")
+    if (!date) errs.date = t("modalErroData")
     if ((metodo === "credito" || metodo === "debito") && !cartaoId && cartoesDoTipo.length > 0) {
-      errs.cartao = "Selecione o cartão"
+      errs.cartao = t("addSelectCard")
     }
     return errs
   }
@@ -150,7 +178,6 @@ export default function AddExpense() {
     try {
       const userId = user!.id
 
-      // Verificar limite de transações para plano Free
       const profile = await getProfile(userId)
       if (!profile || profile.plano === "free") {
         const inicioMes = new Date()
@@ -172,7 +199,6 @@ export default function AddExpense() {
         }
       }
 
-      // Buscar fatura para a primeira parcela (crédito)
       let faturaId: string | null = null
       if (metodo === "credito" && cartaoId) {
         const agora = new Date()
@@ -209,7 +235,7 @@ export default function AddExpense() {
         }
         if (faturaId) await recalcularFatura(faturaId, userId)
         toast.success(`${numParcelas}x criadas com sucesso!`, {
-          description: `${catSelecionada?.nome ?? ""} · R$ ${(valorParcela).toLocaleString("pt-BR", { minimumFractionDigits: 2 })} / parcela`,
+          description: `${catSelecionada?.nome ?? ""} · R$ ${valorParcela.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} ${t("addParcelaDeLabel")}`,
           duration: 3500,
         })
       } else {
@@ -241,86 +267,76 @@ export default function AddExpense() {
   }
 
   return (
-    <div className="p-4 lg:p-6 max-w-xl mx-auto">
-      <div className="mb-6">
-        <p style={{ fontSize: 13 }} className="text-[#777777]">
-          Registre suas despesas de forma simples e rápida
+    <div style={{ padding: "16px", maxWidth: 572, margin: "0 auto" }} className="lg:p-6">
+      <div style={{ marginBottom: 24 }}>
+        <p style={{ fontSize: 13, color: "var(--of-text-muted)" }}>
+          {t("addExpenseSubtitle")}
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
         {/* Valor */}
-        <div className="bg-white rounded-lg border border-[#E0E0E0] p-5" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
-          <label style={{ fontSize: 12, fontWeight: 500 }} className="text-[#777777] uppercase tracking-wider block mb-3">
-            Valor *
-          </label>
-          <div
-            className={`flex items-center border rounded-md px-4 py-3 transition-colors focus-within:border-black ${
-              errors.amount ? "border-[#D32F2F]" : amount ? "border-black" : "border-[#E0E0E0]"
-            }`}
-          >
-            <span style={{ fontSize: 22, fontWeight: 700 }} className="text-[#999999] mr-2">R$</span>
+        <div style={sectionStyle}>
+          <label style={labelStyle}>{t("modalValor")}</label>
+          <div style={{
+            display: "flex", alignItems: "center",
+            border: `1px solid ${errors.amount ? "#EF4444" : amount ? "var(--of-text)" : "var(--of-border)"}`,
+            borderRadius: 8, padding: "12px 14px", transition: "border-color 0.15s",
+          }}>
+            <span style={{ fontSize: 22, fontWeight: 700, color: "var(--of-text-muted)", marginRight: 8 }}>R$</span>
             <input
               type="text"
               inputMode="numeric"
               value={displayAmount}
               onChange={handleAmountChange}
               placeholder="0,00"
-              className="flex-1 outline-none bg-transparent text-black"
-              style={{ fontSize: 32, fontWeight: 700 }}
+              style={{ flex: 1, outline: "none", border: "none", background: "transparent", fontSize: 32, fontWeight: 700, color: "var(--of-text)" }}
             />
           </div>
-          {errors.amount && (
-            <p style={{ fontSize: 12 }} className="text-[#D32F2F] mt-1.5">{errors.amount}</p>
-          )}
+          {errors.amount && <p style={{ fontSize: 12, color: "#EF4444", marginTop: 6 }}>{errors.amount}</p>}
         </div>
 
         {/* Categoria */}
-        <div className="bg-white rounded-lg border border-[#E0E0E0] p-5" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
-          <label style={{ fontSize: 12, fontWeight: 500 }} className="text-[#777777] uppercase tracking-wider block mb-3">
-            Categoria *
-          </label>
-
+        <div style={sectionStyle}>
+          <label style={labelStyle}>{t("modalCategoria")}</label>
           <div ref={catRef} style={{ position: "relative" }}>
-            {/* Trigger */}
             <button
               type="button"
               disabled={loadingCats}
               onClick={() => { if (!loadingCats) setCatsOpen((v) => !v) }}
-              className={`w-full flex items-center justify-between border rounded-md px-3 py-2.5 transition-colors text-left ${
-                errors.category ? "border-[#D32F2F]" : catsOpen ? "border-black" : "border-[#E0E0E0] hover:border-[#999999]"
-              } ${loadingCats ? "bg-[#F5F5F5] cursor-not-allowed" : "bg-white cursor-pointer"}`}
-              style={{ fontSize: 14 }}
+              style={{
+                width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
+                border: `1px solid ${errors.category ? "#EF4444" : catsOpen ? "var(--of-text)" : "var(--of-border)"}`,
+                borderRadius: 8, padding: "10px 12px", fontSize: 14, textAlign: "left",
+                background: loadingCats ? "var(--of-hover)" : "transparent",
+                color: "var(--of-text)", cursor: loadingCats ? "not-allowed" : "pointer",
+                transition: "border-color 0.15s",
+              }}
             >
               {loadingCats ? (
-                <span className="text-[#BBBBBB]">Carregando categorias...</span>
+                <span style={{ color: "var(--of-text-muted)" }}>{t("addLoadingCats")}</span>
               ) : catSelecionada ? (
-                <span className="flex items-center gap-2 text-[#0A0A0A]">
+                <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <span style={{ fontSize: 18, lineHeight: 1 }}>{catSelecionada.icone}</span>
                   <span>{catSelecionada.nome}</span>
                 </span>
               ) : (
-                <span className="text-[#BBBBBB]">Selecione uma categoria...</span>
+                <span style={{ color: "var(--of-text-muted)" }}>{t("addSelectCat")}</span>
               )}
-              <ChevronDown
-                size={16}
-                className="text-[#999999] flex-shrink-0"
-                style={{ transform: catsOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}
-              />
+              <ChevronDown size={16} style={{ color: "var(--of-text-muted)", flexShrink: 0, transform: catsOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }} />
             </button>
 
-            {/* Dropdown panel */}
             {catsOpen && (
               <div style={{
                 position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, zIndex: 50,
-                background: "var(--of-surface)", border: "1px solid #E0E0E0", borderRadius: 10,
+                background: "var(--of-surface)", border: "1px solid var(--of-border)", borderRadius: 10,
                 boxShadow: "0 8px 24px rgba(0,0,0,0.12)", maxHeight: 280, overflowY: "auto",
               }}>
-                {/* Grupo: Padrão */}
                 {catsPadrao.length > 0 && (
                   <div>
                     <p style={{ fontSize: 10, fontWeight: 600, color: "var(--of-text-muted)", padding: "10px 12px 4px", textTransform: "uppercase", letterSpacing: "0.06em" }}>
-                      Padrão
+                      {t("addCatPadrao")}
                     </p>
                     {catsPadrao.map((c) => (
                       <button
@@ -331,10 +347,10 @@ export default function AddExpense() {
                           width: "100%", display: "flex", alignItems: "center", gap: 10,
                           padding: "9px 12px", border: "none", cursor: "pointer", fontSize: 14,
                           color: "var(--of-text)", textAlign: "left", transition: "background 0.1s",
-                          background: categoriaId === c.id ? "#F5F5F0" : "transparent",
+                          background: categoriaId === c.id ? "var(--of-hover)" : "transparent",
                         }}
-                        onMouseEnter={(e) => { if (categoriaId !== c.id) e.currentTarget.style.background = "#F9F9F9" }}
-                        onMouseLeave={(e) => { e.currentTarget.style.background = categoriaId === c.id ? "#F5F5F0" : "transparent" }}
+                        onMouseEnter={(e) => { if (categoriaId !== c.id) e.currentTarget.style.background = "var(--of-hover)" }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = categoriaId === c.id ? "var(--of-hover)" : "transparent" }}
                       >
                         <span style={{ fontSize: 18, lineHeight: 1, flexShrink: 0 }}>{c.icone}</span>
                         <span style={{ flex: 1 }}>{c.nome}</span>
@@ -344,11 +360,10 @@ export default function AddExpense() {
                   </div>
                 )}
 
-                {/* Grupo: Minhas categorias */}
                 {catsMinhas.length > 0 && (
                   <div style={{ borderTop: catsPadrao.length > 0 ? "1px solid var(--of-border-light)" : "none" }}>
                     <p style={{ fontSize: 10, fontWeight: 600, color: "var(--of-text-muted)", padding: "10px 12px 4px", textTransform: "uppercase", letterSpacing: "0.06em" }}>
-                      Minhas categorias
+                      {t("addMyCats")}
                     </p>
                     {catsMinhas.map((c) => (
                       <button
@@ -359,10 +374,10 @@ export default function AddExpense() {
                           width: "100%", display: "flex", alignItems: "center", gap: 10,
                           padding: "9px 12px", border: "none", cursor: "pointer", fontSize: 14,
                           color: "var(--of-text)", textAlign: "left", transition: "background 0.1s",
-                          background: categoriaId === c.id ? "#F5F5F0" : "transparent",
+                          background: categoriaId === c.id ? "var(--of-hover)" : "transparent",
                         }}
-                        onMouseEnter={(e) => { if (categoriaId !== c.id) e.currentTarget.style.background = "#F9F9F9" }}
-                        onMouseLeave={(e) => { e.currentTarget.style.background = categoriaId === c.id ? "#F5F5F0" : "transparent" }}
+                        onMouseEnter={(e) => { if (categoriaId !== c.id) e.currentTarget.style.background = "var(--of-hover)" }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = categoriaId === c.id ? "var(--of-hover)" : "transparent" }}
                       >
                         <span style={{ fontSize: 18, lineHeight: 1, flexShrink: 0 }}>{c.icone}</span>
                         <span style={{ flex: 1 }}>{c.nome}</span>
@@ -372,14 +387,12 @@ export default function AddExpense() {
                   </div>
                 )}
 
-                {/* Empty state */}
                 {catsFiltradas.length === 0 && (
                   <p style={{ fontSize: 13, color: "var(--of-text-muted)", padding: "14px 12px", textAlign: "center" }}>
-                    Nenhuma categoria encontrada
+                    {t("addNoCats")}
                   </p>
                 )}
 
-                {/* Footer: Nova categoria */}
                 <div style={{ borderTop: "1px solid var(--of-border-light)", padding: "6px" }}>
                   <button
                     type="button"
@@ -394,25 +407,20 @@ export default function AddExpense() {
                     onMouseLeave={(e) => { e.currentTarget.style.background = "none" }}
                   >
                     <Plus size={14} />
-                    Criar nova categoria
+                    {t("addNewCat")}
                   </button>
                 </div>
               </div>
             )}
           </div>
-
-          {errors.category && (
-            <p style={{ fontSize: 12 }} className="text-[#D32F2F] mt-2">{errors.category}</p>
-          )}
+          {errors.category && <p style={{ fontSize: 12, color: "#EF4444", marginTop: 6 }}>{errors.category}</p>}
         </div>
 
         {/* Parcelado */}
-        <div className="bg-white rounded-lg border border-[#E0E0E0] p-5" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
-          <label style={{ fontSize: 12, fontWeight: 500 }} className="text-[#777777] uppercase tracking-wider block mb-3">
-            {t("addParcelado")} / {t("addAvista")}
-          </label>
+        <div style={sectionStyle}>
+          <label style={labelStyle}>{t("addParcelado")} / {t("addAvista")}</label>
           <div style={{ display: "flex", gap: 8 }}>
-            {[false, true].map((isParc) => (
+            {([false, true] as const).map((isParc) => (
               <button
                 key={String(isParc)}
                 type="button"
@@ -421,8 +429,8 @@ export default function AddExpense() {
                   flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
                   padding: "10px 14px", borderRadius: 8, border: "none", cursor: "pointer",
                   fontSize: 13, fontWeight: 600, transition: "all 0.15s",
-                  background: parcelado === isParc ? "#0A0A0A" : "#F5F5F5",
-                  color: parcelado === isParc ? "#FFFFFF" : "#555555",
+                  background: parcelado === isParc ? "var(--of-btn-bg)" : "var(--of-hover)",
+                  color: parcelado === isParc ? "var(--of-btn-text)" : "var(--of-text-secondary)",
                 }}
               >
                 {isParc ? <Layers size={14} /> : null}
@@ -433,9 +441,7 @@ export default function AddExpense() {
 
           {parcelado && (
             <div style={{ marginTop: 14 }}>
-              <label style={{ fontSize: 12, fontWeight: 500, color: "#777777", display: "block", marginBottom: 6 }}>
-                {t("addNParcelas")}
-              </label>
+              <label style={{ ...labelStyle, marginBottom: 6 }}>{t("addNParcelas")}</label>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <input
                   type="number"
@@ -443,80 +449,77 @@ export default function AddExpense() {
                   max={48}
                   value={numParcelas}
                   onChange={(e) => setNumParcelas(Math.max(2, Math.min(48, parseInt(e.target.value) || 2)))}
-                  className="border border-[#E0E0E0] rounded-md px-3 py-2 outline-none focus:border-black text-black"
-                  style={{ width: 80, fontSize: 15, fontWeight: 700, textAlign: "center" }}
+                  style={{ ...inputStyle, width: 80, textAlign: "center", fontSize: 15, fontWeight: 700 }}
                 />
-                <span style={{ fontSize: 13, color: "#777777" }}>
-                  × {amount ? `R$ ${((parseInt(amount) / 100) / numParcelas).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "—"} / parcela
+                <span style={{ fontSize: 13, color: "var(--of-text-muted)" }}>
+                  × {amount ? `R$ ${((parseInt(amount) / 100) / numParcelas).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "—"} {t("addParcelaDeLabel")}
                 </span>
               </div>
-              <p style={{ fontSize: 11, color: "#999999", marginTop: 6 }}>{t("addParcelaHint")}</p>
+              <p style={{ fontSize: 11, color: "var(--of-text-muted)", marginTop: 6 }}>{t("addParcelaHint")}</p>
             </div>
           )}
         </div>
 
         {/* Método de pagamento */}
-        <div className="bg-white rounded-lg border border-[#E0E0E0] p-5" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
-          <label style={{ fontSize: 12, fontWeight: 500 }} className="text-[#777777] uppercase tracking-wider block mb-3">
-            Método de pagamento
-          </label>
-          <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
-            {METODOS.map(({ valor, label, icon: Icon }) => (
+        <div style={sectionStyle}>
+          <label style={labelStyle}>{t("addPaymentMethod")}</label>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }} className="sm:grid-cols-5">
+            {METODOS.map(({ valor, labelKey, icon: Icon }) => (
               <button
                 key={valor}
                 type="button"
                 onClick={() => setMetodo(valor)}
-                className={`flex flex-col items-center gap-1.5 p-3 rounded-lg border transition-all duration-200 ${
-                  metodo === valor
-                    ? "bg-black border-black text-white"
-                    : "border-[#E0E0E0] text-[#333333] hover:border-[#999999] hover:bg-[#F5F5F5]"
-                }`}
+                style={{
+                  display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
+                  padding: "12px 8px", borderRadius: 10, border: "none", cursor: "pointer",
+                  fontSize: 11, fontWeight: metodo === valor ? 600 : 400,
+                  transition: "all 0.15s",
+                  background: metodo === valor ? "var(--of-btn-bg)" : "var(--of-hover)",
+                  color: metodo === valor ? "var(--of-btn-text)" : "var(--of-text-secondary)",
+                }}
               >
                 <Icon size={18} />
-                <span style={{ fontSize: 11, fontWeight: metodo === valor ? 600 : 400, textAlign: "center" }}>{label}</span>
+                <span style={{ textAlign: "center" }}>{labelKey}</span>
               </button>
             ))}
           </div>
 
-          {/* Seletor de cartão */}
           {(metodo === "credito" || metodo === "debito") && cartoesDoTipo.length > 0 && (
             <div style={{ marginTop: 14 }}>
-              <label style={{ fontSize: 12, fontWeight: 500, color: "#777777", display: "block", marginBottom: 6 }}>
-                Qual cartão?
-              </label>
+              <label style={{ ...labelStyle, marginBottom: 6 }}>{t("addWhichCard")}</label>
               <select
                 value={cartaoId}
                 onChange={(e) => { setCartaoId(e.target.value); setErrors((p) => ({ ...p, cartao: "" })) }}
-                className={`w-full border rounded-md px-3 py-2.5 outline-none text-black text-sm focus:border-black transition-colors ${
-                  errors.cartao ? "border-[#D32F2F]" : "border-[#E0E0E0]"
-                }`}
-                style={{ fontFamily: "var(--font-body)" }}
+                style={{
+                  ...inputStyle,
+                  borderColor: errors.cartao ? "#EF4444" : "var(--of-border)",
+                  fontFamily: "var(--font-body)",
+                }}
               >
-                <option value="">Selecione o cartão...</option>
+                <option value="">{t("addSelectCard")}</option>
                 {cartoesDoTipo.map((c) => (
                   <option key={c.id} value={c.id}>{c.nome}</option>
                 ))}
               </select>
-              {errors.cartao && <p style={{ fontSize: 12 }} className="text-[#D32F2F] mt-1">{errors.cartao}</p>}
+              {errors.cartao && <p style={{ fontSize: 12, color: "#EF4444", marginTop: 4 }}>{errors.cartao}</p>}
             </div>
           )}
 
-          {/* Toggle confirmado (só para crédito) */}
           {metodo === "credito" && (
             <div style={{
               marginTop: 12, display: "flex", alignItems: "center", justifyContent: "space-between",
               padding: "10px 14px", background: "var(--of-page-bg)", borderRadius: 10,
             }}>
               <div>
-                <p style={{ fontSize: 13, fontWeight: 600, color: "var(--of-text)" }}>Confirmado?</p>
-                <p style={{ fontSize: 11, color: "var(--of-text-muted)" }}>Transações de crédito são pendentes por padrão</p>
+                <p style={{ fontSize: 13, fontWeight: 600, color: "var(--of-text)" }}>{t("addConfirmed")}</p>
+                <p style={{ fontSize: 11, color: "var(--of-text-muted)" }}>{t("addCreditPending")}</p>
               </div>
               <button
                 type="button"
                 onClick={() => setConfirmado((v) => !v)}
                 style={{
                   width: 44, height: 24, borderRadius: 12,
-                  background: confirmado ? "#16A34A" : "#E5E5E3",
+                  background: confirmado ? "#16A34A" : "var(--of-border)",
                   border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s",
                 }}
               >
@@ -532,68 +535,81 @@ export default function AddExpense() {
         </div>
 
         {/* Descrição */}
-        <div className="bg-white rounded-lg border border-[#E0E0E0] p-5" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
-          <label style={{ fontSize: 12, fontWeight: 500 }} className="text-[#777777] uppercase tracking-wider block mb-3">
-            Descrição (opcional)
-          </label>
+        <div style={sectionStyle}>
+          <label style={labelStyle}>{t("modalDescricao")}</label>
           <input
             type="text"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Ex: Supermercado, Uber, Academia..."
-            className="w-full border border-[#E0E0E0] rounded-md px-3 py-2.5 outline-none focus:border-black transition-colors text-black placeholder:text-[#BBBBBB]"
-            style={{ fontSize: 14 }}
+            placeholder={t("addDescPlaceholder")}
+            style={inputStyle}
+            onFocus={(e) => { e.currentTarget.style.borderColor = "var(--of-text)" }}
+            onBlur={(e) => { e.currentTarget.style.borderColor = "var(--of-border)" }}
           />
         </div>
 
         {/* Data */}
-        <div className="bg-white rounded-lg border border-[#E0E0E0] p-5" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
-          <label style={{ fontSize: 12, fontWeight: 500 }} className="text-[#777777] uppercase tracking-wider block mb-3">
-            Data *
-          </label>
-          <div
-            className={`flex items-center border rounded-md px-3 py-2.5 transition-colors ${
-              errors.date ? "border-[#D32F2F]" : "border-[#E0E0E0] focus-within:border-black"
-            }`}
+        <div style={sectionStyle}>
+          <label style={labelStyle}>{t("modalData")}</label>
+          <div style={{
+            display: "flex", alignItems: "center",
+            border: `1px solid ${errors.date ? "#EF4444" : "var(--of-border)"}`,
+            borderRadius: 8, padding: "10px 12px", transition: "border-color 0.15s",
+          }}
+            onFocus={(e) => { e.currentTarget.style.borderColor = "var(--of-text)" }}
+            onBlur={(e) => { e.currentTarget.style.borderColor = errors.date ? "#EF4444" : "var(--of-border)" }}
           >
-            <CalendarDays size={16} className="text-[#999999] mr-2" />
+            <CalendarDays size={16} style={{ color: "var(--of-text-muted)", marginRight: 8, flexShrink: 0 }} />
             <input
               type="date"
               value={date}
               onChange={(e) => { setDate(e.target.value); setErrors((prev) => ({ ...prev, date: "" })) }}
-              className="flex-1 outline-none bg-transparent text-black"
-              style={{ fontSize: 14 }}
+              style={{ flex: 1, outline: "none", border: "none", background: "transparent", fontSize: 14, color: "var(--of-text)" }}
             />
           </div>
-          {errors.date && (
-            <p style={{ fontSize: 12 }} className="text-[#D32F2F] mt-1.5">{errors.date}</p>
-          )}
+          {errors.date && <p style={{ fontSize: 12, color: "#EF4444", marginTop: 6 }}>{errors.date}</p>}
         </div>
 
-        <div className="flex gap-3">
+        {/* Botões */}
+        <div style={{ display: "flex", gap: 12 }}>
           <button
             type="button"
             onClick={() => navigate("/app")}
-            className="flex-1 py-3 border border-[#E0E0E0] rounded-lg text-[#333333] hover:bg-[#F5F5F5] transition-colors"
-            style={{ fontSize: 14, fontWeight: 600 }}
+            style={{
+              flex: 1, padding: "13px 0", borderRadius: 10,
+              border: "1px solid var(--of-border)", fontSize: 14, fontWeight: 600,
+              color: "var(--of-text-secondary)", background: "var(--of-surface)",
+              cursor: "pointer", transition: "all 0.15s",
+            }}
+            onMouseOver={(e) => { e.currentTarget.style.background = "var(--of-hover)"; e.currentTarget.style.borderColor = "var(--of-text)" }}
+            onMouseOut={(e) => { e.currentTarget.style.background = "var(--of-surface)"; e.currentTarget.style.borderColor = "var(--of-border)" }}
           >
-            Cancelar
+            {t("addCancelar")}
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="flex-1 py-3 bg-black text-white rounded-lg hover:bg-[#333333] transition-colors disabled:bg-[#E0E0E0] disabled:text-[#999999] flex items-center justify-center gap-2"
-            style={{ fontSize: 14, fontWeight: 600 }}
+            style={{
+              flex: 1, padding: "13px 0", borderRadius: 10, border: "none",
+              fontSize: 14, fontWeight: 600,
+              background: isSubmitting ? "var(--of-border)" : "var(--of-btn-bg)",
+              color: isSubmitting ? "var(--of-text-muted)" : "var(--of-btn-text)",
+              cursor: isSubmitting ? "not-allowed" : "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              transition: "background 0.15s",
+            }}
+            onMouseOver={(e) => { if (!isSubmitting) e.currentTarget.style.background = "#262626" }}
+            onMouseOut={(e) => { if (!isSubmitting) e.currentTarget.style.background = "var(--of-btn-bg)" }}
           >
             {isSubmitting ? (
               <>
-                <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                Registrando...
+                <span style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.7s linear infinite", display: "inline-block" }} />
+                {t("addRegistering")}
               </>
             ) : (
               <>
                 <CheckCircle2 size={16} />
-                Registrar Gasto
+                {t("addRegisterExpense")}
               </>
             )}
           </button>

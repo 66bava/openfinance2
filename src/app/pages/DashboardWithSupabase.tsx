@@ -1,5 +1,6 @@
 ﻿import { useState, useEffect } from "react"
 import { useAuth } from "../../lib/auth-context"
+import { useLanguage } from "../../lib/language-context"
 import { Link } from "react-router"
 import {
   LineChart, Line, PieChart, Pie, Cell,
@@ -23,13 +24,13 @@ import { ScoreAdvisor } from "../components/dashboard/ScoreAdvisor"
 const fmt = (v: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v)
 
-function fmtDate(dateStr: string) {
+function fmtDate(dateStr: string, t: (k: string) => string) {
   const d = new Date(dateStr + "T00:00:00")
   const today = new Date()
   const yesterday = new Date(today)
   yesterday.setDate(yesterday.getDate() - 1)
-  if (d.toDateString() === today.toDateString()) return "Hoje"
-  if (d.toDateString() === yesterday.toDateString()) return "Ontem"
+  if (d.toDateString() === today.toDateString()) return t("dashHoje")
+  if (d.toDateString() === yesterday.toDateString()) return t("dashOntem")
   return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })
 }
 
@@ -48,11 +49,11 @@ function scoreColor(score: number) {
   return "#EF4444"
 }
 
-function scoreLabel(score: number) {
-  if (score >= 850) return "Excelente"
-  if (score >= 700) return "Ótimo"
-  if (score >= 400) return "Regular"
-  return "Crítico"
+function scoreLabel(score: number, t: (k: string) => string) {
+  if (score >= 850) return t("dashExcelente")
+  if (score >= 700) return t("dashOtimo")
+  if (score >= 400) return t("dashRegular")
+  return t("dashCritico")
 }
 
 const CATEGORY_COLORS = ["#0A0A0A", "#16A34A", "#525252", "#A3A3A3", "#DCFCE7", "#BBF7D0"]
@@ -74,6 +75,7 @@ function categoryIcon(nome: string) {
 // ─── ScoreGauge ──────────────────────────────────────────────────────────────
 
 function ScoreGauge({ score }: { score: number }) {
+  const { t } = useLanguage()
   const pct = score / 1000
   const angle = pct * 180
   const rad = (angle * Math.PI) / 180
@@ -84,17 +86,17 @@ function ScoreGauge({ score }: { score: number }) {
   const color = scoreColor(score)
 
   const pilares = [
-    { nome: "Poupança", pct: Math.min(pct * 1.2, 1) },
-    { nome: "Equilíbrio", pct: Math.min(pct * 1.1, 1) },
-    { nome: "Consistência", pct: Math.min(pct * 0.9, 1) },
-    { nome: "Reserva", pct: Math.min(pct * 0.8, 1) },
-    { nome: "Metas", pct: Math.min(pct * 0.7, 1) },
+    { nome: t("dashPoupanca"), pct: Math.min(pct * 1.2, 1) },
+    { nome: t("dashEquilibrio"), pct: Math.min(pct * 1.1, 1) },
+    { nome: t("dashConsistencia"), pct: Math.min(pct * 0.9, 1) },
+    { nome: t("dashReserva"), pct: Math.min(pct * 0.8, 1) },
+    { nome: t("dashMetas"), pct: Math.min(pct * 0.7, 1) },
   ]
 
   return (
     <div style={{ background: "var(--of-surface)", borderRadius: 16, border: "1px solid var(--of-border)", padding: "20px 20px 16px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
       <p style={{ fontSize: 12, fontWeight: 600, color: "var(--of-text-muted)", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 4 }}>
-        Score de Saúde
+        {t("dashScoreSaude")}
       </p>
 
       <svg viewBox="0 0 240 140" width="100%" style={{ display: "block" }}>
@@ -122,7 +124,7 @@ function ScoreGauge({ score }: { score: number }) {
         </text>
         <text x={cx} y={cy + 14} textAnchor="middle"
           style={{ fontSize: 12, fontWeight: "700", fill: color, fontFamily: "system-ui" }}>
-          {scoreLabel(score)}
+          {scoreLabel(score, t)}
         </text>
 
         <text x={cx - r} y={cy + 22} style={{ fontSize: 9, fill: "var(--of-text-muted)", fontFamily: "system-ui" }}>0</text>
@@ -235,6 +237,7 @@ function ChartTooltip({ active, payload, label }: any) {
 
 export default function DashboardWithSupabase() {
   const { user } = useAuth()
+  const { t } = useLanguage()
   const userId = user!.id
 
   const [totais, setTotais] = useState({ totalGastos: 0, totalRenda: 0, saldoDisponivel: 0, percentualEconomia: 0 })
@@ -252,7 +255,6 @@ export default function DashboardWithSupabase() {
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
 
   const userName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Usuário"
-  // Usa o score do banco (calculado pelo trigger) quando disponível
   const score = dbScore ?? calcularScore(totais.percentualEconomia, totais.totalGastos, totais.totalRenda)
 
   useEffect(() => {
@@ -338,10 +340,10 @@ export default function DashboardWithSupabase() {
           </div>
           <div style={{ flex: 1, minWidth: 200 }}>
             <p style={{ fontSize: 13, fontWeight: 700, color: "#15803D", marginBottom: 2 }}>
-              Convite para grupo familiar
+              {t("dashConviteFamilia")}
             </p>
             <p style={{ fontSize: 12, color: "#166534", lineHeight: 1.4 }}>
-              <strong>{adminConvite?.nome || adminConvite?.email || "Alguém"}</strong> convidou você para o grupo "{convitePendente.grupo?.nome || "Família"}"
+              <strong>{adminConvite?.nome || adminConvite?.email || "Alguém"}</strong> {t("dashConvidouPara")} "{convitePendente.grupo?.nome || "Família"}"
             </p>
           </div>
           <div style={{ display: "flex", gap: 8 }}>
@@ -362,7 +364,7 @@ export default function DashboardWithSupabase() {
                 cursor: "pointer", transition: "background 0.1s",
               }}
             >
-              <X size={13} /> Recusar
+              <X size={13} /> {t("dashRecusar")}
             </button>
             <button
               onClick={async () => {
@@ -383,7 +385,7 @@ export default function DashboardWithSupabase() {
               onMouseEnter={(e) => { e.currentTarget.style.background = "#15803D" }}
               onMouseLeave={(e) => { e.currentTarget.style.background = "#16A34A" }}
             >
-              <Check size={13} /> Aceitar
+              <Check size={13} /> {t("dashAceitar")}
             </button>
           </div>
         </div>
@@ -396,7 +398,7 @@ export default function DashboardWithSupabase() {
         </p>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
           <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--of-text)", letterSpacing: "-0.02em" }}>
-            Bom dia, {userName} 👋
+            {t("dashBomDia")}, {userName} 👋
           </h2>
           <button
             onClick={() => setAddModalOpen(true)}
@@ -418,7 +420,7 @@ export default function DashboardWithSupabase() {
             onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "var(--of-btn-bg)")}
           >
             <Plus size={15} />
-            Nova transação
+            {t("dashNovaTx")}
           </button>
         </div>
       </div>
@@ -426,7 +428,7 @@ export default function DashboardWithSupabase() {
       {/* Stats Cards */}
       <div style={{ display: "grid", gap: 16, marginBottom: 24 }} className="grid grid-cols-2 lg:grid-cols-4">
         <StatCard
-          label="Saldo"
+          label={t("dashSaldo")}
           value={fmt(totais.saldoDisponivel)}
           sub={mesAtual}
           icon={Wallet}
@@ -435,27 +437,27 @@ export default function DashboardWithSupabase() {
           trend="neutral"
         />
         <StatCard
-          label="Receitas"
+          label={t("dashReceitas")}
           value={fmt(totais.totalRenda)}
-          sub="Mês atual"
+          sub={t("dashMesAtual")}
           icon={ArrowUpRight}
           iconBg="#DCFCE7"
           iconColor="#16A34A"
           trend="up"
         />
         <StatCard
-          label="Despesas"
+          label={t("dashDespesas")}
           value={fmt(totais.totalGastos)}
-          sub={`${totais.totalRenda > 0 ? ((totais.totalGastos / totais.totalRenda) * 100).toFixed(0) : 0}% da renda`}
+          sub={`${totais.totalRenda > 0 ? ((totais.totalGastos / totais.totalRenda) * 100).toFixed(0) : 0}% ${t("dashDaRenda")}`}
           icon={ArrowDownRight}
           iconBg="#FEE2E2"
           iconColor="#EF4444"
           trend="down"
         />
         <StatCard
-          label="Economia"
+          label={t("dashEconomia")}
           value={`${totais.percentualEconomia.toFixed(1)}%`}
-          sub="Da renda total"
+          sub={t("dashDaRendaTotal")}
           icon={PiggyBank}
           iconBg="#DCFCE7"
           iconColor="#16A34A"
@@ -479,8 +481,8 @@ export default function DashboardWithSupabase() {
           }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
               <div>
-                <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--of-text)" }}>Receitas vs Despesas</h3>
-                <p style={{ fontSize: 12, color: "var(--of-text-muted)", marginTop: 2 }}>Últimos 6 meses</p>
+                <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--of-text)" }}>{t("dashReceitasVsDespesas")}</h3>
+                <p style={{ fontSize: 12, color: "var(--of-text-muted)", marginTop: 2 }}>{t("dashUltimos6Meses")}</p>
               </div>
               <span style={{
                 fontSize: 11, fontWeight: 600, color: "var(--of-text-secondary)",
@@ -492,9 +494,9 @@ export default function DashboardWithSupabase() {
 
             {evolucao.length === 0 ? (
               <div style={{ height: 220, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8 }}>
-                <p style={{ fontSize: 13, color: "var(--of-text-muted)" }}>Sem dados de evolução ainda</p>
+                <p style={{ fontSize: 13, color: "var(--of-text-muted)" }}>{t("dashSemDados")}</p>
                 <Link to="/app/adicionar" style={{ fontSize: 13, fontWeight: 600, color: "#16A34A", textDecoration: "none" }}>
-                  Adicionar primeira transação →
+                  {t("dashAddFirstTx")}
                 </Link>
               </div>
             ) : (
@@ -521,7 +523,7 @@ export default function DashboardWithSupabase() {
                   </LineChart>
                 </ResponsiveContainer>
                 <div style={{ display: "flex", gap: 20, marginTop: 12 }}>
-                  {[{ cor: "#16A34A", label: "Receitas" }, { cor: "#EF4444", label: "Despesas" }].map((l) => (
+                  {[{ cor: "#16A34A", label: t("dashReceitas") }, { cor: "#EF4444", label: t("dashDespesas") }].map((l) => (
                     <div key={l.label} style={{ display: "flex", alignItems: "center", gap: 6 }}>
                       <div style={{ width: 20, height: 3, borderRadius: 2, background: l.cor }} />
                       <span style={{ fontSize: 11, color: "var(--of-text-muted)" }}>{l.label}</span>
@@ -544,20 +546,20 @@ export default function DashboardWithSupabase() {
               display: "flex", alignItems: "center", justifyContent: "space-between",
               padding: "16px 20px", borderBottom: "1px solid var(--of-border-light)",
             }}>
-              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--of-text)" }}>Transações recentes</h3>
+              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--of-text)" }}>{t("dashTxRecentes")}</h3>
               <Link to="/app/analise" style={{ fontSize: 12, fontWeight: 600, color: "#16A34A", textDecoration: "none" }}>
-                Ver todas →
+                {t("dashVerTodas")}
               </Link>
             </div>
 
             {transacoes.length === 0 ? (
               <div style={{ padding: "40px 20px", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
-                <p style={{ fontSize: 14, color: "var(--of-text-muted)" }}>Nenhuma transação registrada.</p>
+                <p style={{ fontSize: 14, color: "var(--of-text-muted)" }}>{t("dashNenhumaTx")}</p>
                 <Link to="/app/adicionar" style={{
                   fontSize: 13, fontWeight: 700, color: "var(--of-btn-text)",
                   background: "var(--of-btn-bg)", padding: "10px 20px", borderRadius: 8, textDecoration: "none",
                 }}>
-                  + Adicionar primeira transação
+                  {t("dashAddFirstTxBtn")}
                 </Link>
               </div>
             ) : (
@@ -592,7 +594,7 @@ export default function DashboardWithSupabase() {
                             {tx.descricao || "—"}
                           </p>
                           <p style={{ fontSize: 11, color: "var(--of-text-muted)", marginTop: 1 }}>
-                            {tx.categorias?.nome || "Outros"} · {fmtDate(tx.data)}
+                            {tx.categorias?.nome || "Outros"} · {fmtDate(tx.data, t)}
                           </p>
                         </div>
                       </div>
@@ -604,7 +606,7 @@ export default function DashboardWithSupabase() {
 
                         {isConfirming ? (
                           <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                            <span style={{ fontSize: 11, color: "#DC2626", fontWeight: 600 }}>Remover?</span>
+                            <span style={{ fontSize: 11, color: "#DC2626", fontWeight: 600 }}>{t("dashRemover")}?</span>
                             <button
                               onClick={async () => {
                                 setDeletingId(tx.id)
@@ -622,13 +624,13 @@ export default function DashboardWithSupabase() {
                               disabled={isDeleting}
                               style={{ padding: "3px 8px", background: "#DC2626", color: "#fff", border: "none", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}
                             >
-                              Sim
+                              {t("dashSim")}
                             </button>
                             <button
                               onClick={() => setConfirmDeleteId(null)}
                               style={{ padding: "3px 8px", background: "var(--of-page-bg)", color: "var(--of-text)", border: "1px solid var(--of-border)", borderRadius: 6, fontSize: 11, cursor: "pointer" }}
                             >
-                              Não
+                              {t("dashNao")}
                             </button>
                           </div>
                         ) : (
@@ -661,7 +663,7 @@ export default function DashboardWithSupabase() {
           {/* Score Advisor IA */}
           <ScoreAdvisor
             score={score}
-            scoreLabel={scoreLabel(score)}
+            scoreLabel={scoreLabel(score, t)}
             totalGastos={totais.totalGastos}
             totalRenda={totais.totalRenda}
             percentualEconomia={totais.percentualEconomia}
@@ -677,7 +679,7 @@ export default function DashboardWithSupabase() {
             boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
           }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--of-text)" }}>Por categoria</h3>
+              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--of-text)" }}>{t("dashPorCategoria")}</h3>
               <span style={{ fontSize: 11, color: "var(--of-text-muted)" }}>
                 {new Date().toLocaleDateString("pt-BR", { month: "short", year: "numeric" })}
               </span>
@@ -685,7 +687,7 @@ export default function DashboardWithSupabase() {
 
             {categorias.length === 0 ? (
               <div style={{ height: 160, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <p style={{ fontSize: 13, color: "var(--of-text-muted)" }}>Sem gastos este mês</p>
+                <p style={{ fontSize: 13, color: "var(--of-text-muted)" }}>{t("dashSemGastos")}</p>
               </div>
             ) : (
               <>

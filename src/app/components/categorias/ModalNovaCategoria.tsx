@@ -135,7 +135,7 @@ export default function ModalNovaCategoria({ categoriaEditando, onClose, onSalva
               maxLength={30}
               style={{
                 width: '100%', padding: '11px 14px', fontSize: 15,
-                border: `1.5px solid ${erros.nome ? '#DC2626' : '#E5E5E3'}`,
+                border: `1.5px solid ${erros.nome ? '#DC2626' : 'var(--of-border)'}`,
                 borderRadius: 10, outline: 'none', boxSizing: 'border-box',
                 fontFamily: 'var(--font-body)',
               }}
@@ -163,9 +163,9 @@ export default function ModalNovaCategoria({ categoriaEditando, onClose, onSalva
                   style={{
                     padding: '12px',
                     borderRadius: 10,
-                    border: `2px solid ${tipo === t ? (t === 'despesa' ? '#DC2626' : '#16A34A') : '#E5E5E3'}`,
-                    background: tipo === t ? (t === 'despesa' ? '#FEE2E2' : '#DCFCE7') : '#FFFFFF',
-                    color: tipo === t ? (t === 'despesa' ? '#DC2626' : '#16A34A') : '#525252',
+                    border: `2px solid ${tipo === t ? (t === 'despesa' ? '#DC2626' : '#16A34A') : 'var(--of-border)'}`,
+                    background: tipo === t ? (t === 'despesa' ? '#FEE2E2' : '#DCFCE7') : 'var(--of-surface)',
+                    color: tipo === t ? (t === 'despesa' ? '#DC2626' : '#16A34A') : 'var(--of-text-secondary)',
                     fontSize: 14, fontWeight: 600, cursor: 'pointer',
                     fontFamily: 'var(--font-body)', transition: 'all 0.15s',
                   }}
@@ -187,7 +187,7 @@ export default function ModalNovaCategoria({ categoriaEditando, onClose, onSalva
               display: 'flex', alignItems: 'center', gap: 8,
               border: '1.5px solid var(--of-border)', borderRadius: 10, padding: '8px 12px', marginBottom: 12,
             }}>
-              <Search size={14} color="#A3A3A3" />
+              <Search size={14} color="var(--of-text-muted)" />
               <input
                 type="text"
                 value={busca}
@@ -208,7 +208,7 @@ export default function ModalNovaCategoria({ categoriaEditando, onClose, onSalva
                       onClick={() => setEmoji(e)}
                       style={{
                         width: 40, height: 40, fontSize: 20, borderRadius: 8, border: 'none', cursor: 'pointer',
-                        background: emoji === e ? '#E5E5E3' : 'transparent',
+                        background: emoji === e ? 'var(--of-hover)' : 'transparent',
                         transition: 'background 0.1s',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                       }}
@@ -231,12 +231,12 @@ export default function ModalNovaCategoria({ categoriaEditando, onClose, onSalva
                           onClick={() => setEmoji(e)}
                           style={{
                             width: 40, height: 40, fontSize: 20, borderRadius: 8, border: 'none', cursor: 'pointer',
-                            background: emoji === e ? '#E5E5E3' : 'transparent',
+                            background: emoji === e ? 'var(--of-hover)' : 'transparent',
                             transition: 'background 0.1s',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                           }}
                           onMouseOver={(el) => { if (emoji !== e) el.currentTarget.style.background = 'var(--of-hover)' }}
-                          onMouseOut={(el) => { el.currentTarget.style.background = emoji === e ? '#E5E5E3' : 'transparent' }}
+                          onMouseOut={(el) => { el.currentTarget.style.background = emoji === e ? 'var(--of-hover)' : 'transparent' }}
                         >
                           {e}
                         </button>
@@ -280,8 +280,8 @@ export default function ModalNovaCategoria({ categoriaEditando, onClose, onSalva
             disabled={salvando}
             style={{
               padding: '14px',
-              background: salvando ? '#E5E5E3' : '#0A0A0A',
-              color: salvando ? '#A3A3A3' : '#FFFFFF',
+              background: salvando ? 'var(--of-hover)' : 'var(--of-btn-bg)',
+              color: salvando ? 'var(--of-text-muted)' : 'var(--of-btn-text)',
               border: 'none', borderRadius: 12,
               fontSize: 15, fontWeight: 700,
               cursor: salvando ? 'not-allowed' : 'pointer',

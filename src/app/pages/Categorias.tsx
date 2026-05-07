@@ -106,7 +106,7 @@ export default function Categorias() {
   if (carregando) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 300 }}>
-        <div className="w-6 h-6 border-2 border-black border-t-transparent rounded-full animate-spin" />
+        <div style={{ width: 24, height: 24, border: "2px solid var(--of-text)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />
       </div>
     )
   }
@@ -146,7 +146,7 @@ export default function Categorias() {
               Minhas categorias
             </h2>
             {plano === 'free' ? (
-              <p style={{ fontSize: 13, color: atingiuLimite ? '#DC2626' : '#A3A3A3' }}>
+              <p style={{ fontSize: 13, color: atingiuLimite ? '#DC2626' : 'var(--of-text-muted)' }}>
                 {contPersonalizadas} de {LIMITE_FREE} criadas
                 {!atingiuLimite && (
                   <span style={{ color: 'var(--of-text-muted)' }}> · </span>

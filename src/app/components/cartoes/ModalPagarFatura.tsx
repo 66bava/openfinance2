@@ -207,9 +207,9 @@ export default function ModalPagarFatura({ fatura, cartao, userId, onClose, onPa
                   style={{
                     padding: '8px 14px',
                     borderRadius: 8,
-                    border: `1.5px solid ${metodo === m.valor ? '#0A0A0A' : '#E5E5E3'}`,
-                    background: metodo === m.valor ? '#0A0A0A' : '#FFFFFF',
-                    color: metodo === m.valor ? '#FFFFFF' : '#525252',
+                    border: `1.5px solid ${metodo === m.valor ? 'var(--of-btn-bg)' : 'var(--of-border)'}`,
+                    background: metodo === m.valor ? 'var(--of-btn-bg)' : 'var(--of-surface)',
+                    color: metodo === m.valor ? 'var(--of-btn-text)' : 'var(--of-text-secondary)',
                     fontSize: 13,
                     fontWeight: 600,
                     cursor: 'pointer',
@@ -244,8 +244,8 @@ export default function ModalPagarFatura({ fatura, cartao, userId, onClose, onPa
             disabled={salvando}
             style={{
               padding: '14px',
-              background: salvando ? '#E5E5E3' : '#16A34A',
-              color: salvando ? '#A3A3A3' : '#FFFFFF',
+              background: salvando ? 'var(--of-border)' : '#16A34A',
+              color: salvando ? 'var(--of-text-muted)' : '#FFFFFF',
               border: 'none',
               borderRadius: 12,
               fontSize: 15,

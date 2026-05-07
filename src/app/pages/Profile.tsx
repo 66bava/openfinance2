@@ -336,7 +336,7 @@ export default function Profile() {
 
   const inputStyle: React.CSSProperties = {
     width: "100%",
-    border: "1px solid #E0E0E0",
+    border: "1px solid var(--of-border)",
     borderRadius: 8,
     padding: "10px 12px",
     fontSize: 14,
@@ -521,9 +521,9 @@ export default function Profile() {
                             if (fieldErrors[field]) setFieldErrors((p) => ({ ...p, [field]: "" }))
                           }}
                           placeholder={placeholder}
-                          style={{ ...inputStyle, borderColor: fieldErrors[field] ? "#EF4444" : "#E0E0E0" }}
+                          style={{ ...inputStyle, borderColor: fieldErrors[field] ? "#EF4444" : "var(--of-border)" }}
                           onFocus={(e) => (e.currentTarget.style.borderColor = fieldErrors[field] ? "#EF4444" : "var(--of-text)")}
-                          onBlur={(e) => (e.currentTarget.style.borderColor = fieldErrors[field] ? "#EF4444" : "#E0E0E0")}
+                          onBlur={(e) => (e.currentTarget.style.borderColor = fieldErrors[field] ? "#EF4444" : "var(--of-border)")}
                         />
                         {fieldErrors[field] && (
                           <p style={{ fontSize: 12, color: "#EF4444", marginTop: 4 }}>{fieldErrors[field]}</p>
@@ -831,7 +831,7 @@ export default function Profile() {
                     placeholder="••••••••"
                     style={{ ...inputStyle, paddingRight: 40 }}
                     onFocus={(e) => (e.currentTarget.style.borderColor = "var(--of-text)")}
-                    onBlur={(e) => (e.currentTarget.style.borderColor = "#E0E0E0")}
+                    onBlur={(e) => (e.currentTarget.style.borderColor = "var(--of-border)")}
                   />
                   <button type="button" onClick={() => setShowSenhaAtual(!showSenhaAtual)}
                     style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--of-text-muted)", padding: 4 }}>
@@ -853,7 +853,7 @@ export default function Profile() {
                     placeholder="••••••••"
                     style={{ ...inputStyle, paddingRight: 40 }}
                     onFocus={(e) => (e.currentTarget.style.borderColor = "var(--of-text)")}
-                    onBlur={(e) => (e.currentTarget.style.borderColor = "#E0E0E0")}
+                    onBlur={(e) => (e.currentTarget.style.borderColor = "var(--of-border)")}
                   />
                   <button type="button" onClick={() => setShowNovaSenha(!showNovaSenha)}
                     style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--of-text-muted)", padding: 4 }}>
@@ -872,9 +872,9 @@ export default function Profile() {
                   value={confirmarSenha}
                   onChange={(e) => setConfirmarSenha(e.target.value)}
                   placeholder="••••••••"
-                  style={{ ...inputStyle, borderColor: confirmarSenha && confirmarSenha !== novaSenha ? "#EF4444" : "#E0E0E0" }}
+                  style={{ ...inputStyle, borderColor: confirmarSenha && confirmarSenha !== novaSenha ? "#EF4444" : "var(--of-border)" }}
                   onFocus={(e) => (e.currentTarget.style.borderColor = confirmarSenha && confirmarSenha !== novaSenha ? "#EF4444" : "var(--of-text)")}
-                  onBlur={(e) => (e.currentTarget.style.borderColor = confirmarSenha && confirmarSenha !== novaSenha ? "#EF4444" : "#E0E0E0")}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = confirmarSenha && confirmarSenha !== novaSenha ? "#EF4444" : "var(--of-border)")}
                 />
                 {confirmarSenha && confirmarSenha !== novaSenha && (
                   <p style={{ fontSize: 12, color: "#EF4444", marginTop: 4 }}>As senhas não coincidem</p>

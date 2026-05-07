@@ -150,8 +150,8 @@ export function ConfigureIncomeModal({ open, onOpenChange, onSuccess }: Configur
                 display: "flex", alignItems: "center", justifyContent: "center",
                 color: "var(--of-text-muted)", transition: "all 0.15s",
               }}
-              onMouseOver={(e) => { e.currentTarget.style.color = "#0A0A0A"; e.currentTarget.style.background = "var(--of-hover)" }}
-              onMouseOut={(e) => { e.currentTarget.style.color = "#A3A3A3"; e.currentTarget.style.background = "none" }}
+              onMouseOver={(e) => { e.currentTarget.style.color = "var(--of-text)"; e.currentTarget.style.background = "var(--of-hover)" }}
+              onMouseOut={(e) => { e.currentTarget.style.color = "var(--of-text-muted)"; e.currentTarget.style.background = "none" }}
             >
               <X size={18} />
             </DialogPrimitive.Close>
@@ -178,8 +178,8 @@ export function ConfigureIncomeModal({ open, onOpenChange, onSuccess }: Configur
                     onChange={(e) => setRendaPrincipal(e.target.value)}
                     placeholder="0,00"
                     style={{ flex: 1, border: "none", outline: "none", background: "transparent", fontSize: 22, fontWeight: 700, color: "var(--of-text)" }}
-                    onFocus={(e) => { e.currentTarget.parentElement!.style.borderColor = "#0A0A0A" }}
-                    onBlur={(e) => { e.currentTarget.parentElement!.style.borderColor = "#E5E5E3" }}
+                    onFocus={(e) => { e.currentTarget.parentElement!.style.borderColor = "var(--of-text)" }}
+                    onBlur={(e) => { e.currentTarget.parentElement!.style.borderColor = "var(--of-border)" }}
                   />
                 </div>
               </div>
@@ -223,7 +223,7 @@ export function ConfigureIncomeModal({ open, onOpenChange, onSuccess }: Configur
                             transition: "all 0.15s", flexShrink: 0,
                           }}
                           onMouseOver={(e) => { e.currentTarget.style.borderColor = "#EF4444"; e.currentTarget.style.color = "#EF4444" }}
-                          onMouseOut={(e) => { e.currentTarget.style.borderColor = "#E5E5E3"; e.currentTarget.style.color = "#A3A3A3" }}
+                          onMouseOut={(e) => { e.currentTarget.style.borderColor = "var(--of-border)"; e.currentTarget.style.color = "var(--of-text-muted)" }}
                         >
                           <X size={14} />
                         </button>
@@ -239,12 +239,12 @@ export function ConfigureIncomeModal({ open, onOpenChange, onSuccess }: Configur
                 onClick={addFonte}
                 style={{
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                  padding: "9px 0", border: "1px dashed #E5E5E3", borderRadius: 10,
+                  padding: "9px 0", border: "1px dashed var(--of-border)", borderRadius: 10,
                   background: "var(--of-surface)", cursor: "pointer", fontSize: 13, fontWeight: 500,
                   color: "var(--of-text-secondary)", transition: "all 0.15s",
                 }}
-                onMouseOver={(e) => { e.currentTarget.style.borderColor = "#0A0A0A"; e.currentTarget.style.color = "#0A0A0A" }}
-                onMouseOut={(e) => { e.currentTarget.style.borderColor = "#E5E5E3"; e.currentTarget.style.color = "#525252" }}
+                onMouseOver={(e) => { e.currentTarget.style.borderColor = "var(--of-text)"; e.currentTarget.style.color = "var(--of-text)" }}
+                onMouseOut={(e) => { e.currentTarget.style.borderColor = "var(--of-border)"; e.currentTarget.style.color = "var(--of-text-secondary)" }}
               >
                 <Plus size={14} />
                 Adicionar outra fonte de renda

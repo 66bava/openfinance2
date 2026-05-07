@@ -124,7 +124,7 @@ export default function ModalNovoCartao({ userId, onClose, onSalvo }: Props) {
               placeholder="Ex: Nubank, Itaú Platinum..."
               style={{
                 width: '100%', padding: '11px 14px', fontSize: 15,
-                border: `1.5px solid ${erros.nome ? '#DC2626' : '#E5E5E3'}`,
+                border: `1.5px solid ${erros.nome ? '#DC2626' : 'var(--of-border)'}`,
                 borderRadius: 10, outline: 'none', boxSizing: 'border-box',
                 fontFamily: 'var(--font-body)',
               }}
@@ -227,7 +227,7 @@ export default function ModalNovoCartao({ userId, onClose, onSalvo }: Props) {
                     min="1" max="31"
                     style={{
                       width: '100%', padding: '11px 14px', fontSize: 15,
-                      border: `1.5px solid ${erros.diaVencimento ? '#DC2626' : '#E5E5E3'}`,
+                      border: `1.5px solid ${erros.diaVencimento ? '#DC2626' : 'var(--of-border)'}`,
                       borderRadius: 10, outline: 'none', boxSizing: 'border-box', fontFamily: 'var(--font-body)',
                     }}
                   />
@@ -245,7 +245,7 @@ export default function ModalNovoCartao({ userId, onClose, onSalvo }: Props) {
                     min="1" max="31"
                     style={{
                       width: '100%', padding: '11px 14px', fontSize: 15,
-                      border: `1.5px solid ${erros.diaFechamento ? '#DC2626' : '#E5E5E3'}`,
+                      border: `1.5px solid ${erros.diaFechamento ? '#DC2626' : 'var(--of-border)'}`,
                       borderRadius: 10, outline: 'none', boxSizing: 'border-box', fontFamily: 'var(--font-body)',
                     }}
                   />

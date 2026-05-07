@@ -18,7 +18,7 @@ export default function CardCategoria({ categoria, onEditar, onDeletar }: Props)
       onMouseLeave={() => setHover(false)}
       style={{
         background: 'var(--of-surface)',
-        border: `1px solid ${hover && !isPadrao ? '#0A0A0A' : '#E5E5E3'}`,
+        border: `1px solid ${hover && !isPadrao ? 'var(--of-text)' : 'var(--of-border)'}`,
         borderRadius: 14,
         padding: '18px',
         display: 'flex',
@@ -80,10 +80,10 @@ export default function CardCategoria({ categoria, onEditar, onDeletar }: Props)
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 transition: 'background 0.15s',
               }}
-              onMouseOver={(e) => (e.currentTarget.style.background = '#E5E5E3')}
+              onMouseOver={(e) => (e.currentTarget.style.background = 'var(--of-border)')}
               onMouseOut={(e) => (e.currentTarget.style.background = 'var(--of-hover)')}
             >
-              <Pencil size={13} color="#525252" />
+              <Pencil size={13} color="var(--of-text-secondary)" />
             </button>
           )}
           {onDeletar && (

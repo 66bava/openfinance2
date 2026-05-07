@@ -51,8 +51,8 @@ export default function ResumoPagamentosMes({ aPagar, jaPago, venceEmBreve }: Pr
         <div
           className="col-span-2 md:col-span-1"
           style={{
-            background: venceEmBreve.length > 0 ? '#FEF9C3' : '#FFFFFF',
-            border: `1px solid ${venceEmBreve.length > 0 ? '#FDE047' : '#E5E5E3'}`,
+            background: venceEmBreve.length > 0 ? '#FEF9C3' : 'var(--of-surface)',
+            border: `1px solid ${venceEmBreve.length > 0 ? '#FDE047' : 'var(--of-border)'}`,
             borderRadius: 16,
             padding: '20px 22px',
           }}

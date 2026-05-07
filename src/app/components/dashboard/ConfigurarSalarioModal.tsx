@@ -244,8 +244,8 @@ export function ConfigurarSalarioModal({ open, onOpenChange, onSuccess }: Config
                       autoFocus
                       style={{
                         width: "100%", border: "1px solid #BBF7D0", borderRadius: 8,
-                        padding: "9px 12px", fontSize: 14, color: "#0A0A0A",
-                        outline: "none", backgroundColor: "#FFFFFF",
+                        padding: "9px 12px", fontSize: 14, color: "var(--of-text)",
+                        outline: "none", backgroundColor: "var(--of-surface)",
                         boxSizing: "border-box",
                       }}
                       onFocus={(e) => { e.currentTarget.style.borderColor = "#16A34A" }}
@@ -264,8 +264,8 @@ export function ConfigurarSalarioModal({ open, onOpenChange, onSuccess }: Config
                         onChange={(e) => setNovaEntrada((p) => p ? { ...p, valor: e.target.value } : p)}
                         style={{
                           width: "100%", border: "1px solid #BBF7D0", borderRadius: 8,
-                          padding: "9px 12px", fontSize: 14, color: "#0A0A0A",
-                          outline: "none", backgroundColor: "#FFFFFF",
+                          padding: "9px 12px", fontSize: 14, color: "var(--of-text)",
+                          outline: "none", backgroundColor: "var(--of-surface)",
                           boxSizing: "border-box",
                         }}
                         onFocus={(e) => { e.currentTarget.style.borderColor = "#16A34A" }}
@@ -279,8 +279,8 @@ export function ConfigurarSalarioModal({ open, onOpenChange, onSuccess }: Config
                         onChange={(e) => setNovaEntrada((p) => p ? { ...p, dia_do_mes: parseInt(e.target.value) } : p)}
                         style={{
                           width: "100%", border: "1px solid #BBF7D0", borderRadius: 8,
-                          padding: "9px 12px", fontSize: 14, color: "#0A0A0A",
-                          outline: "none", backgroundColor: "#FFFFFF",
+                          padding: "9px 12px", fontSize: 14, color: "var(--of-text)",
+                          outline: "none", backgroundColor: "var(--of-surface)",
                           boxSizing: "border-box",
                         }}
                       >
