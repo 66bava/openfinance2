@@ -192,8 +192,7 @@ export default function Login() {
       }).eq("id", signInData.user.id).then(() => {})
     }
 
-    // Não chama navigate — o `if (user) return <Navigate to="/app">` acima detecta
-    // o state change do onAuthStateChange e redireciona sem race condition
+    navigate("/app", { replace: true })
   }
 
   const inputClass = "w-full bg-white text-black outline-none transition-colors px-3 py-2.5"
