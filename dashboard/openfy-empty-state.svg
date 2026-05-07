@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300" id="svg-empty" data-om-id="c299d454:338" data-src-loc="52724:52826:55176">
+        <defs data-om-id="c299d454:339" data-src-loc="52835:52841:52986">
+          <style data-src-loc="52852:52859:52970">.sans{font-family:'Inter',sans-serif}.mono{font-family:'JetBrains Mono',monospace;letter-spacing:.04em}</style>
+        </defs>
+        <!-- floating coin top-left -->
+        <g transform="translate(60 70) rotate(-12)" stroke="#E5E5E5" stroke-width="1.6" fill="#fff" data-om-id="c299d454:340" data-src-loc="53035:53127:53278">
+          <circle cx="0" cy="0" r="14" data-src-loc="53138:53168"></circle>
+          <path d="M-3 -4 L3 -4 M-4 0 L4 0 M-3 4 L3 4" stroke="#E5E5E5" stroke-linecap="round" data-src-loc="53179:53265"></path>
+        </g>
+        <!-- floating bar chart top-right -->
+        <g transform="translate(330 64) rotate(8)" stroke="#E5E5E5" stroke-width="1.6" fill="none" stroke-linecap="round" data-om-id="c299d454:341" data-src-loc="53333:53447:53679">
+          <rect x="-12" y="-8" width="24" height="16" rx="2" fill="#fff" data-src-loc="53458:53522"></rect>
+          <line x1="-7" y1="4" x2="-7" y2="-2" data-src-loc="53533:53571"></line>
+          <line x1="-1" y1="4" x2="-1" y2="-5" data-src-loc="53582:53620"></line>
+          <line x1="5" y1="4" x2="5" y2="0" data-src-loc="53631:53666"></line>
+        </g>
+        <!-- floating arrow -->
+        <g transform="translate(335 200) rotate(-15)" stroke="#16A34A" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" data-om-id="c299d454:342" data-src-loc="53720:53861:53963">
+          <path d="M-10 8 L0 -2 L10 8" data-src-loc="53872:53902"></path>
+          <line x1="0" y1="-2" x2="0" y2="10" data-src-loc="53913:53950"></line>
+        </g>
+        <!-- clipboard -->
+        <g transform="translate(200 150)" data-om-id="c299d454:343" data-src-loc="53999:54033:54853">
+          <rect x="-58" y="-72" width="116" height="144" rx="10" fill="#fff" stroke="#0A0A0A" stroke-width="1.8" data-src-loc="54044:54148"></rect>
+          <rect x="-26" y="-82" width="52" height="20" rx="4" fill="#fff" stroke="#0A0A0A" stroke-width="1.8" data-src-loc="54159:54260"></rect>
+          <line x1="-30" y1="-40" x2="30" y2="-40" stroke="#E5E5E5" stroke-width="1.4" stroke-linecap="round" data-src-loc="54271:54372"></line>
+          <line x1="-30" y1="-22" x2="14" y2="-22" stroke="#E5E5E5" stroke-width="1.4" stroke-linecap="round" data-src-loc="54383:54484"></line>
+          <!-- big plus -->
+          <circle cx="0" cy="22" r="22" fill="none" stroke="#16A34A" stroke-width="2" stroke-dasharray="3 3" data-src-loc="54523:54623"></circle>
+          <line x1="-10" y1="22" x2="10" y2="22" stroke="#16A34A" stroke-width="2.4" stroke-linecap="round" data-src-loc="54634:54733"></line>
+          <line x1="0" y1="12" x2="0" y2="32" stroke="#16A34A" stroke-width="2.4" stroke-linecap="round" data-src-loc="54744:54840"></line>
+        </g>
+        <!-- text -->
+        <text x="200" y="262" text-anchor="middle" class="sans" font-size="14" font-weight="600" fill="#0A0A0A" data-om-id="c299d454:344" data-src-loc="54884:54988:55020">Nenhuma transação ainda</text>
+        <text x="200" y="282" text-anchor="middle" class="sans" font-size="11" fill="#6B6B68" data-om-id="c299d454:345" data-src-loc="55029:55115:55163">Adicione sua primeira para ver tudo aqui.</text>
+      </svg>

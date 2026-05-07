@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="160" height="160" id="svg-badge1" data-om-id="c299d454:394" data-src-loc="60566:60667:61289">
+          <!-- trophy -->
+          <path d="M22 14 L58 14 L56 32 Q56 44 40 48 Q24 44 24 32 Z" fill="#16A34A" data-src-loc="60704:60779"></path>
+          <path d="M22 22 L14 22 L14 32 Q14 38 22 38" fill="none" stroke="#16A34A" stroke-width="3" data-src-loc="60790:60881"></path>
+          <path d="M58 22 L66 22 L66 32 Q66 38 58 38" fill="none" stroke="#16A34A" stroke-width="3" data-src-loc="60892:60983"></path>
+          <rect x="32" y="48" width="16" height="8" fill="#14532D" data-src-loc="60994:61052"></rect>
+          <rect x="22" y="56" width="36" height="6" rx="1" fill="#0A0A0A" data-src-loc="61063:61128"></rect>
+          <!-- star -->
+          <path d="M40 22 L42.5 28 L49 28.5 L44 33 L45.5 39.5 L40 36 L34.5 39.5 L36 33 L31 28.5 L37.5 28 Z" fill="#fff" data-src-loc="61163:61274"></path>
+        </svg>

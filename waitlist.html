@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Open Finance — Lista de Espera</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0a0a0a;
+      --white: #ffffff;
+      --gray-100: #f5f5f5;
+      --gray-300: #d4d4d4;
+      --gray-500: #737373;
+      --gray-700: #404040;
+      --accent: #e2e8f0;
+      --red: #ef4444;
+      --green: #22c55e;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--black);
+      color: var(--white);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    header {
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .logo {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-badge {
+      width: 28px;
+      height: 28px;
+      background: var(--white);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-badge span {
+      color: var(--black);
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .badge-beta {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.15);
+      color: var(--gray-300);
+      letter-spacing: 0.04em;
+    }
+
+    /* ── Hero ── */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 24px 80px;
+      text-align: center;
+    }
+
+    .eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gray-500);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .eyebrow::before,
+    .eyebrow::after {
+      content: "";
+      display: block;
+      width: 32px;
+      height: 1px;
+      background: rgba(255,255,255,0.15);
+    }
+
+    h1 {
+      font-size: clamp(36px, 7vw, 72px);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      max-width: 800px;
+      margin-bottom: 20px;
+    }
+
+    h1 .highlight {
+      background: linear-gradient(135deg, #ffffff 0%, #a3a3a3 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: clamp(15px, 2.5vw, 18px);
+      color: var(--gray-500);
+      max-width: 480px;
+      line-height: 1.65;
+      margin-bottom: 48px;
+    }
+
+    /* ── Counter ── */
+    .counter-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 36px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 40px;
+      padding: 10px 20px;
+    }
+
+    .counter-dots {
+      display: flex;
+      gap: 4px;
+    }
+
+    .counter-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse-dot 2s infinite;
+    }
+
+    .counter-dot:nth-child(2) { animation-delay: 0.3s; background: rgba(34,197,94,0.6); }
+    .counter-dot:nth-child(3) { animation-delay: 0.6s; background: rgba(34,197,94,0.3); }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+
+    .counter-text {
+      font-size: 13px;
+      color: var(--gray-300);
+    }
+
+    .counter-text strong {
+      color: var(--white);
+      font-weight: 700;
+    }
+
+    #counter-number {
+      display: inline-block;
+      min-width: 28px;
+      text-align: center;
+    }
+
+    /* ── Form ── */
+    .form-wrap {
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 6px 6px 6px 16px;
+      transition: border-color 0.2s;
+    }
+
+    .input-row:focus-within {
+      border-color: rgba(255,255,255,0.3);
+    }
+
+    .email-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--white);
+      font-size: 15px;
+      padding: 8px 0;
+      min-width: 0;
+    }
+
+    .email-input::placeholder { color: var(--gray-500); }
+
+    .submit-btn {
+      background: var(--white);
+      color: var(--black);
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .submit-btn:hover { background: #e5e5e5; }
+    .submit-btn:active { transform: scale(0.98); }
+    .submit-btn:disabled { background: var(--gray-700); color: var(--gray-500); cursor: not-allowed; }
+
+    .spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(0,0,0,0.2);
+      border-top-color: #000;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .field-error {
+      font-size: 12px;
+      color: #f87171;
+      margin-top: 8px;
+      text-align: left;
+      padding-left: 4px;
+      display: none;
+    }
+
+    /* ── Success ── */
+    .success-card {
+      display: none;
+      background: rgba(34,197,94,0.08);
+      border: 1px solid rgba(34,197,94,0.25);
+      border-radius: 12px;
+      padding: 20px 24px;
+      text-align: center;
+    }
+
+    .success-icon {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    .success-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 6px;
+    }
+
+    .success-sub {
+      font-size: 13px;
+      color: var(--gray-500);
+    }
+
+    /* ── Features ── */
+    .features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 48px;
+      max-width: 560px;
+    }
+
+    .feature-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px;
+      padding: 7px 14px;
+      font-size: 12px;
+      color: var(--gray-300);
+    }
+
+    .feature-chip span { font-size: 14px; }
+
+    /* ── Footer ── */
+    footer {
+      padding: 20px 24px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--gray-700);
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    /* ── Responsivo ── */
+    @media (max-width: 480px) {
+      .input-row {
+        flex-direction: column;
+        padding: 12px;
+        gap: 10px;
+      }
+      .submit-btn { width: 100%; justify-content: center; padding: 12px; }
+      .features { gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">
+      <div class="logo-badge"><span>OF</span></div>
+      Open Finance
+    </div>
+    <span class="badge-beta">Em breve</span>
+  </header>
+
+  <main>
+    <div class="eyebrow">Acesso antecipado</div>
+
+    <h1>
+      Suas finanças,<br />
+      <span class="highlight">finalmente inteligentes.</span>
+    </h1>
+
+    <p class="subtitle">
+      Controle gastos, analise investimentos e construa seu futuro financeiro — tudo em um só lugar. Simples, rápido e feito para o Brasil.
+    </p>
+
+    <div class="counter-wrap" id="counter-wrap">
+      <div class="counter-dots">
+        <div class="counter-dot"></div>
+        <div class="counter-dot"></div>
+        <div class="counter-dot"></div>
+      </div>
+      <p class="counter-text">
+        <strong><span id="counter-number">—</span> pessoas</strong> já na lista
+      </p>
+    </div>
+
+    <div class="form-wrap">
+      <div id="form-area">
+        <div class="input-row" id="input-row">
+          <input
+            type="email"
+            class="email-input"
+            id="email-input"
+            placeholder="seu@email.com"
+            autocomplete="email"
+          />
+          <button class="submit-btn" id="submit-btn" onclick="handleSubmit()">
+            <div class="spinner" id="spinner"></div>
+            <span id="btn-text">Entrar na lista</span>
+          </button>
+        </div>
+        <p class="field-error" id="field-error"></p>
+      </div>
+
+      <div class="success-card" id="success-card">
+        <div class="success-icon">🎉</div>
+        <p class="success-title">Você está na lista!</p>
+        <p class="success-sub">Avisaremos assim que o acesso estiver disponível.</p>
+      </div>
+    </div>
+
+    <div class="features">
+      <div class="feature-chip"><span>📊</span> Dashboard em tempo real</div>
+      <div class="feature-chip"><span>🤖</span> IA para investimentos</div>
+      <div class="feature-chip"><span>📄</span> Relatórios PDF e Excel</div>
+      <div class="feature-chip"><span>🔒</span> Dados 100% seguros</div>
+      <div class="feature-chip"><span>🇧🇷</span> Feito para o Brasil</div>
+    </div>
+  </main>
+
+  <footer>
+    Open Finance © 2026 · Todos os direitos reservados
+  </footer>
+
+  <script>
+    const SUPABASE_URL = 'https://cccptybngvodtbuetjvl.supabase.co'
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjY3B0eWJuZ3ZvZHRidWV0anZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNjI5MzYsImV4cCI6MjA5MTkzODkzNn0.S_zKIYXXF87va382sic29sLcXP_GUuhNPsVslE-yjsM'
+
+    const { createClient } = supabase
+    const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+    async function loadCounter() {
+      try {
+        const { count } = await db
+          .from('waitlist')
+          .select('*', { count: 'exact', head: true })
+        document.getElementById('counter-number').textContent = count ?? 0
+      } catch {
+        document.getElementById('counter-number').textContent = '0'
+      }
+    }
+
+    async function handleSubmit() {
+      const input = document.getElementById('email-input')
+      const errorEl = document.getElementById('field-error')
+      const spinner = document.getElementById('spinner')
+      const btnText = document.getElementById('btn-text')
+      const submitBtn = document.getElementById('submit-btn')
+      const email = input.value.trim()
+
+      errorEl.style.display = 'none'
+      errorEl.textContent = ''
+
+      if (!email) {
+        errorEl.textContent = 'Por favor, informe seu e-mail.'
+        errorEl.style.display = 'block'
+        input.focus()
+        return
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(email)) {
+        errorEl.textContent = 'E-mail inválido. Verifique e tente novamente.'
+        errorEl.style.display = 'block'
+        input.focus()
+        return
+      }
+
+      submitBtn.disabled = true
+      spinner.style.display = 'block'
+      btnText.textContent = 'Aguarde...'
+
+      try {
+        const { error } = await db.from('waitlist').insert({
+          email,
+          fonte: 'pagina-waitlist',
+        })
+
+        if (error) {
+          if (error.code === '23505') {
+            errorEl.textContent = 'Este e-mail já está na lista. Aguarde o contato!'
+          } else {
+            errorEl.textContent = 'Erro ao cadastrar. Tente novamente.'
+          }
+          errorEl.style.display = 'block'
+          return
+        }
+
+        document.getElementById('form-area').style.display = 'none'
+        document.getElementById('success-card').style.display = 'block'
+        await loadCounter()
+
+      } finally {
+        submitBtn.disabled = false
+        spinner.style.display = 'none'
+        btnText.textContent = 'Entrar na lista'
+      }
+    }
+
+    document.getElementById('email-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleSubmit()
+    })
+
+    loadCounter()
+  </script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<svg width="1440" height="900" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1440" height="900" fill="#F5F5F0"/>
+  
+  <rect x="0" y="0" width="280" height="900" fill="#0A0A0A"/>
+  <text x="40" y="50" font-family="DM Sans" font-size="24" font-weight="700" fill="#16A34A">Openfy</text>
+  
+  <rect x="280" y="0" width="1160" height="80" fill="#FFFFFF"/>
+  <text x="320" y="50" font-family="DM Sans" font-size="32" font-weight="700" fill="#0A0A0A">Perfil e Configurações</text>
+  
+  <rect x="320" y="100" width="160" height="48" rx="0" fill="transparent"/>
+  <text x="400" y="130" font-family="Inter" font-size="15" font-weight="600" fill="#0A0A0A" text-anchor="middle">Dados pessoais</text>
+  <rect x="320" y="145" width="160" height="3" fill="#16A34A"/>
+  
+  <rect x="480" y="100" width="180" height="48" fill="transparent"/>
+  <text x="570" y="130" font-family="Inter" font-size="15" fill="#666666" text-anchor="middle">Plano e pagamento</text>
+  
+  <rect x="660" y="100" width="140" height="48" fill="transparent"/>
+  <text x="730" y="130" font-family="Inter" font-size="15" fill="#666666" text-anchor="middle">Preferências</text>
+  
+  <rect x="800" y="100" width="120" height="48" fill="transparent"/>
+  <text x="860" y="130" font-family="Inter" font-size="15" fill="#666666" text-anchor="middle">Segurança</text>
+  
+  <rect x="320" y="170" width="520" height="360" rx="12" fill="#FFFFFF"/>
+  <text x="350" y="205" font-family="Inter" font-size="18" font-weight="600" fill="#0A0A0A">Informações básicas</text>
+  
+  <text x="350" y="245" font-family="Inter" font-size="14" fill="#666666">Foto de perfil</text>
+  <circle cx="380" cy="285" r="30" fill="#E5E5E5"/>
+  <text x="380" y="293" font-family="Inter" font-size="20" fill="#666666" text-anchor="middle">PH</text>
+  <rect x="430" y="270" width="130" height="32" rx="6" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="1"/>
+  <text x="495" y="292" font-family="Inter" font-size="13" fill="#0A0A0A" text-anchor="middle">Alterar foto</text>
+  
+  <text x="350" y="345" font-family="Inter" font-size="14" fill="#666666">Nome completo</text>
+  <rect x="350" y="355" width="460" height="44" rx="8" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="1"/>
+  <text x="370" y="382" font-family="Inter" font-size="15" fill="#0A0A0A">Pedro Henrique Silva</text>
+  
+  <text x="350" y="425" font-family="Inter" font-size="14" fill="#666666">Email</text>
+  <rect x="350" y="435" width="460" height="44" rx="8" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="1"/>
+  <text x="370" y="462" font-family="Inter" font-size="15" fill="#0A0A0A">pedro@email.com</text>
+  
+  <rect x="350" y="490" width="20" height="20" rx="4" fill="#16A34A"/>
+  <path d="M 355 500 L 359 504 L 365 496" stroke="#FFFFFF" stroke-width="2" fill="none"/>
+  <text x="380" y="506" font-family="Inter" font-size="14" fill="#0A0A0A">Receber notificações por email</text>
+  
+  <rect x="320" y="560" width="520" height="280" rx="12" fill="#FFFFFF"/>
+  <text x="350" y="595" font-family="Inter" font-size="18" font-weight="600" fill="#0A0A0A">Renda mensal</text>
+  
+  <text x="350" y="635" font-family="Inter" font-size="14" fill="#666666">Renda principal (Salário)</text>
+  <rect x="350" y="645" width="460" height="44" rx="8" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="1"/>
+  <text x="370" y="672" font-family="Inter" font-size="15" fill="#0A0A0A">R$ 12.500,00</text>
+  
+  <text x="350" y="715" font-family="Inter" font-size="14" fill="#666666">Outras fontes de renda:</text>
+  <text x="350" y="740" font-family="Inter" font-size="14" fill="#0A0A0A">+ Freelance</text>
+  <text x="780" y="740" font-family="Inter" font-size="14" font-weight="600" fill="#0A0A0A" text-anchor="end">R$ 2.000</text>
+  <text x="350" y="765" font-family="Inter" font-size="14" fill="#0A0A0A">+ Aluguel</text>
+  <text x="780" y="765" font-family="Inter" font-size="14" font-weight="600" fill="#0A0A0A" text-anchor="end">R$ 1.500</text>
+  
+  <text x="350" y="795" font-family="Inter" font-size="14" font-weight="600" fill="#16A34A">+ Adicionar fonte de renda</text>
+  
+  <text x="350" y="825" font-family="Inter" font-size="16" font-weight="700" fill="#0A0A0A">Total: R$ 16.000,00/mês</text>
+  
+  <rect x="880" y="170" width="520" height="350" rx="12" fill="#FFFFFF"/>
+  <text x="910" y="205" font-family="Inter" font-size="18" font-weight="600" fill="#0A0A0A">Plano atual</text>
+  
+  <text x="910" y="240" font-family="DM Sans" font-size="20" font-weight="700" fill="#0A0A0A">Openfy Pro</text>
+  <text x="910" y="265" font-family="Inter" font-size="14" fill="#666666">R$ 19,90/mês · Renovação 15/04</text>
+  
+  <text x="910" y="300" font-family="Inter" font-size="14" fill="#0A0A0A">✓ Transações ilimitadas</text>
+  <text x="910" y="325" font-family="Inter" font-size="14" fill="#0A0A0A">✓ Score de Saúde completo</text>
+  <text x="910" y="350" font-family="Inter" font-size="14" fill="#0A0A0A">✓ Relatórios com IA</text>
+  
+  <rect x="910" y="380" width="170" height="40" rx="8" fill="#16A34A"/>
+  <text x="995" y="405" font-family="Inter" font-size="14" font-weight="600" fill="#FFFFFF" text-anchor="middle">Fazer upgrade</text>
+  
+  <rect x="1100" y="380" width="140" height="40" rx="8" fill="#FFFFFF" stroke="#E5E5E5" stroke-width="1"/>
+  <text x="1170" y="405" font-family="Inter" font-size="14" fill="#0A0A0A" text-anchor="middle">Cancelar plano</text>
+</svg>
