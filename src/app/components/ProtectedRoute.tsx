@@ -1,39 +1,29 @@
-import { useState, useEffect } from "react";
-import { Navigate, Outlet } from "react-router";
-import { useAuth } from "../../lib/auth-context";
-import { supabase } from "../../lib/supabase";
+import { useEffect } from "react"
+import { Outlet, useNavigate } from "react-router"
+import { useAuth } from "../../lib/auth-context"
+import { supabase } from "../../lib/supabase"
 
 export function ProtectedRoute() {
-  const { user, loading } = useAuth();
-  const [ready, setReady] = useState(false);
+  const { user, loading } = useAuth()
+  const navigate = useNavigate()
 
   useEffect(() => {
-    if (loading) return;
-    if (user) { setReady(true); return; }
-
-    // user é null mas o onAuthStateChange pode ainda não ter propagado
-    // (race condition após login). Verifica a sessão real antes de redirecionar.
+    if (loading || user) return
+    // user é null: verifica sessão real antes de redirecionar
+    // (evita race condition logo após o login onde o contexto ainda não atualizou)
     supabase.auth.getSession().then(({ data }) => {
-      if (!data.session) {
-        // Sem sessão válida — pode redirecionar para login
-        setReady(true);
-      }
-      // Se sessão existe, aguarda onAuthStateChange atualizar o contexto.
-      // O effect re-executa quando `user` mudar e então setReady(true).
-    });
-  }, [user, loading]);
+      if (!data.session) navigate("/login", { replace: true })
+      // se sessão existe, aguarda onAuthStateChange atualizar o user
+    })
+  }, [user, loading])
 
-  if (loading || !ready) {
+  if (loading || !user) {
     return (
       <div className="min-h-screen bg-[#F5F5F5] flex items-center justify-center">
         <div className="w-6 h-6 border-2 border-black border-t-transparent rounded-full animate-spin" />
       </div>
-    );
+    )
   }
 
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return <Outlet />;
+  return <Outlet />
 }

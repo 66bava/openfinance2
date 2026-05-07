@@ -169,9 +169,8 @@ export default function Profile() {
     try {
       await logAudit(userId, "logout", {})
       await supabase.auth.signOut()
-      // ProtectedRoute detecta user=null via onAuthStateChange e redireciona
+      navigate("/login", { replace: true })
     } catch {
-      // mesmo com erro, força redirect
       navigate("/login", { replace: true })
     } finally {
       setLoggingOut(false)

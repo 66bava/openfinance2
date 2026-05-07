@@ -308,8 +308,12 @@ export function Layout() {
   const { t } = useLanguage()
   const [profile, setProfile] = useState<Profile | null>(null)
 
-  const signOut = () => {
-    supabase.auth.signOut() // onAuthStateChange → user=null → ProtectedRoute redireciona
+  const signOut = async () => {
+    try {
+      await supabase.auth.signOut()
+    } finally {
+      navigate("/login", { replace: true })
+    }
   }
 
   function getPageTitle(pathname: string): string {
