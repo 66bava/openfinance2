@@ -4,7 +4,7 @@ import {
   ResponsiveContainer, PieChart, Pie, Cell,
 } from "recharts";
 import { Link } from "react-router";
-import { Search, Sparkles, X } from "lucide-react";
+import { Search, Sparkles, X, Trash2 } from "lucide-react";
 import { useAuth } from "../../lib/auth-context";
 import { useFeatureAccess } from "../hooks/useFeatureAccess";
 import { FeatureLock } from "../components/FeatureLock";
@@ -13,6 +13,7 @@ import {
   getEvolucaoMensal,
   calcularCategorias,
   calcularTotais,
+  deleteTransacao,
 } from "../../lib/queries";
 import { analisarCategoria } from "../../lib/openai";
 
@@ -108,6 +109,8 @@ function AnalysisContent() {
   // filtros
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // IA por categoria
   const [aiCategory, setAiCategory] = useState<string | null>(null);
@@ -435,24 +438,74 @@ function AnalysisContent() {
           </div>
         ) : (
           <div className="divide-y divide-[#F5F5F5]">
-            {despesasFiltradas.map((tx: any) => (
-              <div key={tx.id} className="flex items-center justify-between px-5 py-3.5 hover:bg-[#FAFAFA] transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-[#F5F5F5] flex items-center justify-center text-base">
-                    {categoryIcon(tx.categorias?.nome || "")}
+            {despesasFiltradas.map((tx: any) => {
+              const isConfirming = confirmDeleteId === tx.id;
+              const isDeleting = deletingId === tx.id;
+              return (
+                <div
+                  key={tx.id}
+                  className="flex items-center justify-between px-5 py-3.5 transition-colors"
+                  style={{ background: isConfirming ? "#FEF2F2" : undefined }}
+                >
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="w-9 h-9 rounded-lg bg-[#F5F5F5] flex items-center justify-center text-base flex-shrink-0">
+                      {categoryIcon(tx.categorias?.nome || "")}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-black truncate" style={{ fontSize: 13, fontWeight: 500 }}>{tx.descricao || "—"}</p>
+                      <p className="text-[#999999]" style={{ fontSize: 11 }}>
+                        {tx.categorias?.nome || "Outros"} · {formatDate(tx.data)}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-black" style={{ fontSize: 13, fontWeight: 500 }}>{tx.descricao || "—"}</p>
-                    <p className="text-[#999999]" style={{ fontSize: 11 }}>
-                      {tx.categorias?.nome || "Outros"} · {formatDate(tx.data)}
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <p className="text-[#D32F2F]" style={{ fontSize: 13, fontWeight: 600 }}>
+                      -{formatCurrency(tx.valor)}
                     </p>
+                    {isConfirming ? (
+                      <div className="flex items-center gap-1">
+                        <span style={{ fontSize: 11, color: "#DC2626", fontWeight: 600 }}>Remover?</span>
+                        <button
+                          onClick={async () => {
+                            setDeletingId(tx.id);
+                            setConfirmDeleteId(null);
+                            try {
+                              await deleteTransacao(tx.id);
+                              setTransacoes((prev) => prev.filter((t) => t.id !== tx.id));
+                            } catch { /* silent */ }
+                            finally { setDeletingId(null); }
+                          }}
+                          disabled={isDeleting}
+                          className="px-2 py-0.5 rounded text-white text-xs font-bold"
+                          style={{ background: "#DC2626", border: "none", cursor: "pointer", fontSize: 11 }}
+                        >
+                          Sim
+                        </button>
+                        <button
+                          onClick={() => setConfirmDeleteId(null)}
+                          className="px-2 py-0.5 rounded text-xs"
+                          style={{ background: "#F5F5F5", border: "1px solid #E0E0E0", cursor: "pointer", fontSize: 11 }}
+                        >
+                          Não
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setConfirmDeleteId(tx.id)}
+                        disabled={isDeleting}
+                        title="Remover transação"
+                        className="opacity-0 hover:opacity-100 group-hover:opacity-100 transition-opacity p-1 rounded"
+                        style={{ background: "none", border: "none", cursor: "pointer", color: "#AAAAAA" }}
+                        onMouseOver={(e) => { e.currentTarget.style.color = "#DC2626"; e.currentTarget.style.opacity = "1" }}
+                        onMouseOut={(e) => { e.currentTarget.style.color = "#AAAAAA"; e.currentTarget.style.opacity = "0.4" }}
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    )}
                   </div>
                 </div>
-                <p className="text-[#D32F2F]" style={{ fontSize: 13, fontWeight: 600 }}>
-                  -{formatCurrency(tx.valor)}
-                </p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

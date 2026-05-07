@@ -136,7 +136,15 @@ export async function getEvolucaoMensal(userId: string, meses = 6) {
   return Object.values(mesesMap)
 }
 
-// ─── Adicionar transação ───────────────────────────────────────────────────
+// ─── Adicionar / deletar transação ────────────────────────────────────────
+
+export async function deleteTransacao(id: string) {
+  const { error } = await supabase
+    .from('transacoes')
+    .delete()
+    .eq('id', id)
+  if (error) throw error
+}
 
 export async function addTransacao(
   userId: string,

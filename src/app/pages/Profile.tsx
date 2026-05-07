@@ -166,9 +166,16 @@ export default function Profile() {
 
   const handleLogout = async () => {
     setLoggingOut(true)
-    await logAudit(userId, "logout", {})
-    await supabase.auth.signOut()
-    navigate("/login", { replace: true })
+    try {
+      await logAudit(userId, "logout", {})
+      await supabase.auth.signOut()
+      // ProtectedRoute detecta user=null via onAuthStateChange e redireciona
+    } catch {
+      // mesmo com erro, força redirect
+      navigate("/login", { replace: true })
+    } finally {
+      setLoggingOut(false)
+    }
   }
 
   const handleExportData = async () => {

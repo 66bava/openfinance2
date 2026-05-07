@@ -7,12 +7,12 @@ import {
 } from "recharts"
 import {
   ArrowDownRight, ArrowUpRight, Wallet, PiggyBank,
-  Plus, TrendingUp, TrendingDown, Users, Check, X,
+  Plus, TrendingUp, TrendingDown, Users, Check, X, Trash2,
 } from "lucide-react"
 import {
   getTotaisMes, getGastosPorCategoria,
   getTransacoesMes, getEvolucaoMensal,
-  getProfile,
+  getProfile, deleteTransacao,
 } from "../../lib/queries"
 import { getMinhaMembresia, getAdminPerfil, responderConvite } from "../../lib/queries/familia"
 import { AddTransactionModal } from "../components/dashboard/AddTransactionModal"
@@ -248,6 +248,8 @@ export default function DashboardWithSupabase() {
   const [adminConvite, setAdminConvite] = useState<any>(null)
   const [conviteLoading, setConviteLoading] = useState(false)
   const [dbScore, setDbScore] = useState<number | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
 
   const userName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Usuário"
   // Usa o score do banco (calculado pelo trigger) quando disponível
@@ -560,46 +562,91 @@ export default function DashboardWithSupabase() {
               </div>
             ) : (
               <div>
-                {transacoes.map((tx: any) => (
-                  <div
-                    key={tx.id}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      padding: "12px 20px",
-                      borderBottom: "1px solid var(--of-border-light)",
-                      transition: "background 0.15s",
-                    }}
-                    onMouseOver={(e) => (e.currentTarget.style.background = "var(--of-hover)")}
-                    onMouseOut={(e) => (e.currentTarget.style.background = "transparent")}
-                  >
-                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                      <div style={{
-                        width: 38, height: 38, borderRadius: 10,
-                        background: tx.tipo === "receita" ? "#DCFCE7" : "var(--of-page-bg)",
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        fontSize: 16, flexShrink: 0,
-                      }}>
-                        {categoryIcon(tx.categorias?.nome || "")}
+                {transacoes.map((tx: any) => {
+                  const isConfirming = confirmDeleteId === tx.id
+                  const isDeleting = deletingId === tx.id
+                  return (
+                    <div
+                      key={tx.id}
+                      style={{
+                        display: "flex", alignItems: "center", justifyContent: "space-between",
+                        padding: "11px 16px",
+                        borderBottom: "1px solid var(--of-border-light)",
+                        background: isConfirming ? "#FEF2F2" : "transparent",
+                        transition: "background 0.15s",
+                      }}
+                      onMouseOver={(e) => { if (!isConfirming) e.currentTarget.style.background = "var(--of-hover)" }}
+                      onMouseOut={(e) => { if (!isConfirming) e.currentTarget.style.background = "transparent" }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, minWidth: 0 }}>
+                        <div style={{
+                          width: 36, height: 36, borderRadius: 9,
+                          background: tx.tipo === "receita" ? "#DCFCE7" : "var(--of-page-bg)",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          fontSize: 15, flexShrink: 0,
+                        }}>
+                          {categoryIcon(tx.categorias?.nome || "")}
+                        </div>
+                        <div style={{ minWidth: 0 }}>
+                          <p style={{ fontSize: 13, fontWeight: 500, color: "var(--of-text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            {tx.descricao || "—"}
+                          </p>
+                          <p style={{ fontSize: 11, color: "var(--of-text-muted)", marginTop: 1 }}>
+                            {tx.categorias?.nome || "Outros"} · {fmtDate(tx.data)}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p style={{ fontSize: 13, fontWeight: 500, color: "var(--of-text)" }}>
-                          {tx.descricao || "—"}
-                        </p>
-                        <p style={{ fontSize: 11, color: "var(--of-text-muted)", marginTop: 1 }}>
-                          {tx.categorias?.nome || "Outros"} · {fmtDate(tx.data)}
-                        </p>
+
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: tx.tipo === "receita" ? "#16A34A" : "#EF4444" }}>
+                          {tx.tipo === "receita" ? "+" : "-"}{fmt(tx.valor)}
+                        </span>
+
+                        {isConfirming ? (
+                          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                            <span style={{ fontSize: 11, color: "#DC2626", fontWeight: 600 }}>Remover?</span>
+                            <button
+                              onClick={async () => {
+                                setDeletingId(tx.id)
+                                setConfirmDeleteId(null)
+                                try {
+                                  await deleteTransacao(tx.id)
+                                  setTransacoes((prev) => prev.filter((t) => t.id !== tx.id))
+                                  setRefreshKey((k) => k + 1)
+                                } catch {
+                                  // silent
+                                } finally {
+                                  setDeletingId(null)
+                                }
+                              }}
+                              disabled={isDeleting}
+                              style={{ padding: "3px 8px", background: "#DC2626", color: "#fff", border: "none", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}
+                            >
+                              Sim
+                            </button>
+                            <button
+                              onClick={() => setConfirmDeleteId(null)}
+                              style={{ padding: "3px 8px", background: "var(--of-page-bg)", color: "var(--of-text)", border: "1px solid var(--of-border)", borderRadius: 6, fontSize: 11, cursor: "pointer" }}
+                            >
+                              Não
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => setConfirmDeleteId(tx.id)}
+                            disabled={isDeleting}
+                            title="Remover transação"
+                            style={{ background: "none", border: "none", cursor: "pointer", padding: 4, borderRadius: 6, color: "var(--of-text-muted)", opacity: 0.5, transition: "opacity 0.15s" }}
+                            onMouseOver={(e) => { e.currentTarget.style.opacity = "1"; e.currentTarget.style.color = "#DC2626" }}
+                            onMouseOut={(e) => { e.currentTarget.style.opacity = "0.5"; e.currentTarget.style.color = "var(--of-text-muted)" }}
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        )}
                       </div>
                     </div>
-                    <span style={{
-                      fontSize: 14, fontWeight: 700,
-                      color: tx.tipo === "receita" ? "#16A34A" : "#EF4444",
-                    }}>
-                      {tx.tipo === "receita" ? "+" : "-"}{fmt(tx.valor)}
-                    </span>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
           </div>

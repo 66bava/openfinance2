@@ -62,7 +62,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(newUser);
     });
 
-    return () => subscription.unsubscribe();
+    // Re-verifica sessão quando usuário retorna à aba (cross-tab sync)
+    const handleFocus = () => {
+      supabase.auth.getSession().then(({ data }) => {
+        const newUser = data.session?.user ?? null;
+        if (newUser?.id !== prevUserIdRef.current) {
+          setSession(data.session);
+          setUser(newUser);
+          prevUserIdRef.current = newUser?.id ?? null;
+        }
+      }).catch(() => {});
+    };
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      subscription.unsubscribe();
+      window.removeEventListener("focus", handleFocus);
+    };
   }, []);
 
   return (
