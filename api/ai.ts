@@ -1,7 +1,7 @@
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 
 function readEnv(name: string): string | undefined {
-  const value = process.env[name];
+  const value = process.env[name] ?? process.env[`VITE_${name}`];
   return typeof value === "string" && value.trim() ? value.trim() : undefined;
 }
 
