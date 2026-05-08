@@ -41,7 +41,7 @@ export default function Security() {
               viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.07 }}
               style={{ background: "var(--of-surface)", border: "1px solid var(--of-border)", borderRadius: 16, padding: "32px 36px", display: "flex", gap: 20, alignItems: "flex-start" }}
             >
-              <div style={{ width: 44, height: 44, background: "#F0FDF4", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <div style={{ width: 44, height: 44, background: "var(--of-upgrade-bg)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 {p.icon}
               </div>
               <div>

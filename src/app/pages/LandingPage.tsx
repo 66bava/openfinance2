@@ -27,12 +27,12 @@ export default function LandingPage() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: "#FFFFFF",
+        backgroundColor: "var(--of-page-bg)",
       }}>
         <div style={{
           width: 28,
           height: 28,
-          border: "2.5px solid #0A0A0A",
+          border: "2.5px solid var(--of-text)",
           borderTopColor: "transparent",
           borderRadius: "50%",
           animation: "spin 0.7s linear infinite",

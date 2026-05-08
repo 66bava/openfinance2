@@ -1,7 +1,45 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import path from 'path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
+import type { Plugin } from 'vite'
+
+function apiDevPlugin(): Plugin {
+  return {
+    name: 'api-dev-handler',
+    configureServer(server) {
+      // Injeta TODAS as variáveis do .env no process.env para o handler ter acesso
+      const env = loadEnv(server.config.mode, process.cwd(), '')
+      Object.assign(process.env, env)
+
+      server.middlewares.use('/api/ai', (req: any, res: any) => {
+        const chunks: Buffer[] = []
+        req.on('data', (c: Buffer) => chunks.push(c))
+        req.on('end', async () => {
+          try {
+            req.body = JSON.parse(Buffer.concat(chunks).toString() || '{}')
+            let statusCode = 200
+            const wrappedRes = {
+              status(code: number) { statusCode = code; return wrappedRes },
+              json(data: unknown) {
+                res.statusCode = statusCode
+                res.setHeader('Content-Type', 'application/json')
+                res.end(JSON.stringify(data))
+              },
+              setHeader(name: string, value: string) { res.setHeader(name, value) },
+            }
+            const { default: handler } = await server.ssrLoadModule('/api/ai.ts')
+            await handler(req, wrappedRes)
+          } catch (err) {
+            res.statusCode = 500
+            res.setHeader('Content-Type', 'application/json')
+            res.end(JSON.stringify({ error: { message: String(err) } }))
+          }
+        })
+      })
+    },
+  }
+}
 
 export default defineConfig({
   plugins: [
@@ -9,6 +47,7 @@ export default defineConfig({
     // Tailwind is not being actively used – do not remove them
     react(),
     tailwindcss(),
+    apiDevPlugin(),
   ],
   resolve: {
     alias: {

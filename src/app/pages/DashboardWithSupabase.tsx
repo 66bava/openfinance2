@@ -3,26 +3,28 @@ import { useAuth } from "../../lib/auth-context"
 import { useLanguage } from "../../lib/language-context"
 import { Link } from "react-router"
 import {
-  LineChart, Line, PieChart, Pie, Cell,
+  LineChart, Line, PieChart, Pie, Cell, BarChart, Bar,
   Tooltip, ResponsiveContainer, XAxis, YAxis, CartesianGrid,
 } from "recharts"
 import {
   ArrowDownRight, ArrowUpRight, Wallet, PiggyBank,
   Plus, TrendingUp, TrendingDown, Users, Check, X, Trash2,
+  AlertCircle,
 } from "lucide-react"
 import {
   getTotaisMes, getGastosPorCategoria,
   getTransacoesMes, getEvolucaoMensal,
-  getProfile, deleteTransacao,
+  deleteTransacao,
 } from "../../lib/queries"
+import { getInvestimentos, calcularPatrimonioEstimado } from "../../lib/queries/investimentos"
+import { getAssinaturas, calcularTotalMensal } from "../../lib/queries/assinaturas"
+import type { Investimento, Assinatura } from "../../lib/types"
+import { formatCurrency, formatDate, formatShortDate } from "../../lib/format"
 import { getMinhaMembresia, getAdminPerfil, responderConvite } from "../../lib/queries/familia"
 import { AddTransactionModal } from "../components/dashboard/AddTransactionModal"
 import { ScoreAdvisor } from "../components/dashboard/ScoreAdvisor"
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
-
-const fmt = (v: number) =>
-  new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v)
 
 function fmtDate(dateStr: string, t: (k: string) => string) {
   const d = new Date(dateStr + "T00:00:00")
@@ -34,12 +36,40 @@ function fmtDate(dateStr: string, t: (k: string) => string) {
   return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })
 }
 
-function calcularScore(pct: number, gastos: number, renda: number): number {
+function calcularScore(
+  pct: number,
+  gastos: number,
+  renda: number,
+  totalInvestido = 0,
+  numInvestimentos = 0,
+  recorrentes = 0,
+  diversificacao = 0,
+  assinaturasMensal = 0,
+  assinaturasCount = 0,
+): number {
   if (renda === 0) return 300
-  const poupancaScore = Math.min(pct * 20, 400) // max 400 pts por poupança
+  const poupancaScore = Math.min(pct * 20, 400)
   const equilibrioScore = gastos / renda < 0.8 ? 300 : gastos / renda < 1 ? 150 : 50
+
+  // Bônus por investir: recorrência, patrimônio e diversificação
+  const investScore = numInvestimentos > 0
+    ? Math.min(50 + (totalInvestido / (renda || 1)) * 30 + recorrentes * 18 + diversificacao * 10, 200)
+    : 0
+
+  // Assinaturas: penaliza excesso, premia controle saudável
+  const burden = renda > 0 ? (assinaturasMensal / renda) : 0
+  let subsScore = 0
+  if (assinaturasMensal > 0) {
+    if (burden > 0.15) subsScore -= 100
+    else if (burden > 0.1) subsScore -= 60
+    else if (burden > 0.05) subsScore -= 20
+    else subsScore += 20
+
+    if (assinaturasCount >= 10) subsScore -= 20
+    else if (assinaturasCount >= 7) subsScore -= 10
+  }
   const base = 300
-  return Math.round(Math.min(base + poupancaScore + equilibrioScore, 1000))
+  return Math.round(Math.min(Math.max(base + poupancaScore + equilibrioScore + investScore + subsScore, 0), 1000))
 }
 
 function scoreColor(score: number) {
@@ -213,6 +243,7 @@ function StatCard({
 // ─── Custom Tooltip ──────────────────────────────────────────────────────────
 
 function ChartTooltip({ active, payload, label }: any) {
+  const { lang } = useLanguage()
   if (!active || !payload?.length) return null
   return (
     <div style={{
@@ -226,7 +257,7 @@ function ChartTooltip({ active, payload, label }: any) {
       <p style={{ fontWeight: 600, color: "var(--of-text)", marginBottom: 6 }}>{label}</p>
       {payload.map((p: any) => (
         <p key={p.name} style={{ color: p.color, marginBottom: 2 }}>
-          {p.name}: {fmt(p.value)}
+          {p.name}: {formatCurrency(p.value, lang)}
         </p>
       ))}
     </div>
@@ -237,8 +268,9 @@ function ChartTooltip({ active, payload, label }: any) {
 
 export default function DashboardWithSupabase() {
   const { user } = useAuth()
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
   const userId = user!.id
+  const fmt = (v: number) => formatCurrency(v, lang)
 
   const [totais, setTotais] = useState({ totalGastos: 0, totalRenda: 0, saldoDisponivel: 0, percentualEconomia: 0 })
   const [categorias, setCategorias] = useState<any[]>([])
@@ -250,12 +282,35 @@ export default function DashboardWithSupabase() {
   const [convitePendente, setConvitePendente] = useState<any>(null)
   const [adminConvite, setAdminConvite] = useState<any>(null)
   const [conviteLoading, setConviteLoading] = useState(false)
-  const [dbScore, setDbScore] = useState<number | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
+  const [investInfo, setInvestInfo] = useState({
+    total: 0,
+    patrimonio: 0,
+    count: 0,
+    recorrentes: 0,
+    diversificacao: 0,
+    aportesPorMes: [] as Array<{ month: string; value: number }>,
+    ultimos: [] as Investimento[],
+  })
+  const [subInfo, setSubInfo] = useState({
+    totalMensal: 0,
+    count: 0,
+    proximas: [] as Assinatura[],
+  })
 
   const userName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Usuário"
-  const score = dbScore ?? calcularScore(totais.percentualEconomia, totais.totalGastos, totais.totalRenda)
+  const score = calcularScore(
+    totais.percentualEconomia,
+    totais.totalGastos,
+    totais.totalRenda,
+    investInfo.total,
+    investInfo.count,
+    investInfo.recorrentes,
+    investInfo.diversificacao,
+    subInfo.totalMensal,
+    subInfo.count,
+  )
 
   useEffect(() => {
     async function load() {
@@ -292,15 +347,50 @@ export default function DashboardWithSupabase() {
         }
       } catch { /* silent */ }
     }
-    async function loadScore() {
+    async function loadInvestimentos() {
       try {
-        const profile = await getProfile(userId)
-        if (profile?.score != null) setDbScore(profile.score)
+        const invs = await getInvestimentos(userId)
+        const total = invs.reduce((a, i) => a + i.valor_aporte, 0)
+        const patrimonio = calcularPatrimonioEstimado(invs)
+        const recorrentes = invs.filter((i) => i.aporte_recorrente).length
+        const diversificacao = new Set(invs.map((i) => i.categoria_investimento)).size
+
+        const byMonth = new Map<string, number>()
+        for (const inv of invs) {
+          const m = inv.data_investimento.slice(0, 7) // YYYY-MM
+          byMonth.set(m, (byMonth.get(m) ?? 0) + inv.valor_aporte)
+        }
+        const aportesPorMes = [...byMonth.entries()]
+          .sort((a, b) => a[0].localeCompare(b[0]))
+          .slice(-6)
+          .map(([month, value]) => ({ month, value }))
+
+        setInvestInfo({
+          total,
+          patrimonio,
+          count: invs.length,
+          recorrentes,
+          diversificacao,
+          aportesPorMes,
+          ultimos: invs.slice(0, 3),
+        })
+      } catch { /* silent */ }
+    }
+    async function loadAssinaturas() {
+      try {
+        const subs = await getAssinaturas(userId)
+        const totalMensal = calcularTotalMensal(subs)
+        setSubInfo({
+          totalMensal,
+          count: subs.length,
+          proximas: subs.filter((s) => !!s.proximo_pagamento).slice(0, 3),
+        })
       } catch { /* silent */ }
     }
     load()
     loadConvite()
-    loadScore()
+    loadInvestimentos()
+    loadAssinaturas()
   }, [userId, refreshKey])
 
   if (loading) {
@@ -463,6 +553,196 @@ export default function DashboardWithSupabase() {
           iconColor="#16A34A"
           trend={totais.percentualEconomia > 20 ? "up" : "neutral"}
         />
+      </div>
+
+      {/* Investimentos + Assinaturas */}
+      <div style={{ display: "grid", gap: 16, marginBottom: 24 }} className="grid grid-cols-1 lg:grid-cols-2">
+        <div style={{
+          background: "var(--of-surface)",
+          borderRadius: 16,
+          border: "1px solid var(--of-border)",
+          padding: "18px 20px",
+          boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+        }}>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 12 }}>
+            <div>
+              <p style={{ fontSize: 12, fontWeight: 700, color: "var(--of-text)", marginBottom: 2 }}>
+                {t("dashInvestResumoTitulo")}
+              </p>
+              <p style={{ fontSize: 12, color: "var(--of-text-muted)" }}>
+                {t("dashInvestResumoSub")}
+              </p>
+            </div>
+            <Link to="/app/investimentos" style={{ fontSize: 12, fontWeight: 700, color: "#16A34A", textDecoration: "none" }}>
+              {t("dashVerTodas")}
+            </Link>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 12, marginBottom: 12 }}>
+            <div>
+              <p style={{ fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--of-text-muted)", fontWeight: 700 }}>
+                {t("dashInvestPatrimonio")}
+              </p>
+              <p style={{ fontSize: 16, fontWeight: 800, color: "var(--of-text)", marginTop: 2 }}>
+                {fmt(investInfo.patrimonio)}
+              </p>
+            </div>
+            <div>
+              <p style={{ fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--of-text-muted)", fontWeight: 700 }}>
+                {t("dashInvestTotalAportes")}
+              </p>
+              <p style={{ fontSize: 16, fontWeight: 800, color: "var(--of-text)", marginTop: 2 }}>
+                {fmt(investInfo.total)}
+              </p>
+            </div>
+            <div>
+              <p style={{ fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--of-text-muted)", fontWeight: 700 }}>
+                {t("dashInvestRecorrentes")}
+              </p>
+              <p style={{ fontSize: 16, fontWeight: 800, color: "var(--of-text)", marginTop: 2 }}>
+                {investInfo.recorrentes}
+              </p>
+            </div>
+          </div>
+
+          {investInfo.aportesPorMes.length > 0 ? (
+            <div style={{ height: 140 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={investInfo.aportesPorMes.map((p) => ({
+                    month: formatShortDate(p.month + "-01", lang),
+                    value: p.value,
+                  }))}
+                  margin={{ left: 0, right: 8, top: 8, bottom: 0 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--of-border)" vertical={false} />
+                  <XAxis dataKey="month" tick={{ fontSize: 11, fill: "var(--of-text-muted)" }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: "var(--of-text-muted)" }} axisLine={false} tickLine={false}
+                    tickFormatter={(v) => `${t("commonMoedaAbrev")}${(v / 1000).toFixed(0)}k`} width={48} />
+                  <Tooltip content={<ChartTooltip />} />
+                  <Bar dataKey="value" name={t("dashInvestAportes")} fill="#16A34A" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <div style={{ padding: "12px 0" }}>
+              <p style={{ fontSize: 12, color: "var(--of-text-muted)" }}>{t("dashInvestSemDados")}</p>
+            </div>
+          )}
+
+          {investInfo.ultimos.length > 0 && (
+            <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 6 }}>
+              <p style={{ fontSize: 11, fontWeight: 700, color: "var(--of-text-muted)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                {t("dashInvestUltimosAportes")}
+              </p>
+              {investInfo.ultimos.map((inv) => (
+                <div key={inv.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+                  <div style={{ minWidth: 0 }}>
+                    <p style={{ fontSize: 12, fontWeight: 600, color: "var(--of-text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {inv.nome}
+                    </p>
+                    <p style={{ fontSize: 11, color: "var(--of-text-muted)" }}>
+                      {formatDate(inv.data_investimento, lang)}
+                    </p>
+                  </div>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: "var(--of-text)" }}>{fmt(inv.valor_aporte)}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div style={{
+          background: "var(--of-surface)",
+          borderRadius: 16,
+          border: "1px solid var(--of-border)",
+          padding: "18px 20px",
+          boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+        }}>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 12 }}>
+            <div>
+              <p style={{ fontSize: 12, fontWeight: 700, color: "var(--of-text)", marginBottom: 2 }}>
+                {t("dashSubsResumoTitulo")}
+              </p>
+              <p style={{ fontSize: 12, color: "var(--of-text-muted)" }}>
+                {t("dashSubsResumoSub")}
+              </p>
+            </div>
+            <Link to="/app/assinaturas" style={{ fontSize: 12, fontWeight: 700, color: "#16A34A", textDecoration: "none" }}>
+              {t("dashVerTodas")}
+            </Link>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 12, marginBottom: 12 }}>
+            <div>
+              <p style={{ fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--of-text-muted)", fontWeight: 700 }}>
+                {t("dashSubsTotalMensal")}
+              </p>
+              <p style={{ fontSize: 16, fontWeight: 800, color: "#EF4444", marginTop: 2 }}>
+                {fmt(subInfo.totalMensal)}
+              </p>
+            </div>
+            <div>
+              <p style={{ fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--of-text-muted)", fontWeight: 700 }}>
+                {t("dashSubsAtivas")}
+              </p>
+              <p style={{ fontSize: 16, fontWeight: 800, color: "var(--of-text)", marginTop: 2 }}>
+                {subInfo.count}
+              </p>
+            </div>
+            <div>
+              <p style={{ fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--of-text-muted)", fontWeight: 700 }}>
+                {t("dashSubsProximas")}
+              </p>
+              <p style={{ fontSize: 16, fontWeight: 800, color: "var(--of-text)", marginTop: 2 }}>
+                {subInfo.proximas.length}
+              </p>
+            </div>
+          </div>
+
+          {subInfo.proximas.length === 0 ? (
+            <p style={{ fontSize: 12, color: "var(--of-text-muted)" }}>{t("dashSubsSemProximas")}</p>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {subInfo.proximas.map((a) => (
+                <div key={a.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+                  <div style={{ minWidth: 0, display: "flex", alignItems: "center", gap: 10 }}>
+                    <div style={{ width: 28, height: 28, borderRadius: 8, background: (a.cor || "#16A34A") + "22", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <span style={{ fontSize: 14 }}>{a.icone || "💳"}</span>
+                    </div>
+                    <div style={{ minWidth: 0 }}>
+                      <p style={{ fontSize: 12, fontWeight: 600, color: "var(--of-text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {a.nome}
+                      </p>
+                      {a.proximo_pagamento && (
+                        <p style={{ fontSize: 11, color: "var(--of-text-muted)" }}>
+                          {formatDate(a.proximo_pagamento, lang)}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: "var(--of-text)" }}>{formatCurrency(a.valor, lang)}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {totais.totalRenda > 0 && subInfo.totalMensal / totais.totalRenda > 0.12 && (
+            <div style={{
+              marginTop: 12,
+              display: "flex", alignItems: "center", gap: 10,
+              padding: "10px 12px",
+              background: "#FEF2F2",
+              border: "1px solid #FECACA",
+              borderRadius: 12,
+            }}>
+              <AlertCircle size={16} color="#EF4444" />
+              <p style={{ fontSize: 12, color: "#991B1B", lineHeight: 1.4 }}>
+                {t("dashSubsAlertaPeso")}
+              </p>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Main grid */}
@@ -668,6 +948,16 @@ export default function DashboardWithSupabase() {
             totalRenda={totais.totalRenda}
             percentualEconomia={totais.percentualEconomia}
             categorias={categorias}
+            investimentos={{
+              totalAportes: investInfo.total,
+              patrimonioEstimado: investInfo.patrimonio,
+              recorrentes: investInfo.recorrentes,
+              diversificacao: investInfo.diversificacao,
+            }}
+            assinaturas={{
+              totalMensal: subInfo.totalMensal,
+              count: subInfo.count,
+            }}
           />
 
           {/* Categoria Donut */}

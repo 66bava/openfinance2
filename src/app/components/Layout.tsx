@@ -16,6 +16,8 @@ import {
   Moon,
   TrendingUp,
   Users,
+  Repeat,
+  Landmark,
 } from "lucide-react"
 import { OFLogo } from "./OFLogo"
 import { Toaster } from "sonner"
@@ -25,42 +27,7 @@ import { supabase } from "../../lib/supabase"
 import type { Profile } from "../../lib/types"
 import { useTheme } from "../../lib/theme-context"
 import { useLanguage } from "../../lib/language-context"
-import type { Lang } from "../../lib/i18n"
-
-const LANGS: { code: Lang; label: string }[] = [
-  { code: "pt", label: "PT" },
-  { code: "en", label: "EN" },
-  { code: "es", label: "ES" },
-]
-
-function AppLangSwitcher() {
-  const { lang, setLang } = useLanguage()
-  return (
-    <div style={{
-      display: "flex", alignItems: "center", gap: 1,
-      background: "var(--of-page-bg)", border: "1px solid var(--of-border)",
-      borderRadius: 20, padding: "3px 4px",
-    }}>
-      {LANGS.map(({ code, label }) => (
-        <button
-          key={code}
-          onClick={() => setLang(code)}
-          style={{
-            fontSize: 10, fontWeight: lang === code ? 700 : 500,
-            color: lang === code ? "var(--of-text)" : "var(--of-text-muted)",
-            background: lang === code ? "var(--of-surface)" : "transparent",
-            border: "none", borderRadius: 14, padding: "3px 8px",
-            cursor: "pointer", letterSpacing: "0.04em",
-            boxShadow: lang === code ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
-            transition: "all 0.15s",
-          }}
-        >
-          {label}
-        </button>
-      ))}
-    </div>
-  )
-}
+import { LanguageDropdown } from "./LanguageDropdown"
 
 function UserMenu({
   displayName, userEmail, plano, avatarLetter, signOut,
@@ -167,6 +134,8 @@ const BASE_NAV_PATHS = [
   { path: "/app", labelKey: "appDashboard" as const, icon: LayoutDashboard },
   { path: "/app/adicionar", labelKey: "appAdicionar" as const, icon: PlusCircle },
   { path: "/app/futuro", labelKey: "appFuturo" as const, icon: TrendingUp },
+  { path: "/app/investimentos", labelKey: "appInvestimentos" as const, icon: Landmark },
+  { path: "/app/assinaturas", labelKey: "appAssinaturas" as const, icon: Repeat },
   { path: "/app/analise", labelKey: "appAnalise" as const, icon: BarChart2 },
   { path: "/app/relatorios", labelKey: "appRelatorios" as const, icon: FileText },
   { path: "/app/cartoes", labelKey: "appCartoes" as const, icon: CreditCard },
@@ -325,6 +294,8 @@ export function Layout() {
       "/app/cartoes": t("appTitleCartoes"),
       "/app/categorias": t("appTitleCategorias"),
       "/app/futuro": t("appTitleFuturo"),
+      "/app/investimentos": t("appTitleInvestimentos"),
+      "/app/assinaturas": t("appTitleAssinaturas"),
       "/app/familia": t("appTitleFamilia"),
       "/app/perfil": t("appTitlePerfil"),
     }
@@ -426,7 +397,7 @@ export function Layout() {
             >
               {theme === "dark" ? <Sun size={15} strokeWidth={2.2} /> : <Moon size={15} strokeWidth={2.2} />}
             </button>
-            <AppLangSwitcher />
+            <LanguageDropdown />
             <UserMenu
               displayName={displayName}
               userEmail={userEmail}

@@ -15,8 +15,10 @@ import {
   calcularTotais,
   deleteTransacao,
 } from "../../lib/queries";
-import { analisarCategoria } from "../../lib/openai";
-import { verificarIncrementarIaReport } from "../../lib/queries/receitas-recorrentes";
+import { getInvestimentos, calcularPatrimonioEstimado } from "../../lib/queries/investimentos";
+import { getAssinaturas, calcularTotalMensal } from "../../lib/queries/assinaturas";
+import { analisarCategoria, analisarRelatorio } from "../../lib/openai";
+import { verificarIncrementarIaReport, consultarLimiteIa } from "../../lib/queries/receitas-recorrentes";
 import { toast } from "sonner";
 
 type Period = "semana" | "mês" | "ano";
@@ -122,7 +124,19 @@ function AnalysisContent() {
   const [aiUsado, setAiUsado] = useState<number | null>(null);
   const [aiLimite, setAiLimite] = useState<number | null>(null);
 
+  // IA do relatório (período inteiro)
+  const [aiReportText, setAiReportText] = useState<string | null>(null);
+  const [aiReportLoading, setAiReportLoading] = useState(false);
+  const [aiReportError, setAiReportError] = useState<string | null>(null);
+
   const dateRange = useMemo(() => getDateRange(period), [period]);
+
+  useEffect(() => {
+    consultarLimiteIa(userId).then(({ usado, limite }) => {
+      setAiUsado(usado);
+      setAiLimite(limite);
+    }).catch(() => {});
+  }, [userId]);
 
   useEffect(() => {
     async function carregar() {
@@ -145,6 +159,8 @@ function AnalysisContent() {
     setSearchQuery("");
     setAiCategory(null);
     setAiText(null);
+    setAiReportText(null);
+    setAiReportError(null);
   }, [userId, dateRange]);
 
   const categorias = useMemo(() => calcularCategorias(transacoes), [transacoes]);
@@ -220,6 +236,64 @@ function AnalysisContent() {
       setAiError(e.message || "Erro ao gerar análise.");
     } finally {
       setAiLoading(false);
+    }
+    }
+
+  async function handleAnalisarRelatorio() {
+    setAiReportError(null);
+    setAiReportLoading(true);
+
+    try {
+      const limite = await verificarIncrementarIaReport(userId);
+      setAiUsado(limite.usado);
+      setAiLimite(limite.limite);
+
+      if (!limite.success) {
+        const msg = limite.limite >= 0
+          ? `Limite semanal atingido (${limite.usado}/${limite.limite} análises). Renova na segunda-feira.`
+          : "Limite de análises atingido.";
+        setAiReportError(msg);
+        toast.error(msg);
+        return;
+      }
+
+      const [invs, subs] = await Promise.all([
+        getInvestimentos(userId),
+        getAssinaturas(userId),
+      ])
+
+      const totalAportes = invs.reduce((acc, i) => acc + (Number(i.valor_aporte) || 0), 0)
+      const patrimonioEstimado = calcularPatrimonioEstimado(invs)
+      const recorrentes = invs.filter((i) => i.aporte_recorrente).length
+      const diversificacao = new Set(invs.map((i) => i.categoria_investimento)).size
+      const aportesNoPeriodo = invs
+        .filter((i) => i.data_investimento >= dateRange.inicio && i.data_investimento <= dateRange.fim)
+        .reduce((acc, i) => acc + (Number(i.valor_aporte) || 0), 0)
+
+      const subsTotalMensal = calcularTotalMensal(subs)
+
+      const result = await analisarRelatorio({
+        periodoLabel: periodoLabel[period],
+        inicio: dateRange.inicio,
+        fim: dateRange.fim,
+        transacoes,
+        investimentos: {
+          totalAportes,
+          patrimonioEstimado,
+          recorrentes,
+          diversificacao,
+          aportesNoPeriodo,
+        },
+        assinaturas: {
+          totalMensal: subsTotalMensal,
+          count: subs.length,
+        },
+      });
+      setAiReportText(result);
+    } catch (e: any) {
+      setAiReportError(e.message || "Erro ao gerar análise do relatório.");
+    } finally {
+      setAiReportLoading(false);
     }
   }
 
@@ -297,8 +371,67 @@ function AnalysisContent() {
           )}
         </div>
 
-        {/* Categoria breakdown com IA */}
-        <div className="bg-white rounded-lg p-5 border border-[#E0E0E0]" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
+        <div className="space-y-4">
+          {/* Conselheiro IA do período */}
+          <div className="bg-white rounded-lg p-5 border border-[#E0E0E0]" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-black" style={{ fontSize: 14, fontWeight: 600 }}>Conselheiro IA</h3>
+              {aiLimite !== null && aiUsado !== null && (
+                <span style={{
+                  fontSize: 11, fontWeight: 600,
+                  color: aiLimite === -1 ? "#16A34A" : aiUsado >= aiLimite ? "#DC2626" : "#6B7280",
+                }}>
+                  {aiLimite === -1
+                    ? "Ilimitado"
+                    : aiUsado >= aiLimite
+                      ? "Limite atingido · renova segunda"
+                      : `${aiLimite - aiUsado} restante${aiLimite - aiUsado === 1 ? "" : "s"} esta semana`}
+                </span>
+              )}
+            </div>
+            <p style={{ fontSize: 12, color: "#6B7280", lineHeight: 1.45, marginBottom: 10 }}>
+              Plano de ação do período ({periodoLabel[period]}), com justificativas baseadas nos seus dados.
+            </p>
+
+            {!aiReportText && !aiReportLoading && (
+              <button
+                onClick={handleAnalisarRelatorio}
+                className="w-full flex items-center justify-center gap-2 rounded-lg border border-[#E5E7EB] hover:bg-[#F5F5F5] transition-colors"
+                style={{ padding: "10px 12px", fontSize: 13, fontWeight: 600, color: "#111" }}
+              >
+                <Sparkles size={14} />
+                Gerar plano do período
+              </button>
+            )}
+
+            {aiReportLoading && (
+              <div className="flex items-center gap-2 text-[#555]">
+                <div className="w-4 h-4 border-2 border-[#16A34A] border-t-transparent rounded-full animate-spin" />
+                <span style={{ fontSize: 12 }}>Gerando análise completa...</span>
+              </div>
+            )}
+
+            {aiReportError && !aiReportLoading && (
+              <p style={{ fontSize: 12 }} className="text-red-600">{aiReportError}</p>
+            )}
+
+            {aiReportText && !aiReportLoading && (
+              <div className="mt-2 rounded-lg border border-[#E5E7EB] bg-[#FAFAFA] p-3">
+                <div>{renderAI(aiReportText)}</div>
+                <button
+                  onClick={handleAnalisarRelatorio}
+                  className="mt-3 w-full flex items-center justify-center gap-2 rounded-lg border border-[#E5E7EB] hover:bg-[#F5F5F5] transition-colors"
+                  style={{ padding: "9px 12px", fontSize: 12, fontWeight: 600, color: "#111" }}
+                >
+                  <Sparkles size={13} />
+                  Gerar novamente
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Categoria breakdown com IA */}
+          <div className="bg-white rounded-lg p-5 border border-[#E0E0E0]" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-black" style={{ fontSize: 14, fontWeight: 600 }}>Por Categoria</h3>
             {aiLimite !== null && aiUsado !== null && (
@@ -370,6 +503,7 @@ function AnalysisContent() {
               </div>
             </div>
           )}
+          </div>
         </div>
       </div>
 

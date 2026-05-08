@@ -1,12 +1,12 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Link } from "react-router"
 import { motion, AnimatePresence } from "motion/react"
-import { Menu, X, Sun, Moon } from "lucide-react"
+import { Menu, X, Sun, Moon, ChevronDown } from "lucide-react"
 import { useTheme } from "../../../lib/theme-context"
 import { useLanguage } from "../../../lib/language-context"
 import type { Lang } from "../../../lib/i18n"
 
-function OpenfyLogo({ dark = false }: { dark?: boolean }) {
+function OpenfyLogo() {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
       <div style={{
@@ -21,7 +21,7 @@ function OpenfyLogo({ dark = false }: { dark?: boolean }) {
       </div>
       <span style={{
         fontSize: 17, fontWeight: 700,
-        color: dark ? "#FFFFFF" : "var(--of-text)",
+        color: "var(--of-text)",
         letterSpacing: "-0.02em", fontFamily: "var(--font-display)",
       }}>
         Openfy
@@ -32,45 +32,118 @@ function OpenfyLogo({ dark = false }: { dark?: boolean }) {
 
 export { OpenfyLogo }
 
-const LANGS: { code: Lang; label: string }[] = [
-  { code: "pt", label: "PT" },
-  { code: "en", label: "EN" },
-  { code: "es", label: "ES" },
+const LANG_OPTIONS: { code: Lang; labelKey: "langLongPT" | "langLongEN" | "langLongES" }[] = [
+  { code: "pt", labelKey: "langLongPT" },
+  { code: "en", labelKey: "langLongEN" },
+  { code: "es", labelKey: "langLongES" },
 ]
 
-function LangSwitcher() {
-  const { lang, setLang } = useLanguage()
+function LangDropdown() {
+  const { lang, setLang, t } = useLanguage()
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener("mousedown", handler)
+    return () => document.removeEventListener("mousedown", handler)
+  }, [])
 
   return (
-    <div style={{
-      display: "flex", alignItems: "center", gap: 1,
-      background: "var(--of-page-bg)",
-      border: "1px solid var(--of-border)",
-      borderRadius: 20, padding: "3px 4px",
-    }}>
-      {LANGS.map(({ code, label }) => (
-        <button
-          key={code}
-          onClick={() => setLang(code)}
+    <div ref={ref} style={{ position: "relative" }}>
+      <button
+        onClick={() => setOpen(v => !v)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        style={{
+          display: "inline-flex", alignItems: "center", gap: 5,
+          height: 34, padding: "0 11px",
+          borderRadius: 8,
+          background: "transparent",
+          border: "1px solid var(--of-border)",
+          color: "var(--of-text-secondary)",
+          cursor: "pointer", fontSize: 12, fontWeight: 700,
+          letterSpacing: "0.06em",
+          transition: "border-color 0.15s, color 0.15s",
+        }}
+        onMouseEnter={e => {
+          e.currentTarget.style.borderColor = "var(--of-text-muted)"
+          e.currentTarget.style.color = "var(--of-text)"
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.borderColor = "var(--of-border)"
+          e.currentTarget.style.color = "var(--of-text-secondary)"
+        }}
+      >
+        {lang.toUpperCase()}
+        <ChevronDown
+          size={12}
           style={{
-            fontSize: 11, fontWeight: lang === code ? 700 : 500,
-            color: lang === code ? "var(--of-text)" : "var(--of-text-muted)",
-            background: lang === code ? "var(--of-surface)" : "transparent",
-            border: "none", borderRadius: 14,
-            padding: "4px 9px", cursor: "pointer",
-            letterSpacing: "0.04em",
-            boxShadow: lang === code ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
-            transition: "all 0.15s",
+            transform: open ? "rotate(180deg)" : "rotate(0deg)",
+            transition: "transform 0.2s",
+            color: "var(--of-text-muted)",
           }}
-        >
-          {label}
-        </button>
-      ))}
+        />
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            role="menu"
+            initial={{ opacity: 0, y: -6, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -6, scale: 0.97 }}
+            transition={{ duration: 0.15 }}
+            style={{
+              position: "absolute", top: "calc(100% + 8px)", right: 0, zIndex: 300,
+              background: "var(--of-surface)",
+              border: "1px solid var(--of-border)",
+              borderRadius: 10,
+              boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+              minWidth: 168, overflow: "hidden",
+            }}
+          >
+            {LANG_OPTIONS.map(opt => {
+              const active = opt.code === lang
+              return (
+                <button
+                  key={opt.code}
+                  role="menuitemradio"
+                  aria-checked={active}
+                  onClick={() => { setLang(opt.code); setOpen(false) }}
+                  style={{
+                    width: "100%",
+                    display: "flex", alignItems: "center", justifyContent: "space-between",
+                    padding: "10px 14px",
+                    background: active ? "var(--of-hover)" : "transparent",
+                    border: "none", cursor: "pointer", textAlign: "left",
+                    transition: "background 0.1s",
+                  }}
+                  onMouseEnter={e => { if (!active) e.currentTarget.style.background = "var(--of-hover)" }}
+                  onMouseLeave={e => { if (!active) e.currentTarget.style.background = "transparent" }}
+                >
+                  <span style={{ fontSize: 13, fontWeight: 500, color: "var(--of-text)" }}>
+                    {t(opt.labelKey)}
+                  </span>
+                  <span style={{
+                    fontSize: 10, fontWeight: 800, letterSpacing: "0.06em",
+                    color: active ? "#16A34A" : "var(--of-text-muted)",
+                  }}>
+                    {opt.code.toUpperCase()}
+                  </span>
+                </button>
+              )
+            })}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
 
-function DarkModeToggle() {
+function DarkModeToggle({ size = 36 }: { size?: number }) {
   const { theme, toggleTheme } = useTheme()
   const { t } = useLanguage()
   const isDark = theme === "dark"
@@ -81,25 +154,23 @@ function DarkModeToggle() {
       title={isDark ? t("darkModeOff") : t("darkModeOn")}
       style={{
         display: "flex", alignItems: "center", justifyContent: "center",
-        width: 36, height: 36, borderRadius: "50%",
+        width: size, height: size, borderRadius: "50%",
         background: "var(--of-btn-bg)",
         color: "var(--of-btn-text)",
-        border: "none",
-        cursor: "pointer",
-        flexShrink: 0,
+        border: "none", cursor: "pointer", flexShrink: 0,
         boxShadow: "0 1px 4px rgba(0,0,0,0.18)",
         transition: "transform 0.2s, box-shadow 0.2s",
       }}
-      onMouseEnter={(e) => {
+      onMouseEnter={e => {
         e.currentTarget.style.transform = "scale(1.08)"
         e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.28)"
       }}
-      onMouseLeave={(e) => {
+      onMouseLeave={e => {
         e.currentTarget.style.transform = "scale(1)"
         e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.18)"
       }}
     >
-      {isDark ? <Sun size={15} strokeWidth={2.2} /> : <Moon size={15} strokeWidth={2.2} />}
+      {isDark ? <Sun size={14} strokeWidth={2.2} /> : <Moon size={14} strokeWidth={2.2} />}
     </button>
   )
 }
@@ -142,7 +213,8 @@ export default function Navbar() {
             <OpenfyLogo />
           </a>
 
-          <nav style={{ display: "flex", gap: 36 }} className="hidden md:flex">
+          {/* Desktop nav links */}
+          <nav style={{ gap: 36 }} className="hidden md:flex">
             {navLinks.map((link) => (
               <a
                 key={link.href}
@@ -152,17 +224,17 @@ export default function Navbar() {
                   color: "var(--of-text-secondary)",
                   textDecoration: "none", transition: "color 0.15s",
                 }}
-                onMouseOver={(e) => (e.currentTarget.style.color = "var(--of-text)")}
-                onMouseOut={(e) => (e.currentTarget.style.color = "var(--of-text-secondary)")}
+                onMouseOver={e => (e.currentTarget.style.color = "var(--of-text)")}
+                onMouseOut={e => (e.currentTarget.style.color = "var(--of-text-secondary)")}
               >
                 {link.label}
               </a>
             ))}
           </nav>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }} className="hidden md:flex">
-            <LangSwitcher />
-            <DarkModeToggle />
+          {/* Desktop right side: [LangDropdown] [Entrar] [Começar] [DarkMode] */}
+          <div style={{ alignItems: "center", gap: 8 }} className="hidden md:flex">
+            <LangDropdown />
             <Link
               to="/login"
               style={{
@@ -171,11 +243,11 @@ export default function Navbar() {
                 textDecoration: "none", padding: "8px 16px",
                 borderRadius: 8, transition: "color 0.15s, background 0.15s",
               }}
-              onMouseOver={(e) => {
+              onMouseOver={e => {
                 e.currentTarget.style.color = "var(--of-text)"
                 e.currentTarget.style.background = "var(--of-hover)"
               }}
-              onMouseOut={(e) => {
+              onMouseOut={e => {
                 e.currentTarget.style.color = "var(--of-text-secondary)"
                 e.currentTarget.style.background = "transparent"
               }}
@@ -191,15 +263,18 @@ export default function Navbar() {
                 borderRadius: 8, backgroundColor: "var(--of-btn-bg)",
                 transition: "background 0.15s",
               }}
-              onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "var(--of-btn-hover-bg)")}
-              onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "var(--of-btn-bg)")}
+              onMouseOver={e => (e.currentTarget.style.backgroundColor = "var(--of-btn-hover-bg)")}
+              onMouseOut={e => (e.currentTarget.style.backgroundColor = "var(--of-btn-bg)")}
             >
               {t("navComecarGratis")}
             </Link>
+            <DarkModeToggle />
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }} className="md:hidden">
-            <DarkModeToggle />
+          {/* Mobile right side: [LangDropdown] [DarkMode] [hamburger] */}
+          <div style={{ alignItems: "center", gap: 8 }} className="md:hidden flex">
+            <LangDropdown />
+            <DarkModeToggle size={34} />
             <button
               onClick={() => setMenuAberto(!menuAberto)}
               style={{
@@ -213,6 +288,7 @@ export default function Navbar() {
           </div>
         </div>
 
+        {/* Mobile drawer */}
         <AnimatePresence>
           {menuAberto && (
             <motion.div
@@ -240,9 +316,7 @@ export default function Navbar() {
                     {link.label}
                   </a>
                 ))}
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 16, gap: 8 }}>
-                  <LangSwitcher />
-                </div>
+
                 <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
                   <Link
                     to="/login"

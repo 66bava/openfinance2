@@ -117,3 +117,50 @@ export type TipoPagamentoFatura = 'total' | 'parcial'
 export type BandeiraCartao = 'visa' | 'mastercard' | 'elo' | 'amex' | 'hipercard' | 'outro'
 export type TipoCartao = 'credito' | 'debito'
 export type StatusFatura = 'aberta' | 'fechada' | 'paga' | 'parcial'
+
+export type CategoriaInvestimento = 'renda_fixa' | 'renda_variavel' | 'fundos' | 'outros'
+export type RiscoInvestimento = 'baixo' | 'moderado' | 'alto'
+export type LiquidezInvestimento = 'diaria' | 'curto' | 'media' | 'longo'
+export type RecorrenciaInvestimento = 'semanal' | 'quinzenal' | 'mensal' | 'anual'
+
+export interface Investimento {
+  id: string
+  user_id: string
+  nome: string
+  tipo: string
+  categoria_investimento: CategoriaInvestimento
+  corretora?: string | null
+  corretora_personalizada?: string | null
+  valor_aporte: number
+  aporte_recorrente: boolean
+  recorrencia?: RecorrenciaInvestimento | null
+  rentabilidade?: number | null
+  rentabilidade_tipo: 'percent' | 'reais'
+  data_investimento: string
+  vencimento?: string | null
+  observacoes?: string | null
+  risco: RiscoInvestimento
+  liquidez: LiquidezInvestimento
+  ativo: boolean
+  created_at: string
+  updated_at: string
+}
+
+export type RecorrenciaAssinatura = 'semanal' | 'quinzenal' | 'mensal' | 'bimestral' | 'trimestral' | 'semestral' | 'anual'
+
+export interface Assinatura {
+  id: string
+  user_id: string
+  nome: string
+  valor: number
+  recorrencia: RecorrenciaAssinatura
+  categoria?: string | null
+  proximo_pagamento?: string | null
+  renovacao_automatica: boolean
+  ativo: boolean
+  icone?: string | null
+  cor?: string | null
+  observacoes?: string | null
+  created_at: string
+  updated_at: string
+}

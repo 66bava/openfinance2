@@ -1,8 +1,10 @@
-﻿import { motion } from "motion/react"
+﻿import { useState } from "react"
+import { motion } from "motion/react"
 import { useLanguage } from "../../../lib/language-context"
 
 export default function Dashboard() {
   const { t } = useLanguage()
+  const [imgError, setImgError] = useState(false)
   return (
     <section
       style={{
@@ -68,24 +70,33 @@ export default function Dashboard() {
               app.openfy.com.br/dashboard
             </div>
           </div>
-          <img
-            src="/dashboard-preview.png"
-            alt="Openfy dashboard preview"
-            style={{ width: "100%", display: "block" }}
-            onError={(e) => {
-              const el = e.currentTarget
-              el.style.display = "none"
-              const placeholder = document.createElement("div")
-              placeholder.style.cssText = "height:480px;display:flex;align-items:center;justify-content:center;background:#FAFAFA;flex-direction:column;gap:12px"
-              placeholder.innerHTML = `
-                <div style="width:48px;height:48px;background:#E5E5E3;border-radius:12px;display:flex;align-items:center;justify-content:center">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="2" y="13" width="6" height="9" rx="1" fill="#A3A3A3"/><rect x="9" y="8" width="6" height="14" rx="1" fill="#A3A3A3"/><rect x="16" y="3" width="6" height="19" rx="1" fill="#A3A3A3"/></svg>
-                </div>
-                <p style="font-size:14px;color:#A3A3A3;font-family:system-ui">Screenshot do dashboard em breve</p>
-              `
-              el.parentElement?.appendChild(placeholder)
-            }}
-          />
+          {imgError ? (
+            <div style={{
+              height: 480, display: "flex", alignItems: "center", justifyContent: "center",
+              background: "var(--of-page-bg)", flexDirection: "column", gap: 12,
+            }}>
+              <div style={{
+                width: 48, height: 48, background: "var(--of-border)",
+                borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <rect x="2" y="13" width="6" height="9" rx="1" fill="var(--of-text-muted)" />
+                  <rect x="9" y="8" width="6" height="14" rx="1" fill="var(--of-text-muted)" />
+                  <rect x="16" y="3" width="6" height="19" rx="1" fill="var(--of-text-muted)" />
+                </svg>
+              </div>
+              <p style={{ fontSize: 14, color: "var(--of-text-muted)", fontFamily: "system-ui" }}>
+                Screenshot do dashboard em breve
+              </p>
+            </div>
+          ) : (
+            <img
+              src="/dashboard-preview.png"
+              alt="Openfy dashboard preview"
+              style={{ width: "100%", display: "block" }}
+              onError={() => setImgError(true)}
+            />
+          )}
         </motion.div>
       </div>
     </section>

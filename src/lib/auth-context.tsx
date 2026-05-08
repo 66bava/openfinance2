@@ -43,13 +43,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (event === "SIGNED_IN" && newUser && prevUserId !== newUser.id) {
         const userId = newUser.id;
         setTimeout(() => {
-          supabase.from("audit_logs").insert({ user_id: userId, acao: "login", detalhes: {} }).catch(() => {});
+          supabase.from("audit_logs").insert({ user_id: userId, acao: "login", detalhes: {} }).then(undefined, () => {});
         }, 0);
       }
       if (event === "SIGNED_OUT" && prevUserId) {
         const userId = prevUserId;
         setTimeout(() => {
-          supabase.from("audit_logs").insert({ user_id: userId, acao: "logout", detalhes: {} }).catch(() => {});
+          supabase.from("audit_logs").insert({ user_id: userId, acao: "logout", detalhes: {} }).then(undefined, () => {});
         }, 0);
       }
     });

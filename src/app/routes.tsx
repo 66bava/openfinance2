@@ -11,6 +11,8 @@ import FaturaDetalhe from "./pages/FaturaDetalhe"
 import Categorias from "./pages/Categorias"
 import Futuro from "./pages/Futuro"
 import Familia from "./pages/Familia"
+import Investimentos from "./pages/Investimentos"
+import Assinaturas from "./pages/Assinaturas"
 import Onboarding from "./pages/Onboarding"
 import Login from "./pages/login"
 import Cadastro from "./pages/Cadastro"
@@ -75,6 +77,8 @@ export const router = createBrowserRouter([
           { path: "cartoes/:id/fatura/:mes/:ano", Component: FaturaDetalhe },
           { path: "categorias", Component: Categorias },
           { path: "futuro", Component: Futuro },
+          { path: "investimentos", Component: Investimentos },
+          { path: "assinaturas", Component: Assinaturas },
           { path: "familia", Component: Familia },
           { path: "perfil", Component: Profile },
         ],

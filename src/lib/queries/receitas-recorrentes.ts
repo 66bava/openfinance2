@@ -61,6 +61,37 @@ export async function deleteReceitaRecorrente(id: string): Promise<void> {
   if (error) throw error
 }
 
+function mondayOfCurrentWeek(): string {
+  const today = new Date()
+  const dow = today.getDay()
+  const daysBack = dow === 0 ? 6 : dow - 1
+  const monday = new Date(today)
+  monday.setDate(today.getDate() - daysBack)
+  monday.setHours(0, 0, 0, 0)
+  return monday.toISOString().split('T')[0]
+}
+
+export async function consultarLimiteIa(userId: string): Promise<{
+  usado: number
+  limite: number
+}> {
+  const { data } = await supabase
+    .from('profiles')
+    .select('plano, relatorios_ia_semana, semana_ia_reset')
+    .eq('id', userId)
+    .single()
+
+  if (!data) return { usado: 0, limite: 3 }
+
+  const semanaAtual = mondayOfCurrentWeek()
+  const usado = !data.semana_ia_reset || data.semana_ia_reset < semanaAtual
+    ? 0
+    : data.relatorios_ia_semana
+
+  const limite = data.plano === 'familia' ? -1 : data.plano === 'pro' ? 10 : 3
+  return { usado, limite }
+}
+
 export async function verificarIncrementarIaReport(userId: string): Promise<{
   success: boolean
   message?: string
