@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useLocation, useNavigate } from "react-router"
+﻿import { NavLink, Outlet, useLocation, useNavigate } from "react-router"
 import { useState, useEffect, useRef } from "react"
 import {
   LayoutDashboard,
@@ -103,10 +103,10 @@ function UserMenu({
         </div>
         <div className="hidden md:block" style={{ textAlign: "left" }}>
           <p style={{ fontSize: 12, fontWeight: 600, color: "var(--of-text)", lineHeight: 1.2 }}>
-            {displayName.length > 16 ? displayName.slice(0, 16) + "…" : displayName}
+            {displayName.length > 16 ? displayName.slice(0, 16) + "â€¦" : displayName}
           </p>
           <p style={{ fontSize: 10, color: "var(--of-text-muted)" }}>
-            Plano {plano === "familia" ? "Família" : plano === "pro" || plano === "beta" ? "Pro" : "Free"}
+            Plano {plano === "familia" ? "FamÃ­lia" : plano === "pro" || plano === "beta" ? "Pro" : "Free"}
           </p>
         </div>
         <ChevronDown size={13} style={{ color: "var(--of-text-muted)", transform: open ? "rotate(180deg)" : "none", transition: "transform 0.15s" }} />
@@ -338,7 +338,7 @@ export function Layout() {
     if (!user) return
     getProfile(user.id).then((p) => {
       setProfile(p)
-      if (p && p.onboarding_completo === false) {
+      if (p && p.onboarding_completo !== true) {
         navigate("/app/onboarding", { replace: true })
       }
     })
@@ -346,7 +346,7 @@ export function Layout() {
 
   const pageTitle = getPageTitle(location.pathname)
   const userEmail = user?.email ?? ""
-  const displayName = profile?.nome || user?.user_metadata?.full_name || userEmail.split("@")[0] || "Usuário"
+  const displayName = profile?.nome || user?.user_metadata?.full_name || userEmail.split("@")[0] || "UsuÃ¡rio"
   const avatarLetter = displayName.charAt(0).toUpperCase()
   const plano = profile?.plano ?? "free"
   const sidebarProps = { displayName, userEmail, plano, avatarLetter, signOut }
@@ -444,7 +444,7 @@ export function Layout() {
         <nav
           className="lg:hidden"
           role="navigation"
-          aria-label="Navegação principal"
+          aria-label="NavegaÃ§Ã£o principal"
           style={{
             position: "fixed", bottom: 0, left: 0, right: 0,
             backgroundColor: "var(--of-surface)", borderTop: "1px solid var(--of-border)",
@@ -483,3 +483,4 @@ export function Layout() {
     </div>
   )
 }
+

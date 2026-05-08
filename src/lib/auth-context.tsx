@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+﻿import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { flushSync } from "react-dom";
 import type { User, Session } from "@supabase/supabase-js";
 import { supabase } from "./supabase";
@@ -24,22 +24,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
       const newUser = newSession?.user ?? null;
-
-      // Audit logs (fire-and-forget, fora do flushSync para não bloquear)
-      if (event === "SIGNED_IN" && newUser && prevUserIdRef.current !== newUser.id) {
-        supabase.from("audit_logs").insert({
-          user_id: newUser.id,
-          acao: "login",
-          detalhes: {},
-        }).catch(() => {});
-      }
-      if (event === "SIGNED_OUT" && prevUserIdRef.current) {
-        supabase.from("audit_logs").insert({
-          user_id: prevUserIdRef.current,
-          acao: "logout",
-          detalhes: {},
-        }).catch(() => {});
-      }
+      const prevUserId = prevUserIdRef.current;
 
       prevUserIdRef.current = newUser?.id ?? null;
 
@@ -51,6 +36,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(newUser);
         setLoading(false);
       });
+
+      // IMPORTANTE: evitar chamadas Supabase dentro do callback do onAuthStateChange,
+      // pois isso pode causar deadlock no client. Agende para depois do callback.
+      // (audit logs: fire-and-forget)
+      if (event === "SIGNED_IN" && newUser && prevUserId !== newUser.id) {
+        const userId = newUser.id;
+        setTimeout(() => {
+          supabase.from("audit_logs").insert({ user_id: userId, acao: "login", detalhes: {} }).catch(() => {});
+        }, 0);
+      }
+      if (event === "SIGNED_OUT" && prevUserId) {
+        const userId = prevUserId;
+        setTimeout(() => {
+          supabase.from("audit_logs").insert({ user_id: userId, acao: "logout", detalhes: {} }).catch(() => {});
+        }, 0);
+      }
     });
 
     // Sync cross-tab: re-verifica sessão quando usuário retorna à aba
