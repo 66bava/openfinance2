@@ -1,27 +1,24 @@
-const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
+import { supabase } from "./supabase"
 
-async function groqRequest(prompt: string, maxTokens = 400): Promise<string> {
-  const apiKey = import.meta.env.VITE_GROQ_API_KEY
-  if (!apiKey) throw new Error("Configure VITE_GROQ_API_KEY no arquivo .env.local")
+async function aiRequest(prompt: string, maxTokens = 400): Promise<string> {
+  const { data } = await supabase.auth.getSession()
+  const accessToken = data.session?.access_token
+  if (!accessToken) throw new Error("Faça login para usar o Conselheiro IA.")
 
-  const res = await fetch(GROQ_URL, {
+  const res = await fetch("/api/ai", {
     method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-    body: JSON.stringify({
-      model: "llama-3.3-70b-versatile",
-      messages: [{ role: "user", content: prompt }],
-      max_tokens: maxTokens,
-      temperature: 0.7,
-    }),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({ prompt, maxTokens }),
   })
 
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}))
-    throw new Error((err as any)?.error?.message ?? `Erro ${res.status} na API`)
-  }
+  const payload = await res.json().catch(() => ({} as any))
+  if (!res.ok) throw new Error(payload?.error?.message ?? `Erro ${res.status} na API`)
 
-  const data = await res.json()
-  return data.choices?.[0]?.message?.content ?? "Não foi possível gerar a análise."
+  const content = payload?.content
+  return typeof content === "string" && content.trim() ? content : "Não foi possível gerar a análise."
 }
 
 export interface ScoreContext {
@@ -34,7 +31,10 @@ export interface ScoreContext {
 }
 
 export async function analisarScore(ctx: ScoreContext): Promise<string> {
-  const catStr = ctx.categorias.slice(0, 5).map((c) => `${c.name} (${c.percent}%)`).join(", ")
+  const catStr = ctx.categorias
+    .slice(0, 5)
+    .map((c) => `${c.name} (${c.percent}%)`)
+    .join(", ")
 
   const prompt = `Você é um consultor financeiro pessoal brasileiro, amigável e direto.
 
@@ -56,7 +56,7 @@ Use português brasileiro simples. Formate assim:
 2. [ação concreta]
 3. [ação concreta]`
 
-  return groqRequest(prompt, 400)
+  return aiRequest(prompt, 400)
 }
 
 export interface CategoriaContext {
@@ -91,5 +91,6 @@ Responda em 3 partes curtas:
 1. [ação específica com número ou meta]
 2. [ação específica com número ou meta]`
 
-  return groqRequest(prompt, 350)
+  return aiRequest(prompt, 350)
 }
+

@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Openfy — Configuração</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #f2f0e8;
+      --green:     #16A34A;
+      --green-dk:  #14532D;
+      --green-lt:  #DCFCE7;
+      --green-fo:  rgba(22,163,74,.12);
+      --black:     #111827;
+      --gray-2:    #374151;
+      --gray-4:    #6B7280;
+      --gray-6:    #9CA3AF;
+      --border:    #E5E7EB;
+      --white:     #FFFFFF;
+      --red:       #EF4444;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      color: var(--black);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── HEADER ────────────────────────────────────────────── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 32px;
+      flex-shrink: 0;
+    }
+
+    .logo-circle {
+      width: 44px; height: 44px;
+      background: var(--green);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    /* ── LANGUAGE SWITCHER ─────────────────────────────────── */
+    .lang-switcher {
+      display: flex;
+      align-items: center;
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 3px;
+      gap: 2px;
+    }
+
+    .lang-btn {
+      padding: 5px 11px;
+      border: none;
+      background: none;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--gray-4);
+      transition: background .15s, color .15s;
+      font-family: inherit;
+      letter-spacing: .04em;
+    }
+
+    .lang-btn.active {
+      background: var(--green);
+      color: var(--white);
+    }
+
+    .lang-btn:not(.active):hover { background: var(--green-lt); color: var(--green); }
+
+    /* ── PROGRESS ──────────────────────────────────────────── */
+    .progress {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .progress-dash {
+      width: 28px; height: 4px;
+      border-radius: 2px;
+      background: var(--border);
+      transition: background .35s;
+    }
+
+    .progress-dash.done { background: var(--green); }
+
+    /* ── MAIN CONTENT ──────────────────────────────────────── */
+    .content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 24px 24px;
+    }
+
+    .step {
+      display: none;
+      width: 100%;
+      max-width: 620px;
+      animation: stepIn .3s ease both;
+    }
+
+    .step.active { display: block; }
+
+    @keyframes stepIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── STEP 1 ────────────────────────────────────────────── */
+    .s1-wrap { text-align: center; }
+
+    .app-icon {
+      width: 80px; height: 80px;
+      background: var(--green);
+      border-radius: 22px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 28px;
+    }
+
+    .step-title {
+      font-size: 30px;
+      font-weight: 800;
+      color: var(--black);
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+
+    .step-subtitle {
+      font-size: 15px;
+      color: var(--gray-4);
+      max-width: 420px;
+      margin: 0 auto 32px;
+      line-height: 1.65;
+    }
+
+    .green { color: var(--green); }
+
+    .pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 40px;
+    }
+
+    .pill {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 18px;
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--gray-2);
+      background: var(--white);
+      white-space: nowrap;
+    }
+
+    .pill-icon { display: flex; align-items: center; color: var(--green); }
+
+    /* ── STEP 2 ────────────────────────────────────────────── */
+    .question-box {
+      border: 2px solid var(--black);
+      border-radius: 12px;
+      padding: 18px 24px;
+      background: var(--white);
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.5;
+      margin-bottom: 32px;
+    }
+
+    .form-group { margin-bottom: 22px; }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--black);
+      margin-bottom: 8px;
+    }
+
+    .currency-wrap {
+      display: flex;
+      align-items: center;
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: border-color .15s, box-shadow .15s;
+    }
+
+    .currency-wrap:focus-within {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px var(--green-fo);
+    }
+
+    .currency-prefix {
+      padding: 0 10px 0 14px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--gray-4);
+      white-space: nowrap;
+    }
+
+    .currency-wrap input {
+      flex: 1;
+      border: none;
+      outline: none;
+      padding: 12px 14px 12px 4px;
+      font-size: 14px;
+      font-family: inherit;
+      background: transparent;
+      color: var(--black);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--black);
+      background: var(--white);
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+
+    .form-input:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px var(--green-fo);
+    }
+
+    .form-hint { margin-top: 7px; font-size: 12px; color: var(--gray-4); }
+
+    .hint-link {
+      color: var(--green);
+      cursor: pointer;
+      text-decoration: none;
+      border-bottom: 1px dashed var(--green);
+      transition: opacity .15s;
+    }
+
+    .hint-link:hover { opacity: .7; }
+
+    /* ── STEP 3 ────────────────────────────────────────────── */
+    .cats-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .cats-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      color: var(--gray-6);
+      text-transform: uppercase;
+    }
+
+    .cats-label strong { color: var(--black); font-weight: 700; }
+
+    .cats-count {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-2);
+    }
+
+    .cat-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 14px;
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 8px;
+    }
+
+    .cat-icon-wrap {
+      width: 38px; height: 38px;
+      background: var(--green-lt);
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 18px;
+    }
+
+    .cat-info { flex: 1; min-width: 0; }
+
+    .cat-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--black);
+    }
+
+    .cat-desc {
+      font-size: 12px;
+      color: var(--green);
+      margin-top: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .cat-remove {
+      background: none; border: none;
+      cursor: pointer;
+      color: var(--gray-6);
+      padding: 4px;
+      font-size: 18px;
+      line-height: 1;
+      transition: color .15s;
+      flex-shrink: 0;
+    }
+
+    .cat-remove:hover { color: var(--red); }
+
+    /* Add category button */
+    .add-cat-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 13px 14px;
+      border: 1.5px solid var(--green);
+      border-radius: 10px;
+      background: var(--white);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--gray-2);
+      font-family: inherit;
+      margin-bottom: 22px;
+      transition: background .15s;
+    }
+
+    .add-cat-btn:hover { background: #f0fdf4; }
+    .add-cat-btn:disabled { opacity: .4; cursor: not-allowed; }
+    .add-cat-btn:disabled:hover { background: var(--white); }
+
+    .add-plus {
+      width: 26px; height: 26px;
+      border: 1.5px solid var(--green);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--green);
+      font-size: 18px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    /* Inline add form */
+    .add-form {
+      display: none;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .add-form.visible { display: flex; }
+
+    .add-form-input {
+      flex: 1;
+      padding: 11px 14px;
+      border: 1.5px solid var(--green);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      background: var(--white);
+      box-shadow: 0 0 0 3px var(--green-fo);
+    }
+
+    .btn-confirm {
+      padding: 11px 18px;
+      background: var(--green);
+      color: var(--white);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: inherit;
+      font-weight: 600;
+      transition: background .15s;
+    }
+
+    .btn-confirm:hover { background: var(--green-dk); }
+
+    .btn-cancel-sm {
+      padding: 11px 14px;
+      border: 1.5px solid var(--border);
+      background: var(--white);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--gray-4);
+      transition: border-color .15s;
+    }
+
+    .btn-cancel-sm:hover { border-color: var(--gray-6); }
+
+    .suggestions-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      color: var(--gray-6);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .chip {
+      padding: 7px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      font-size: 13px;
+      color: var(--gray-2);
+      background: var(--white);
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color .15s, color .15s, background .15s;
+    }
+
+    .chip:hover {
+      border-color: var(--green);
+      color: var(--green);
+      background: #f0fdf4;
+    }
+
+    .chip.used {
+      opacity: .35;
+      cursor: not-allowed;
+    }
+
+    /* ── STEP 4 ────────────────────────────────────────────── */
+    .s4-wrap { text-align: center; }
+
+    .success-icon-wrap {
+      position: relative;
+      width: 80px;
+      margin: 0 auto 28px;
+    }
+
+    .success-circle {
+      width: 80px; height: 80px;
+      background: var(--green);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .dot-a {
+      position: absolute;
+      top: -5px; right: -8px;
+      width: 9px; height: 9px;
+      background: var(--green);
+      border-radius: 50%;
+    }
+
+    .dot-b {
+      position: absolute;
+      top: 10px; right: -18px;
+      width: 6px; height: 6px;
+      background: var(--green);
+      border-radius: 50%;
+      opacity: .6;
+    }
+
+    .summary-cards {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      margin: 28px 0 32px;
+      flex-wrap: wrap;
+    }
+
+    .sum-card {
+      flex: 1;
+      min-width: 140px;
+      max-width: 180px;
+      padding: 16px 18px;
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      text-align: left;
+    }
+
+    .sum-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      color: var(--gray-6);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .sum-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--black);
+      margin-bottom: 3px;
+      word-break: break-word;
+    }
+
+    .sum-sub { font-size: 12px; color: var(--gray-4); }
+
+    .s4-note { font-size: 13px; color: var(--gray-4); margin-top: 16px; line-height: 1.5; }
+
+    /* ── BUTTONS (shared) ──────────────────────────────────── */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 32px;
+      background: var(--green);
+      color: var(--white);
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background .15s;
+    }
+
+    .btn-primary:hover { background: #15803d; }
+
+    /* ── FOOTER ────────────────────────────────────────────── */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .btn-back {
+      background: none; border: none;
+      color: var(--gray-2);
+      font-size: 14px; font-weight: 500;
+      cursor: pointer;
+      padding: 10px 8px;
+      font-family: inherit;
+      margin-right: auto;
+      transition: color .15s;
+    }
+
+    .btn-back:hover { color: var(--black); }
+
+    .footer-spacer { margin-right: auto; }
+
+    .btn-skip {
+      padding: 10px 20px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: var(--white);
+      font-size: 14px; font-weight: 500;
+      color: var(--gray-2);
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color .15s;
+    }
+
+    .btn-skip:hover { border-color: var(--gray-6); }
+
+    .btn-continue {
+      padding: 10px 22px;
+      background: var(--green);
+      color: var(--white);
+      border: none;
+      border-radius: 8px;
+      font-size: 14px; font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background .15s;
+      white-space: nowrap;
+    }
+
+    .btn-continue:hover { background: #15803d; }
+
+    /* ── RESPONSIVE ────────────────────────────────────────── */
+
+    /* Prevent iOS Safari font zoom on inputs */
+    input, select, textarea { font-size: 16px !important; }
+
+    @media (max-width: 600px) {
+      .header { padding: 14px 16px; }
+      .header-right { gap: 10px; }
+
+      /* Smaller language buttons */
+      .lang-btn { padding: 4px 8px; font-size: 11px; }
+
+      /* Smaller progress dashes */
+      .progress-dash { width: 20px; }
+
+      /* Step 1 */
+      .app-icon { width: 64px; height: 64px; border-radius: 17px; margin-bottom: 20px; }
+      .step-title { font-size: 22px; margin-bottom: 10px; }
+      .step-subtitle { font-size: 14px; margin-bottom: 24px; }
+
+      /* Pills: let them wrap freely */
+      .pills { gap: 8px; margin-bottom: 28px; justify-content: center; }
+      .pill { font-size: 12px; padding: 7px 12px; }
+
+      /* Step 2 */
+      .question-box { padding: 14px 16px; font-size: 14px; margin-bottom: 22px; }
+      .form-group { margin-bottom: 18px; }
+      .form-label { font-size: 13px; }
+
+      /* Step 3 */
+      .cats-label { font-size: 10px; }
+      .cat-item { padding: 11px 12px; }
+      .cat-icon-wrap { width: 34px; height: 34px; font-size: 16px; }
+      .cat-name { font-size: 13px; }
+      .cat-desc { font-size: 11px; }
+      .add-cat-btn { padding: 11px 12px; font-size: 13px; }
+
+      /* Step 4 */
+      .s4-wrap .step-title { font-size: 22px; }
+      .success-icon-wrap { width: 64px; margin-bottom: 20px; }
+      .success-circle { width: 64px; height: 64px; }
+      .success-circle svg { width: 26px; height: 26px; }
+      .dot-a { top: -4px; right: -6px; width: 7px; height: 7px; }
+      .dot-b { right: -14px; width: 5px; height: 5px; }
+
+      /* Stack summary cards vertically */
+      .summary-cards {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        margin: 18px 0 22px;
+      }
+      .sum-card { max-width: none; padding: 14px 16px; }
+      .sum-value { font-size: 17px; }
+
+      /* Content area */
+      .content { padding: 18px 16px 12px; align-items: flex-start; }
+
+      /* Footer */
+      .footer { padding: 12px 14px; gap: 8px; }
+      .btn-back { padding: 10px 6px; font-size: 13px; }
+      .btn-skip { padding: 9px 14px; font-size: 13px; }
+      .btn-continue { padding: 9px 16px; font-size: 13px; }
+
+      /* Add form */
+      .add-category-form { flex-wrap: wrap; }
+      .add-category-form input { min-width: 0; }
+
+      /* Chips */
+      .chip { font-size: 12px; padding: 6px 12px; }
+    }
+
+    @media (max-width: 380px) {
+      .step-title { font-size: 19px; }
+      .header-right { gap: 8px; }
+      .lang-btn { padding: 3px 6px; font-size: 10px; }
+      .progress-dash { width: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════ HEADER ══════════════════ -->
+  <header class="header">
+    <!-- Logo -->
+    <div class="logo-circle" aria-label="Openfy">
+      <svg width="22" height="22" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="10" y="68" width="24" height="22" rx="4" fill="white"/>
+        <rect x="38" y="48" width="24" height="22" rx="4" fill="white"/>
+        <rect x="66" y="26" width="24" height="22" rx="4" fill="#14532D"/>
+      </svg>
+    </div>
+
+    <div class="header-right">
+      <!-- Language Switcher -->
+      <div class="lang-switcher" role="group" aria-label="Idioma">
+        <button class="lang-btn active" data-lang="pt" onclick="setLang('pt')">PT</button>
+        <button class="lang-btn"        data-lang="en" onclick="setLang('en')">EN</button>
+        <button class="lang-btn"        data-lang="es" onclick="setLang('es')">ES</button>
+      </div>
+
+      <!-- Progress indicator -->
+      <div class="progress" role="progressbar" aria-valuemin="1" aria-valuemax="4" id="progress">
+        <div class="progress-dash done" id="pd-1"></div>
+        <div class="progress-dash"      id="pd-2"></div>
+        <div class="progress-dash"      id="pd-3"></div>
+        <div class="progress-dash"      id="pd-4"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══════════════════ CONTENT ══════════════════ -->
+  <main class="content" id="main-content">
+
+    <!-- ── STEP 1: Boas-vindas ─────────────────── -->
+    <div class="step active" id="step-1" role="region">
+      <div class="s1-wrap">
+        <div class="app-icon" aria-hidden="true">
+          <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="10" y="68" width="24" height="22" rx="4" fill="white"/>
+            <rect x="38" y="48" width="24" height="22" rx="4" fill="white"/>
+            <rect x="66" y="26" width="24" height="22" rx="4" fill="#14532D"/>
+          </svg>
+        </div>
+
+        <h1 class="step-title" id="s1-title"></h1>
+        <p class="step-subtitle" id="s1-subtitle"></p>
+
+        <div class="pills">
+          <div class="pill">
+            <span class="pill-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            </span>
+            <span id="s1-pill1"></span>
+          </div>
+          <div class="pill">
+            <span class="pill-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            </span>
+            <span id="s1-pill2"></span>
+          </div>
+          <div class="pill">
+            <span class="pill-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </span>
+            <span id="s1-pill3"></span>
+          </div>
+        </div>
+
+        <button class="btn-primary" id="s1-cta" onclick="goToStep(2)"></button>
+      </div>
+    </div>
+
+    <!-- ── STEP 2: Renda & Meta ────────────────── -->
+    <div class="step" id="step-2" role="region">
+      <div class="question-box" id="s2-header"></div>
+
+      <div class="form-group">
+        <label class="form-label" id="s2-label1" for="income-input"></label>
+        <div class="currency-wrap">
+          <span class="currency-prefix" id="s2-prefix"></span>
+          <input type="text" id="income-input" inputmode="decimal" autocomplete="off" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" id="s2-label2" for="goal-input"></label>
+        <input type="text" class="form-input" id="goal-input" autocomplete="off" />
+        <p class="form-hint" id="s2-hint"></p>
+      </div>
+    </div>
+
+    <!-- ── STEP 3: Categorias ──────────────────── -->
+    <div class="step" id="step-3" role="region">
+      <div class="question-box" id="s3-header"></div>
+
+      <div class="cats-header">
+        <span class="cats-label" id="s3-limit"></span>
+        <span class="cats-count" id="s3-count"></span>
+      </div>
+
+      <div id="categories-list"></div>
+
+      <!-- Inline form to add category -->
+      <div class="add-form" id="add-form">
+        <input type="text" class="add-form-input" id="new-cat-input" maxlength="40" />
+        <button class="btn-confirm" id="btn-confirm-cat" onclick="confirmCategory()">✓</button>
+        <button class="btn-cancel-sm" onclick="cancelAdd()">✕</button>
+      </div>
+
+      <button class="add-cat-btn" id="add-cat-btn" onclick="showAddForm()">
+        <span class="add-plus" aria-hidden="true">+</span>
+        <span id="s3-add-label"></span>
+      </button>
+
+      <div class="suggestions-label" id="s3-suggestions-label"></div>
+      <div class="chips" id="chips-container"></div>
+    </div>
+
+    <!-- ── STEP 4: Concluído ───────────────────── -->
+    <div class="step" id="step-4" role="region">
+      <div class="s4-wrap">
+        <div class="success-icon-wrap" aria-hidden="true">
+          <div class="success-circle">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div class="dot-a"></div>
+          <div class="dot-b"></div>
+        </div>
+
+        <h1 class="step-title" id="s4-title"></h1>
+        <p class="step-subtitle" id="s4-subtitle"></p>
+
+        <div class="summary-cards">
+          <div class="sum-card">
+            <div class="sum-label" id="s4-card1-label"></div>
+            <div class="sum-value" id="s4-income">—</div>
+            <div class="sum-sub"   id="s4-card1-sub"></div>
+          </div>
+          <div class="sum-card">
+            <div class="sum-label" id="s4-card2-label"></div>
+            <div class="sum-value" id="s4-goal">—</div>
+            <div class="sum-sub"   id="s4-card2-sub"></div>
+          </div>
+          <div class="sum-card">
+            <div class="sum-label" id="s4-card3-label"></div>
+            <div class="sum-value" id="s4-catcount">0</div>
+            <div class="sum-sub"   id="s4-card3-sub"></div>
+          </div>
+        </div>
+
+        <button class="btn-primary" id="s4-cta" onclick="goToDashboard()"></button>
+        <p class="s4-note" id="s4-note"></p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ══════════════════ FOOTER ══════════════════ -->
+  <footer class="footer">
+    <button class="btn-back"     id="btn-back"     onclick="goBack()"    style="display:none"></button>
+    <div    class="footer-spacer" id="footer-spacer" style="display:none"></div>
+    <button class="btn-skip"     id="btn-skip"     onclick="skipStep()"></button>
+    <button class="btn-continue" id="btn-continue" onclick="goNext()"></button>
+  </footer>
+
+  <!-- ══════════════════ SCRIPT ══════════════════ -->
+  <script>
+  // ── State ───────────────────────────────────────────────────
+  const state = {
+    lang:       'pt',
+    step:       1,
+    userName:   'Pedro',
+    categories: [{ nameKey: 's3_default_name', descKey: 's3_default_desc', icon: '🛒' }]
+  };
+
+  const MAX_CATS = 3;
+
+  // ── i18n ────────────────────────────────────────────────────
+  const LANG = {
+    pt: {
+      s1_title:      'Bem-vindo à <span class="green">Openfy</span>, {name}',
+      s1_subtitle:   'Suas contas já estão conectadas. Em 3 passos rápidos, vamos calibrar seu perfil e descobrir seu Score Financeiro.',
+      s1_pill1:      'Defina seus objetivos',
+      s1_pill2:      'Crie suas categorias',
+      s1_pill3:      'Veja seu Score',
+      s1_cta:        'Começar configuração →',
+
+      s2_header:     'Antes de você continuar, gostaríamos que respondesse <span class="green">algumas perguntas</span>',
+      s2_label1:     'Qual a sua renda mensal?',
+      s2_prefix:     'R$',
+      s2_ph1:        'Informe aqui...',
+      s2_label2:     'Qual a sua meta?',
+      s2_ph2:        'Informe aqui...',
+      s2_hint:       'Ex: {h1}, {h2}, {h3}...',
+      s2_h1:         'sair do vermelho',
+      s2_h2:         'guardar reserva',
+      s2_h3:         'investir mais',
+
+      s3_header:     'Que legal, {name}! Agora com seus objetivos definidos, vamos <span class="green">criar suas categorias</span>',
+      s3_limit:      'VOCÊ PODE CRIAR ATÉ <strong>{max}</strong> CATEGORIAS NESSE MOMENTO',
+      s3_add:        'Criar Categoria',
+      s3_ph_add:     'Nome da categoria...',
+      s3_suggestions:'SUGESTÕES RÁPIDAS',
+      s3_cat_desc:    'Categoria personalizada',
+      s3_default_name:'Mercado',
+      s3_default_desc:'Compras de supermercado',
+      s3_chips:      ['Lazer','Saúde','Moradia','Transporte','Educação','Assinaturas'],
+      s3_chip_desc:  ['Entretenimento e diversão','Planos e consultas','Aluguel e contas','Combustível e transporte','Cursos e material','Streaming e apps'],
+
+      s4_title:      'Tudo pronto, {name}!',
+      s4_subtitle:   'Sua conta está configurada. Calculamos seu Score Financeiro inicial — clique abaixo pra ver o resultado e o que ele significa.',
+      s4_card1:      'RENDA',
+      s4_card1_sub:  'por mês',
+      s4_card2:      'META',
+      s4_card2_sub:  '',
+      s4_card3:      'CATEGORIAS',
+      s4_card3_sub:  'criadas',
+      s4_cta:        'Ver meu dashboard →',
+      s4_footer_cta: 'Ir para o dashboard →',
+      s4_note:       'Você pode editar essas informações a qualquer momento em Configurações.',
+      s4_none:       'Não informado',
+
+      nav_back:     '← Voltar',
+      nav_skip:     'Pular',
+      nav_continue: 'Continuar →',
+    },
+    en: {
+      s1_title:      'Welcome to <span class="green">Openfy</span>, {name}',
+      s1_subtitle:   'Your accounts are already connected. In 3 quick steps, we\'ll calibrate your profile and discover your Financial Score.',
+      s1_pill1:      'Define your goals',
+      s1_pill2:      'Create your categories',
+      s1_pill3:      'See your Score',
+      s1_cta:        'Start setup →',
+
+      s2_header:     'Before you continue, we\'d like you to answer <span class="green">a few questions</span>',
+      s2_label1:     'What is your monthly income?',
+      s2_prefix:     '$',
+      s2_ph1:        'Enter here...',
+      s2_label2:     'What is your goal?',
+      s2_ph2:        'Enter here...',
+      s2_hint:       'E.g: {h1}, {h2}, {h3}...',
+      s2_h1:         'get out of debt',
+      s2_h2:         'build savings',
+      s2_h3:         'invest more',
+
+      s3_header:     'Great, {name}! Now with your goals set, let\'s <span class="green">create your categories</span>',
+      s3_limit:      'YOU CAN CREATE UP TO <strong>{max}</strong> CATEGORIES NOW',
+      s3_add:        'Create Category',
+      s3_ph_add:     'Category name...',
+      s3_suggestions:'QUICK SUGGESTIONS',
+      s3_cat_desc:    'Custom category',
+      s3_default_name:'Grocery',
+      s3_default_desc:'Supermarket shopping',
+      s3_chips:      ['Leisure','Health','Housing','Transport','Education','Subscriptions'],
+      s3_chip_desc:  ['Entertainment & fun','Plans & consultations','Rent & bills','Fuel & transport','Courses & materials','Streaming & apps'],
+
+      s4_title:      'All done, {name}!',
+      s4_subtitle:   'Your account is configured. We calculated your initial Financial Score — click below to see the result and what it means.',
+      s4_card1:      'INCOME',
+      s4_card1_sub:  'per month',
+      s4_card2:      'GOAL',
+      s4_card2_sub:  '',
+      s4_card3:      'CATEGORIES',
+      s4_card3_sub:  'created',
+      s4_cta:        'View my dashboard →',
+      s4_footer_cta: 'Go to dashboard →',
+      s4_note:       'You can edit this information at any time in Settings.',
+      s4_none:       'Not provided',
+
+      nav_back:     '← Back',
+      nav_skip:     'Skip',
+      nav_continue: 'Continue →',
+    },
+    es: {
+      s1_title:      'Bienvenido a <span class="green">Openfy</span>, {name}',
+      s1_subtitle:   'Tus cuentas ya están conectadas. En 3 pasos rápidos, calibraremos tu perfil y descubriremos tu Puntaje Financiero.',
+      s1_pill1:      'Define tus objetivos',
+      s1_pill2:      'Crea tus categorías',
+      s1_pill3:      'Ve tu Puntaje',
+      s1_cta:        'Comenzar configuración →',
+
+      s2_header:     'Antes de continuar, nos gustaría que respondas <span class="green">algunas preguntas</span>',
+      s2_label1:     '¿Cuál es tu ingreso mensual?',
+      s2_prefix:     '$',
+      s2_ph1:        'Ingresa aquí...',
+      s2_label2:     '¿Cuál es tu meta?',
+      s2_ph2:        'Ingresa aquí...',
+      s2_hint:       'Ej: {h1}, {h2}, {h3}...',
+      s2_h1:         'salir de deudas',
+      s2_h2:         'ahorrar reserva',
+      s2_h3:         'invertir más',
+
+      s3_header:     '¡Genial, {name}! Ahora con tus objetivos definidos, vamos a <span class="green">crear tus categorías</span>',
+      s3_limit:      'PUEDES CREAR HASTA <strong>{max}</strong> CATEGORÍAS EN ESTE MOMENTO',
+      s3_add:        'Crear Categoría',
+      s3_ph_add:     'Nombre de la categoría...',
+      s3_suggestions:'SUGERENCIAS RÁPIDAS',
+      s3_cat_desc:    'Categoría personalizada',
+      s3_default_name:'Mercado',
+      s3_default_desc:'Compras en el supermercado',
+      s3_chips:      ['Ocio','Salud','Vivienda','Transporte','Educación','Suscripciones'],
+      s3_chip_desc:  ['Entretenimiento y diversión','Planes y consultas','Alquiler y facturas','Combustible y transporte','Cursos y material','Streaming y apps'],
+
+      s4_title:      '¡Todo listo, {name}!',
+      s4_subtitle:   'Tu cuenta está configurada. Calculamos tu Puntaje Financiero inicial — haz clic abajo para ver el resultado y lo que significa.',
+      s4_card1:      'INGRESO',
+      s4_card1_sub:  'por mes',
+      s4_card2:      'META',
+      s4_card2_sub:  '',
+      s4_card3:      'CATEGORÍAS',
+      s4_card3_sub:  'creadas',
+      s4_cta:        'Ver mi dashboard →',
+      s4_footer_cta: 'Ir al dashboard →',
+      s4_note:       'Puedes editar esta información en cualquier momento en Configuración.',
+      s4_none:       'No informado',
+
+      nav_back:     '← Volver',
+      nav_skip:     'Omitir',
+      nav_continue: 'Continuar →',
+    }
+  };
+
+  // ── Helpers ─────────────────────────────────────────────────
+  function t(key) {
+    const d = LANG[state.lang] || LANG.pt;
+    let v = d[key] ?? LANG.pt[key] ?? key;
+    return String(v)
+      .replace(/{name}/g, state.userName)
+      .replace(/{max}/g,  MAX_CATS)
+      .replace(/{h1}/g,   d.s2_h1 || '')
+      .replace(/{h2}/g,   d.s2_h2 || '')
+      .replace(/{h3}/g,   d.s2_h3 || '');
+  }
+
+  function tArr(key) {
+    const d = LANG[state.lang] || LANG.pt;
+    return d[key] || [];
+  }
+
+  function setText(id, val)   { const el = document.getElementById(id); if (el) el.textContent = val; }
+  function setHTML(id, val)   { const el = document.getElementById(id); if (el) el.innerHTML  = val; }
+  function setAttr(id, a, v)  { const el = document.getElementById(id); if (el) el[a] = v; }
+
+  // ── Category icons map ────────────────────────────────────
+  const CAT_ICONS = {
+    Mercado:'🛒', Market:'🛒', Mercado:'🛒',
+    Lazer:'🎮',   Leisure:'🎮',  Ocio:'🎮',
+    Saúde:'🏥',   Health:'🏥',   Salud:'🏥',
+    Moradia:'🏠', Housing:'🏠',  Vivienda:'🏠',
+    Transporte:'🚗', Transport:'🚗',
+    Educação:'📚', Education:'📚', Educación:'📚',
+    Assinaturas:'📺', Subscriptions:'📺', Suscripciones:'📺',
+  };
+
+  function getIcon(name) {
+    return CAT_ICONS[name] || '📁';
+  }
+
+  // ── Render all i18n ──────────────────────────────────────
+  function renderAll() {
+    // Step 1
+    setHTML('s1-title',    t('s1_title'));
+    setText('s1-subtitle', t('s1_subtitle'));
+    setText('s1-pill1',    t('s1_pill1'));
+    setText('s1-pill2',    t('s1_pill2'));
+    setText('s1-pill3',    t('s1_pill3'));
+    setText('s1-cta',      t('s1_cta'));
+
+    // Step 2
+    setHTML('s2-header',  t('s2_header'));
+    setText('s2-label1',  t('s2_label1'));
+    setText('s2-prefix',  t('s2_prefix'));
+    setAttr('income-input','placeholder', t('s2_ph1'));
+    setText('s2-label2',  t('s2_label2'));
+    setAttr('goal-input','placeholder',   t('s2_ph2'));
+    renderHint();
+
+    // Step 3
+    setHTML('s3-header',          t('s3_header'));
+    setHTML('s3-limit',           t('s3_limit'));
+    setText('s3-add-label',       t('s3_add'));
+    setText('s3-suggestions-label', t('s3_suggestions'));
+    setAttr('new-cat-input','placeholder', t('s3_ph_add'));
+    renderCategories();
+    renderChips();
+
+    // Step 4
+    setHTML('s4-title',      t('s4_title'));
+    setText('s4-subtitle',   t('s4_subtitle'));
+    setText('s4-card1-label',t('s4_card1'));
+    setText('s4-card1-sub',  t('s4_card1_sub'));
+    setText('s4-card2-label',t('s4_card2'));
+    setText('s4-card2-sub',  t('s4_card2_sub'));
+    setText('s4-card3-label',t('s4_card3'));
+    setText('s4-card3-sub',  t('s4_card3_sub'));
+    setText('s4-cta',        t('s4_cta'));
+    setText('s4-note',       t('s4_note'));
+
+    // Nav buttons
+    setText('btn-back',     t('nav_back'));
+    setText('btn-skip',     t('nav_skip'));
+    updateFooterForStep(state.step);
+  }
+
+  function renderHint() {
+    const hintEl = document.getElementById('s2-hint');
+    if (!hintEl) return;
+    const d = LANG[state.lang] || LANG.pt;
+    const make = (txt, fill) =>
+      `<a class="hint-link" href="#" onclick="fillGoal('${fill}');return false;">${txt}</a>`;
+    hintEl.innerHTML = t('s2_hint')
+      .replace(d.s2_h1, make(d.s2_h1, d.s2_h1))
+      .replace(d.s2_h2, make(d.s2_h2, d.s2_h2))
+      .replace(d.s2_h3, make(d.s2_h3, d.s2_h3));
+  }
+
+  function fillGoal(val) {
+    const el = document.getElementById('goal-input');
+    if (el) { el.value = val; el.focus(); }
+  }
+
+  // ── Categories ──────────────────────────────────────────
+  function renderCategories() {
+    const list = document.getElementById('categories-list');
+    if (!list) return;
+    list.innerHTML = '';
+
+    state.categories.forEach((cat, i) => {
+      const item = document.createElement('div');
+      item.className = 'cat-item';
+      const name = cat.nameKey ? t(cat.nameKey) : cat.name;
+      const desc = cat.descKey ? t(cat.descKey) : (cat.desc || t('s3_cat_desc'));
+      item.innerHTML = `
+        <div class="cat-icon-wrap">${cat.icon || '📁'}</div>
+        <div class="cat-info">
+          <div class="cat-name">${escapeHtml(name)}</div>
+          <div class="cat-desc">${escapeHtml(desc)}</div>
+        </div>
+        <button class="cat-remove" onclick="removeCategory(${i})" aria-label="Remover">×</button>
+      `;
+      list.appendChild(item);
+    });
+
+    // Update count
+    const count = document.getElementById('s3-count');
+    if (count) count.textContent = `${state.categories.length} / ${MAX_CATS}`;
+
+    // Toggle add button
+    const addBtn = document.getElementById('add-cat-btn');
+    if (addBtn) addBtn.disabled = state.categories.length >= MAX_CATS;
+  }
+
+  function renderChips() {
+    const container = document.getElementById('chips-container');
+    if (!container) return;
+    const names = tArr('s3_chips');
+    const descs = tArr('s3_chip_desc');
+    container.innerHTML = '';
+
+    names.forEach((name, i) => {
+      const used = state.categories.some(c => (c.nameKey ? t(c.nameKey) : c.name) === name);
+      const btn = document.createElement('button');
+      btn.className = 'chip' + (used ? ' used' : '');
+      btn.textContent = `+ ${name}`;
+      btn.disabled = used;
+      btn.onclick = () => {
+        if (state.categories.length >= MAX_CATS || used) return;
+        state.categories.push({ name, desc: descs[i] || '', icon: getIcon(name) });
+        renderCategories();
+        renderChips();
+      };
+      container.appendChild(btn);
+    });
+  }
+
+  function showAddForm() {
+    if (state.categories.length >= MAX_CATS) return;
+    document.getElementById('add-form').classList.add('visible');
+    document.getElementById('add-cat-btn').style.display = 'none';
+    const inp = document.getElementById('new-cat-input');
+    inp.value = '';
+    inp.focus();
+  }
+
+  function cancelAdd() {
+    document.getElementById('add-form').classList.remove('visible');
+    const btn = document.getElementById('add-cat-btn');
+    btn.style.display = '';
+  }
+
+  function confirmCategory() {
+    const inp = document.getElementById('new-cat-input');
+    const name = inp.value.trim();
+    if (!name) { inp.focus(); return; }
+    if (state.categories.length >= MAX_CATS) return;
+    state.categories.push({ name, desc: t('s3_cat_desc'), icon: getIcon(name) });
+    cancelAdd();
+    renderCategories();
+    renderChips();
+  }
+
+  function removeCategory(idx) {
+    state.categories.splice(idx, 1);
+    renderCategories();
+    renderChips();
+    // Re-show add button if hidden
+    const btn = document.getElementById('add-cat-btn');
+    btn.style.display = '';
+  }
+
+  // ── Step 4 summary ──────────────────────────────────────
+  function updateSummary() {
+    const income = document.getElementById('income-input')?.value?.trim();
+    const goal   = document.getElementById('goal-input')?.value?.trim();
+    const prefix = t('s2_prefix');
+    const none   = t('s4_none');
+
+    setText('s4-income',   income ? `${prefix} ${income}` : none);
+    setText('s4-goal',     goal   || none);
+    setText('s4-catcount', state.categories.length);
+  }
+
+  // ── Navigation ──────────────────────────────────────────
+  function goToStep(n) {
+    // Deactivate current
+    document.getElementById(`step-${state.step}`)?.classList.remove('active');
+
+    state.step = n;
+
+    // Activate new
+    const stepEl = document.getElementById(`step-${n}`);
+    if (stepEl) {
+      stepEl.classList.add('active');
+      stepEl.scrollIntoView({ behavior: 'instant', block: 'start' });
+    }
+
+    // Progress dashes: mark 1..n as done
+    for (let i = 1; i <= 4; i++) {
+      const dash = document.getElementById(`pd-${i}`);
+      if (dash) dash.classList.toggle('done', i <= n);
+    }
+
+    if (n === 4) updateSummary();
+
+    updateFooterForStep(n);
+    renderAll();
+  }
+
+  function updateFooterForStep(n) {
+    const back     = document.getElementById('btn-back');
+    const spacer   = document.getElementById('footer-spacer');
+    const skip     = document.getElementById('btn-skip');
+    const cont     = document.getElementById('btn-continue');
+
+    if (!back || !skip || !cont) return;
+
+    if (n === 1) {
+      back.style.display   = 'none';
+      spacer.style.display = 'block';
+      skip.style.display   = 'block';
+      cont.style.display   = 'block';
+      cont.textContent     = t('nav_continue');
+      cont.onclick         = goNext;
+    } else if (n === 4) {
+      back.style.display   = 'block';
+      spacer.style.display = 'none';
+      skip.style.display   = 'none';
+      cont.style.display   = 'block';
+      cont.textContent     = t('s4_footer_cta');
+      cont.onclick         = goToDashboard;
+    } else {
+      back.style.display   = 'block';
+      spacer.style.display = 'none';
+      skip.style.display   = 'block';
+      cont.style.display   = 'block';
+      cont.textContent     = t('nav_continue');
+      cont.onclick         = goNext;
+    }
+
+    setText('btn-back', t('nav_back'));
+    setText('btn-skip', t('nav_skip'));
+  }
+
+  function goNext()  { if (state.step < 4) goToStep(state.step + 1); }
+  function goBack()  { if (state.step > 1) goToStep(state.step - 1); }
+  function skipStep(){ goNext(); }
+
+  function goToDashboard() {
+    window.location.href = '/app';
+  }
+
+  // ── Language ─────────────────────────────────────────────
+  function setLang(lang) {
+    state.lang = lang;
+    document.documentElement.lang = lang === 'pt' ? 'pt-BR' : lang === 'es' ? 'es' : 'en';
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.lang === lang);
+    });
+    renderAll();
+  }
+
+  // ── Keyboard ─────────────────────────────────────────────
+  document.addEventListener('keydown', e => {
+    const form = document.getElementById('add-form');
+    if (form?.classList.contains('visible')) {
+      if (e.key === 'Enter')  { e.preventDefault(); confirmCategory(); }
+      if (e.key === 'Escape') { cancelAdd(); }
+    }
+  });
+
+  // ── Income formatting ────────────────────────────────────
+  document.getElementById('income-input').addEventListener('input', function () {
+    // Keep only digits and separators
+    this.value = this.value.replace(/[^\d.,]/g, '');
+  });
+
+  // ── Escape HTML ──────────────────────────────────────────
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;');
+  }
+
+  // ── Init ─────────────────────────────────────────────────
+  goToStep(1);
+  </script>
+</body>
+</html>
