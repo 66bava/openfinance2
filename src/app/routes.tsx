@@ -1,19 +1,20 @@
 import { createBrowserRouter } from "react-router"
 import { Layout } from "./components/Layout"
 import { ProtectedRoute } from "./components/ProtectedRoute"
-import DashboardWithSupabase from "./pages/DashboardWithSupabase"
+import Dashboard from "./pages/Dashboard"
 import AddExpense from "./pages/AddExpense"
-import Analysis from "./pages/Analysis"
-import Reports from "./pages/Reports"
-import Profile from "./pages/Profile"
+import Insights from "./pages/Insights"
+import Planejamento from "./pages/Planejamento"
+import InvestimentosPanel from "./pages/InvestimentosPanel"
+import ProfilePanel from "./pages/ProfilePanel"
 import Cartoes from "./pages/Cartoes"
-import FaturaDetalhe from "./pages/FaturaDetalhe"
-import Categorias from "./pages/Categorias"
-import Futuro from "./pages/Futuro"
-import Familia from "./pages/Familia"
-import Investimentos from "./pages/Investimentos"
-import Assinaturas from "./pages/Assinaturas"
+import Importacao from "./pages/Importacao"
+import Transacoes from "./pages/Transacoes"
+import Notificacoes from "./pages/Notificacoes"
+import Ciclos from "./pages/Ciclos"
 import Onboarding from "./pages/Onboarding"
+import AceiteTermos from "./pages/AceiteTermos"
+import Score from "./pages/Score"
 import Login from "./pages/login"
 import Cadastro from "./pages/Cadastro"
 import LandingPage from "./pages/LandingPage"
@@ -69,18 +70,19 @@ export const router = createBrowserRouter([
       {
         Component: Layout,
         children: [
-          { index: true, Component: DashboardWithSupabase },
+          { index: true, Component: Dashboard },
+          { path: "aceite-termos", Component: AceiteTermos },
           { path: "adicionar", Component: AddExpense },
-          { path: "analise", Component: Analysis },
-          { path: "relatorios", Component: Reports },
+          { path: "score", Component: Score },
+          { path: "insights", Component: Insights },
+          { path: "planejamento", Component: Planejamento },
           { path: "cartoes", Component: Cartoes },
-          { path: "cartoes/:id/fatura/:mes/:ano", Component: FaturaDetalhe },
-          { path: "categorias", Component: Categorias },
-          { path: "futuro", Component: Futuro },
-          { path: "investimentos", Component: Investimentos },
-          { path: "assinaturas", Component: Assinaturas },
-          { path: "familia", Component: Familia },
-          { path: "perfil", Component: Profile },
+          { path: "importacao", Component: Importacao },
+          { path: "transacoes", Component: Transacoes },
+          { path: "notificacoes", Component: Notificacoes },
+          { path: "ciclos", Component: Ciclos },
+          { path: "investimentos", Component: InvestimentosPanel },
+          { path: "perfil", Component: ProfilePanel },
         ],
       },
     ],

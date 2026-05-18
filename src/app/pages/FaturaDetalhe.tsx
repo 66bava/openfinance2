@@ -247,7 +247,7 @@ export default function FaturaDetalhe() {
 
       {/* Botão fixo pagar fatura */}
       {fatura.status !== 'paga' && fatura.valor_total > 0 && (
-        <div style={{
+        <div className="lg:hidden" style={{
           position: 'fixed', bottom: 0, left: 0, right: 0,
           background: 'var(--of-surface)', borderTop: '1px solid var(--of-border)',
           padding: '16px 20px 28px',

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Openfy — Insights IA</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#16A34A;--green-b:#22C55E;--green-dim:rgba(22,163,74,.12);
+  --bg:#080808;--bg-s:#0A0A0A;--bg-c:#111111;--bg-c2:#161616;--bg-i:#1A1A1A;
+  --bd:rgba(255,255,255,.06);--bd-l:rgba(255,255,255,.10);
+  --t1:#EEEDE6;--t2:#8A8A7E;--t3:#444440;
+  --red:#EF4444;--red-dim:rgba(239,68,68,.12);
+  --amber:#F59E0B;--amber-dim:rgba(245,158,11,.12);
+  --blue:#3B82F6;--blue-dim:rgba(59,130,246,.12);
+  --purple:#8B5CF6;--purple-dim:rgba(139,92,246,.12);
+  --r:12px;--rs:8px;--tr:.22s cubic-bezier(.4,0,.2,1);
+  --fd:'DM Sans',sans-serif;--fb:'Inter',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t1);font-family:var(--fb);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+.page{max-width:1100px;margin:0 auto;padding:28px}
+
+/* HEADER */
+.page-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:28px;gap:16px}
+.page-title{font-family:var(--fd);font-size:24px;font-weight:700;letter-spacing:-.4px;color:var(--t1);margin-bottom:4px}
+.page-sub{font-size:14px;color:var(--t2)}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:0 18px;height:38px;border-radius:var(--rs);font-size:13px;font-weight:600;cursor:pointer;transition:all var(--tr);font-family:var(--fd);border:none;text-decoration:none}
+.btn-primary{background:var(--green);color:#fff}
+.btn-primary:hover{background:#15803D}
+.btn-ghost{background:transparent;color:var(--t2);border:1px solid var(--bd)}
+.btn-ghost:hover{border-color:var(--bd-l);color:var(--t1)}
+.btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* NEXT ACTION HERO */
+.next-action-hero{background:linear-gradient(135deg,rgba(22,163,74,.10),rgba(22,163,74,.04));border:1px solid rgba(34,197,94,.18);border-radius:16px;padding:28px;display:flex;align-items:center;gap:24px;margin-bottom:24px;position:relative;overflow:hidden}
+.next-action-hero::before{content:'';position:absolute;right:-60px;top:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(22,163,74,.12) 0%,transparent 70%);pointer-events:none}
+.next-action-icon{width:56px;height:56px;background:var(--green);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:26px}
+.next-action-content{flex:1}
+.next-action-eyebrow{font-size:11px;font-weight:700;color:var(--green-b);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.next-action-title{font-family:var(--fd);font-size:20px;font-weight:700;color:var(--t1);letter-spacing:-.3px;margin-bottom:8px}
+.next-action-desc{font-size:14px;color:var(--t2);line-height:1.6;max-width:500px}
+.next-action-cta{flex-shrink:0}
+
+/* GRID */
+.insights-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px}
+.insight-card{background:var(--bg-c);border:1px solid var(--bd);border-radius:var(--r);padding:20px;transition:all var(--tr);cursor:pointer;position:relative;overflow:hidden}
+.insight-card:hover{border-color:var(--bd-l);transform:translateY(-2px)}
+.insight-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.insight-type{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:3px 9px;border-radius:20px}
+.type-alert{background:var(--red-dim);color:var(--red);border:1px solid rgba(239,68,68,.2)}
+.type-opportunity{background:var(--green-dim);color:var(--green-b);border:1px solid rgba(34,197,94,.2)}
+.type-forecast{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(59,130,246,.2)}
+.type-tip{background:var(--purple-dim);color:var(--purple);border:1px solid rgba(139,92,246,.2)}
+.type-info{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(245,158,11,.2)}
+
+.insight-icon{font-size:22px}
+.insight-title{font-family:var(--fd);font-size:15px;font-weight:700;color:var(--t1);margin-bottom:8px;line-height:1.3;letter-spacing:-.2px}
+.insight-desc{font-size:13px;color:var(--t2);line-height:1.65}
+.insight-desc strong{color:var(--t1);font-weight:600}
+.insight-footer{display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:12px;border-top:1px solid var(--bd)}
+.insight-action{font-size:12px;font-weight:600;cursor:pointer;transition:color var(--tr)}
+.insight-meta{font-size:11px;color:var(--t3)}
+
+/* FORECAST CARD */
+.forecast-card{background:var(--bg-c);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;margin-bottom:20px}
+.card-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--bd)}
+.card-title{font-family:var(--fd);font-size:14px;font-weight:600;color:var(--t1);display:flex;align-items:center;gap:8px}
+.card-title svg{width:15px;height:15px;stroke:var(--t2);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.card-action{font-size:12px;color:var(--t2);cursor:pointer;transition:color var(--tr)}
+.card-action:hover{color:var(--t1)}
+.card-body{padding:20px}
+
+/* FORECAST BARS */
+.forecast-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;align-items:flex-end;height:140px}
+.forecast-col{display:flex;flex-direction:column;align-items:center;gap:6px;height:100%}
+.forecast-bar-wrap{flex:1;width:100%;display:flex;flex-direction:column;justify-content:flex-end;gap:3px}
+.forecast-seg{width:100%;border-radius:4px;transition:height .8s ease}
+.forecast-seg.income{background:var(--green);opacity:.7;border-radius:4px}
+.forecast-seg.expense{background:var(--red);opacity:.7;border-radius:4px}
+.forecast-seg.projected{background:var(--blue);opacity:.5;border-radius:4px;border:1px dashed rgba(59,130,246,.5)}
+.forecast-label{font-size:10px;color:var(--t3)}
+.forecast-label.cur{color:var(--blue);font-weight:600}
+.forecast-val{font-size:9px;color:var(--t3)}
+
+/* SUMMARY */
+.summary-box{background:linear-gradient(135deg,rgba(59,130,246,.08),rgba(59,130,246,.03));border:1px solid rgba(59,130,246,.15);border-radius:var(--r);padding:20px;margin-bottom:20px}
+.summary-header{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px}
+.summary-header svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.summary-text{font-size:14px;color:var(--t2);line-height:1.75}
+.summary-text strong{color:var(--t1);font-weight:600}
+.summary-bullets{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:16px}
+.summary-bullet{background:var(--bg-c);border-radius:var(--rs);padding:12px;display:flex;align-items:flex-start;gap:8px}
+.bullet-dot{width:6px;height:6px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.bullet-text{font-size:12px;color:var(--t2);line-height:1.5}
+.bullet-text strong{color:var(--t1);display:block;margin-bottom:2px;font-size:13px}
+
+/* REPORT */
+.report-cta{background:var(--bg-c);border:1px solid var(--bd);border-radius:var(--r);padding:24px;display:flex;align-items:center;gap:20px}
+.report-icon{width:48px;height:48px;background:var(--bg-c2);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.report-icon svg{width:22px;height:22px;stroke:var(--t2);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.report-content{flex:1}
+.report-title{font-family:var(--fd);font-size:15px;font-weight:700;color:var(--t1);margin-bottom:4px}
+.report-sub{font-size:13px;color:var(--t3)}
+.report-actions{display:flex;gap:8px;flex-shrink:0}
+
+@media(max-width:900px){.insights-grid{grid-template-columns:1fr 1fr}.summary-bullets{grid-template-columns:1fr}.next-action-hero{flex-direction:column}.next-action-cta{width:100%}.next-action-cta .btn{width:100%;justify-content:center}}
+@media(max-width:600px){.page{padding:16px}.insights-grid{grid-template-columns:1fr}.forecast-grid{grid-template-columns:1fr 1fr}.report-cta{flex-direction:column}.report-actions{width:100%}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Insights IA</div>
+      <div class="page-sub">Sua central de inteligência financeira. Atualizada diariamente.</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <div class="btn btn-ghost"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>Atualizar</div>
+    </div>
+  </div>
+
+  <!-- NEXT ACTION -->
+  <div class="next-action-hero">
+    <div class="next-action-icon">🎯</div>
+    <div class="next-action-content">
+      <div class="next-action-eyebrow">Próxima Ação Recomendada</div>
+      <div class="next-action-title">Monte sua reserva de emergência</div>
+      <div class="next-action-desc">Você tem apenas 2,1 meses de cobertura. Transferir R$ 500 hoje para uma conta de rendimento diário (<strong style="color:var(--green-b)">+35 pts no score</strong>) é a ação de maior impacto disponível agora.</div>
+    </div>
+    <div class="next-action-cta">
+      <div class="btn btn-primary"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Executar Agora</div>
+    </div>
+  </div>
+
+  <!-- INSIGHT CARDS -->
+  <div class="insights-grid">
+
+    <div class="insight-card">
+      <div class="insight-card-top">
+        <span class="insight-type type-alert"><svg width="10" height="10" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Alerta</span>
+        <span class="insight-icon">🍕</span>
+      </div>
+      <div class="insight-title">Delivery explodiu em maio</div>
+      <div class="insight-desc">Você gastou <strong>R$ 434 com delivery</strong> neste mês — <strong>73% acima</strong> da sua média histórica de R$ 251. No ritmo atual, vai fechar maio com R$ 580.</div>
+      <div class="insight-footer">
+        <span class="insight-action" style="color:var(--red)">Ver transações →</span>
+        <span class="insight-meta">Hoje</span>
+      </div>
+    </div>
+
+    <div class="insight-card">
+      <div class="insight-card-top">
+        <span class="insight-type type-opportunity">💡 Oportunidade</span>
+        <span class="insight-icon">💸</span>
+      </div>
+      <div class="insight-title">Economize R$ 180/mês cancelando serviços</div>
+      <div class="insight-desc">Você tem <strong>4 assinaturas digitais</strong> ativas. A IA identificou que Netflix, Prime Video e YouTube Premium têm baixo uso — juntos somam <strong>R$ 180/mês</strong>.</div>
+      <div class="insight-footer">
+        <span class="insight-action" style="color:var(--green-b)">Ver assinaturas →</span>
+        <span class="insight-meta">Esta semana</span>
+      </div>
+    </div>
+
+    <div class="insight-card">
+      <div class="insight-card-top">
+        <span class="insight-type type-forecast">📊 Previsão</span>
+        <span class="insight-icon">🗓️</span>
+      </div>
+      <div class="insight-title">Junho vai ser pesado</div>
+      <div class="insight-desc">Com IPTU, fatura do cartão (R$ 2.140) e o seguro do carro vencendo, junho terá <strong>R$ 6.800 em saídas previstas</strong> — 41% acima da média.</div>
+      <div class="insight-footer">
+        <span class="insight-action" style="color:var(--blue)">Ver planejamento →</span>
+        <span class="insight-meta">Próximo mês</span>
+      </div>
+    </div>
+
+    <div class="insight-card">
+      <div class="insight-card-top">
+        <span class="insight-type type-tip">✨ Dica</span>
+        <span class="insight-icon">🏦</span>
+      </div>
+      <div class="insight-title">Troque o dinheiro por Pix e economize</div>
+      <div class="insight-desc">Você ainda usa dinheiro em <strong>R$ 434/mês (9%)</strong> dos seus gastos. Migrar para Pix em feiras e mercados facilita o rastreamento e eleva o score.</div>
+      <div class="insight-footer">
+        <span class="insight-action" style="color:var(--purple)">Saber mais →</span>
+        <span class="insight-meta">Hábito</span>
+      </div>
+    </div>
+
+    <div class="insight-card">
+      <div class="insight-card-top">
+        <span class="insight-type type-opportunity">💡 Oportunidade</span>
+        <span class="insight-icon">📈</span>
+      </div>
+      <div class="insight-title">Seu CDB está rendendo abaixo do CDI</div>
+      <div class="insight-desc">O CDB no banco X rende <strong>88% do CDI</strong>. Há opções no mercado pagando <strong>110% do CDI</strong> com a mesma liquidez. Diferença estimada: <strong>R$ 340/ano</strong>.</div>
+      <div class="insight-footer">
+        <span class="insight-action" style="color:var(--green-b)">Comparar opções →</span>
+        <span class="insight-meta">Investimentos</span>
+      </div>
+    </div>
+
+    <div class="insight-card">
+      <div class="insight-card-top">
+        <span class="insight-type type-info" style="background:var(--amber-dim);color:var(--amber);border-color:rgba(245,158,11,.2)">⚡ Padrão</span>
+        <span class="insight-icon">🌙</span>
+      </div>
+      <div class="insight-title">Você gasta mais às quintas à noite</div>
+      <div class="insight-desc">Análise dos últimos 90 dias mostra que <strong>38% dos seus gastos impulsivos</strong> acontecem às quintas e sextas entre 20h e 23h. Maioria em delivery e entretenimento.</div>
+      <div class="insight-footer">
+        <span class="insight-action" style="color:var(--amber)">Ver análise →</span>
+        <span class="insight-meta">Comportamento</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORECAST -->
+  <div class="forecast-card">
+    <div class="card-head">
+      <div class="card-title"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Previsão dos Próximos Meses</div>
+      <span class="card-action">Ajustar parâmetros</span>
+    </div>
+    <div class="card-body">
+      <div style="display:flex;gap:16px;margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t2)"><div style="width:8px;height:8px;background:var(--green);border-radius:2px;opacity:.7"></div>Entradas</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t2)"><div style="width:8px;height:8px;background:var(--red);border-radius:2px;opacity:.7"></div>Saídas</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t2)"><div style="width:8px;height:8px;background:var(--blue);border-radius:2px;opacity:.5;border:1px dashed rgba(59,130,246,.6)"></div>Projetado</div>
+      </div>
+      <div class="forecast-grid">
+        <div class="forecast-col">
+          <div class="forecast-bar-wrap">
+            <div class="forecast-seg income" style="height:62px"></div>
+            <div class="forecast-seg expense" style="height:41px"></div>
+          </div>
+          <div class="forecast-label">Mar</div>
+          <div class="forecast-val">R$ 4.100</div>
+        </div>
+        <div class="forecast-col">
+          <div class="forecast-bar-wrap">
+            <div class="forecast-seg income" style="height:65px"></div>
+            <div class="forecast-seg expense" style="height:44px"></div>
+          </div>
+          <div class="forecast-label">Abr</div>
+          <div class="forecast-val">R$ 4.820</div>
+        </div>
+        <div class="forecast-col">
+          <div class="forecast-bar-wrap">
+            <div class="forecast-seg income" style="height:70px"></div>
+            <div class="forecast-seg expense" style="height:48px"></div>
+          </div>
+          <div class="forecast-label cur">Mai</div>
+          <div class="forecast-val" style="color:var(--blue)">Atual</div>
+        </div>
+        <div class="forecast-col">
+          <div class="forecast-bar-wrap">
+            <div class="forecast-seg projected" style="height:68px"></div>
+            <div class="forecast-seg projected" style="height:60px"></div>
+          </div>
+          <div class="forecast-label cur">Jun</div>
+          <div class="forecast-val" style="color:var(--blue)">R$ 6.800</div>
+        </div>
+      </div>
+      <div style="margin-top:16px;padding:12px 16px;background:var(--amber-dim);border:1px solid rgba(245,158,11,.2);border-radius:var(--rs);display:flex;align-items:center;gap:10px">
+        <svg width="16" height="16" viewBox="0 0 24 24" stroke="var(--amber)" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span style="font-size:13px;color:var(--amber)">Junho terá mais saídas do que entradas previstas. Considere reduzir gastos variáveis em maio para compensar.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="summary-box">
+    <div class="summary-header"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Resumo Inteligente do Mês</div>
+    <div class="summary-text">Em maio, você manteve um <strong>bom ritmo de poupança</strong>, mas os gastos com delivery e lazer impactaram o orçamento. No geral, o mês está <strong>dentro do planejado</strong> com uma margem de R$ 1.560 disponível para as próximas semanas. O score subiu 25 pontos — mantenha o comportamento de poupança.</div>
+    <div class="summary-bullets">
+      <div class="summary-bullet">
+        <div class="bullet-dot" style="background:var(--green-b)"></div>
+        <div class="bullet-text"><strong>Poupança em dia</strong>R$ 2.380 guardados — 33% da renda bruta, acima da meta de 20%.</div>
+      </div>
+      <div class="summary-bullet">
+        <div class="bullet-dot" style="background:var(--red)"></div>
+        <div class="bullet-text"><strong>Delivery fora de controle</strong>73% acima da média. Principal ponto de atenção do mês.</div>
+      </div>
+      <div class="summary-bullet">
+        <div class="bullet-dot" style="background:var(--blue)"></div>
+        <div class="bullet-text"><strong>Junho exige planejamento</strong>Mês pesado. Recomendável criar reserva específica já em maio.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REPORT CTA -->
+  <div class="report-cta">
+    <div class="report-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
+    <div class="report-content">
+      <div class="report-title">Gerar Relatório Completo de maio</div>
+      <div class="report-sub">Análise detalhada com gráficos, recomendações e comparativo mensal — gerado pela IA em segundos.</div>
+    </div>
+    <div class="report-actions">
+      <div class="btn btn-ghost"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="8 12 12 16 16 12"/><line x1="12" y1="8" x2="12" y2="16"/></svg>Exportar PDF</div>
+      <div class="btn btn-primary"><svg viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>Gerar com IA</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

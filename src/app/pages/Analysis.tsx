@@ -17,6 +17,8 @@ import {
 } from "../../lib/queries";
 import { getInvestimentos, calcularPatrimonioEstimado } from "../../lib/queries/investimentos";
 import { getAssinaturas, calcularTotalMensal } from "../../lib/queries/assinaturas";
+import { getUserFinancialSettings } from "../../lib/queries/financial-settings";
+import { getCurrentCycleRange } from "../../lib/financial-cycle";
 import { analisarCategoria, analisarRelatorio } from "../../lib/openai";
 import { verificarIncrementarIaReport, consultarLimiteIa } from "../../lib/queries/receitas-recorrentes";
 import { toast } from "sonner";
@@ -73,7 +75,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-function getDateRange(period: Period): { inicio: string; fim: string } {
+function getDateRange(period: Period, cycleStartDay?: number): { inicio: string; fim: string } {
   const today = new Date();
   const fim = today.toISOString().split("T")[0];
   if (period === "semana") {
@@ -82,6 +84,10 @@ function getDateRange(period: Period): { inicio: string; fim: string } {
     return { inicio: inicio.toISOString().split("T")[0], fim };
   }
   if (period === "mês") {
+    if (cycleStartDay) {
+      const r = getCurrentCycleRange({ cycle_start_day: cycleStartDay }, today);
+      return { inicio: r.inicio, fim: r.fim };
+    }
     const inicio = new Date(today.getFullYear(), today.getMonth(), 1);
     return { inicio: inicio.toISOString().split("T")[0], fim };
   }
@@ -109,6 +115,13 @@ function AnalysisContent() {
   const [transacoes, setTransacoes] = useState<any[]>([]);
   const [evolucao, setEvolucao] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [cycleStartDay, setCycleStartDay] = useState<number>(1);
+
+  useEffect(() => {
+    getUserFinancialSettings(userId)
+      .then((s) => setCycleStartDay(Number(s.cycle_start_day) || 1))
+      .catch(() => {});
+  }, [userId]);
 
   // filtros
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -129,7 +142,7 @@ function AnalysisContent() {
   const [aiReportLoading, setAiReportLoading] = useState(false);
   const [aiReportError, setAiReportError] = useState<string | null>(null);
 
-  const dateRange = useMemo(() => getDateRange(period), [period]);
+  const dateRange = useMemo(() => getDateRange(period, cycleStartDay), [period, cycleStartDay]);
 
   useEffect(() => {
     consultarLimiteIa(userId).then(({ usado, limite }) => {

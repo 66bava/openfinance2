@@ -5,29 +5,10 @@ import { Menu, X, Sun, Moon, ChevronDown } from "lucide-react"
 import { useTheme } from "../../../lib/theme-context"
 import { useLanguage } from "../../../lib/language-context"
 import type { Lang } from "../../../lib/i18n"
+import { OFLogo } from "../OFLogo"
 
 function OpenfyLogo() {
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-      <div style={{
-        width: 28, height: 28, background: "#16A34A", borderRadius: 6,
-        display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-      }}>
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-          <rect x="0" y="8" width="4" height="6" rx="1" fill="white" />
-          <rect x="5" y="4" width="4" height="10" rx="1" fill="white" />
-          <rect x="10" y="0" width="4" height="14" rx="1" fill="white" />
-        </svg>
-      </div>
-      <span style={{
-        fontSize: 17, fontWeight: 700,
-        color: "var(--of-text)",
-        letterSpacing: "-0.02em", fontFamily: "var(--font-display)",
-      }}>
-        Openfy
-      </span>
-    </div>
-  )
+  return <OFLogo size="sm" variant="horizontal" ariaLabel="Openfy" />
 }
 
 export { OpenfyLogo }

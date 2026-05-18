@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Openfy — Novo Registro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green: #16A34A;
+    --green-dim: rgba(22,163,74,0.12);
+    --green-glow: rgba(22,163,74,0.25);
+    --bg: #0A0A0A;
+    --surface: #111111;
+    --surface2: #1A1A1A;
+    --border: rgba(255,255,255,0.07);
+    --border-hover: rgba(255,255,255,0.14);
+    --text: #F5F5F0;
+    --muted: rgba(245,245,240,0.45);
+    --error: #EF4444;
+    --error-dim: rgba(239,68,68,0.12);
+    --radius-card: 16px;
+    --radius-input: 12px;
+    --radius-pill: 999px;
+  }
+
+  [data-theme="light"] {
+    --bg: #F5F5F0;
+    --surface: #FFFFFF;
+    --surface2: #F0F0EB;
+    --border: rgba(0,0,0,0.08);
+    --border-hover: rgba(0,0,0,0.16);
+    --text: #0A0A0A;
+    --muted: rgba(10,10,10,0.45);
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  .wrapper {
+    width: 100%;
+    max-width: 560px;
+  }
+
+  /* Theme toggle */
+  .theme-toggle {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 16px;
+    border-radius: var(--radius-pill);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: all 0.2s;
+  }
+  .theme-toggle:hover { border-color: var(--green); color: var(--green); }
+
+  /* Header */
+  .header { margin-bottom: 32px; }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--green-dim);
+    border: 1px solid var(--green-glow);
+    color: var(--green);
+    padding: 4px 12px;
+    border-radius: var(--radius-pill);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .badge-dot {
+    width: 6px; height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  h1 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    color: var(--text);
+  }
+  .subtitle {
+    margin-top: 6px;
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 400;
+    line-height: 1.5;
+  }
+
+  /* Method cards */
+  .method-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .method-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-card);
+    padding: 20px 14px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .method-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 0%, var(--green-glow) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .method-card:hover { border-color: var(--border-hover); transform: translateY(-1px); }
+  .method-card:hover::before { opacity: 0.5; }
+  .method-card.active { border-color: var(--green); background: var(--green-dim); }
+  .method-card.active::before { opacity: 1; }
+  .method-card.disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+
+  .method-icon {
+    width: 40px; height: 40px;
+    background: var(--surface2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: background 0.2s;
+    position: relative; z-index: 1;
+  }
+  .method-card.active .method-icon { background: var(--green-dim); }
+
+  .method-name {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    position: relative; z-index: 1;
+  }
+  .method-copy {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.4;
+    position: relative; z-index: 1;
+  }
+  .method-card.active .method-name { color: var(--green); }
+
+  /* Active indicator */
+  .check-indicator {
+    position: absolute;
+    top: 10px; right: 10px;
+    width: 18px; height: 18px;
+    background: var(--green);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 2;
+  }
+  .method-card.active .check-indicator { opacity: 1; transform: scale(1); }
+  .check-indicator svg { width: 10px; height: 10px; }
+
+  /* Content panels */
+  .content-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    padding: 24px;
+    animation: slideIn 0.25s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Text input */
+  .panel-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-input);
+    padding: 14px 16px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s;
+    min-height: 100px;
+    line-height: 1.6;
+  }
+  textarea::placeholder { color: var(--muted); }
+  textarea:focus { border-color: var(--green); }
+
+  .text-hint {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* Upload area */
+  .upload-area {
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius-card);
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .upload-area:hover { border-color: var(--green); background: var(--green-dim); }
+  .upload-icon {
+    width: 48px; height: 48px;
+    background: var(--surface2);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+  }
+  .upload-area:hover .upload-icon { background: var(--green-dim); }
+  .upload-title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .upload-sub { font-size: 12px; color: var(--muted); }
+  input[type="file"] { display: none; }
+
+  /* Manual form */
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: 1 / -1; }
+
+  label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+
+  input[type="text"], input[type="number"], select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-input);
+    padding: 11px 14px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+    -webkit-appearance: none;
+  }
+  input:focus, select:focus { border-color: var(--green); }
+  select { cursor: pointer; }
+  select option { background: var(--surface2); }
+  input::placeholder { color: var(--muted); }
+
+  /* Type pills */
+  .type-pills { display: flex; gap: 8px; margin-bottom: 16px; }
+  .pill {
+    padding: 7px 16px;
+    border-radius: var(--radius-pill);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'Inter', sans-serif;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+  }
+  .pill:hover { border-color: var(--border-hover); color: var(--text); }
+  .pill.despesa.active { background: rgba(239,68,68,0.12); border-color: #EF4444; color: #EF4444; }
+  .pill.receita.active { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+
+  /* AI confirmation card */
+  .ai-card {
+    background: var(--surface2);
+    border: 1px solid var(--green-glow);
+    border-radius: var(--radius-card);
+    padding: 20px;
+    margin-top: 20px;
+    animation: slideIn 0.3s ease;
+  }
+  .ai-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .ai-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--green-dim);
+    border: 1px solid var(--green-glow);
+    color: var(--green);
+    padding: 3px 10px;
+    border-radius: var(--radius-pill);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .ai-title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    flex: 1;
+  }
+
+  .ai-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .ai-row:last-of-type { border-bottom: none; }
+  .ai-key { font-size: 12px; color: var(--muted); }
+  .ai-val { font-size: 13px; font-weight: 500; color: var(--text); }
+  .ai-val.green { color: var(--green); }
+  .ai-val.red { color: var(--error); }
+
+  /* Loading state */
+  .loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 40px 20px;
+    text-align: center;
+  }
+  .spinner-ring {
+    width: 40px; height: 40px;
+    border: 2.5px solid var(--border);
+    border-top-color: var(--green);
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .loading-sub { font-size: 12px; color: var(--muted); }
+
+  /* Error state */
+  .error-state {
+    background: var(--error-dim);
+    border: 1px solid rgba(239,68,68,0.25);
+    border-radius: var(--radius-card);
+    padding: 20px;
+    margin-top: 20px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    animation: slideIn 0.25s ease;
+  }
+  .error-icon { font-size: 20px; flex-shrink: 0; }
+  .error-title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--error);
+    margin-bottom: 4px;
+  }
+  .error-sub { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .error-retry {
+    margin-top: 10px;
+    background: transparent;
+    border: 1px solid var(--error);
+    color: var(--error);
+    padding: 6px 14px;
+    border-radius: var(--radius-pill);
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .error-retry:hover { background: var(--error-dim); }
+
+  /* Actions */
+  .actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .btn-ghost {
+    flex: 1;
+    padding: 13px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-input);
+    color: var(--muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--border-hover); color: var(--text); }
+
+  .btn-primary {
+    flex: 2;
+    padding: 13px;
+    background: var(--green);
+    border: none;
+    border-radius: var(--radius-input);
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-primary:hover { background: #15803d; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(22,163,74,0.35); }
+  .btn-primary:active { transform: none; }
+  .btn-primary.ai { background: linear-gradient(135deg, #16A34A 0%, #0D7A36 100%); }
+
+  /* Demo states bar */
+  .demo-bar {
+    display: flex;
+    gap: 8px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+  .demo-btn {
+    flex: 1;
+    padding: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .demo-btn:hover { color: var(--text); border-color: var(--border-hover); }
+
+  .hidden { display: none !important; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  @media (max-width: 480px) {
+    .method-grid { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    h1 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" onclick="toggleTheme()">☀︎ Light</button>
+
+<div class="wrapper">
+  <div class="header">
+    <div class="badge"><span class="badge-dot"></span>Novo registro</div>
+    <h1>Como você quer<br>adicionar?</h1>
+    <p class="subtitle">Escolha o método. A IA organiza o resto.</p>
+  </div>
+
+  <!-- Method cards -->
+  <div class="method-grid">
+    <div class="method-card active" data-method="texto" onclick="selectMethod('texto', this)">
+      <div class="check-indicator">
+        <svg viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="method-icon">✦</div>
+      <div class="method-name">Texto livre</div>
+      <div class="method-copy">Descreva com suas palavras</div>
+    </div>
+    <div class="method-card" data-method="foto" onclick="selectMethod('foto', this)">
+      <div class="check-indicator">
+        <svg viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="method-icon">⬡</div>
+      <div class="method-name">Comprovante</div>
+      <div class="method-copy">Foto ou PDF do recibo</div>
+    </div>
+    <div class="method-card" data-method="manual" onclick="selectMethod('manual', this)">
+      <div class="check-indicator">
+        <svg viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="method-icon">◈</div>
+      <div class="method-name">Manual</div>
+      <div class="method-copy">Preencha você mesmo</div>
+    </div>
+  </div>
+
+  <!-- Content panels -->
+
+  <!-- TEXTO -->
+  <div class="panel active" id="panel-texto">
+    <div class="content-panel">
+      <div class="panel-label">Descreva a transação</div>
+      <textarea id="texto-input" placeholder="ex: almocei no Madero com o pessoal da firma, foi R$92 no débito…" oninput="checkText()"></textarea>
+      <p class="text-hint">
+        <span>⚡</span>
+        <span>A IA identifica valor, categoria e data automaticamente.</span>
+      </p>
+    </div>
+    <!-- AI result / loading / error shown here -->
+    <div id="ai-loading" class="content-panel hidden" style="margin-top:12px">
+      <div class="loading-state">
+        <div class="spinner-ring"></div>
+        <div class="loading-label">Analisando...</div>
+        <div class="loading-sub">Identificando valor e categoria</div>
+      </div>
+    </div>
+    <div id="ai-result" class="ai-card hidden">
+      <div class="ai-header">
+        <div class="ai-chip">✦ IA</div>
+        <div class="ai-title">Confirme os dados</div>
+      </div>
+      <div class="ai-row"><span class="ai-key">Tipo</span><span class="ai-val red">Despesa</span></div>
+      <div class="ai-row"><span class="ai-key">Valor</span><span class="ai-val">R$ 92,00</span></div>
+      <div class="ai-row"><span class="ai-key">Categoria</span><span class="ai-val">Alimentação</span></div>
+      <div class="ai-row"><span class="ai-key">Data</span><span class="ai-val">Hoje, 13/05</span></div>
+      <div class="ai-row"><span class="ai-key">Confiança</span><span class="ai-val green">Alta · 97%</span></div>
+    </div>
+    <div id="ai-error" class="error-state hidden">
+      <div class="error-icon">⚠</div>
+      <div>
+        <div class="error-title">Não consegui interpretar</div>
+        <div class="error-sub">Tente descrever com mais detalhes ou adicione o valor manualmente.</div>
+        <button class="error-retry" onclick="retryAnalysis()">Tentar novamente</button>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn-ghost" onclick="resetPanel()">Cancelar</button>
+      <button class="btn-primary ai" id="btn-analisar" onclick="analyzeText()">⚡ Analisar com IA</button>
+    </div>
+  </div>
+
+  <!-- FOTO -->
+  <div class="panel" id="panel-foto">
+    <div class="content-panel">
+      <label class="upload-area" for="file-upload">
+        <input type="file" id="file-upload" accept="image/*,.pdf" onchange="handleUpload(this)" />
+        <div class="upload-icon" id="upload-icon">⬡</div>
+        <div class="upload-title" id="upload-title">Solte a imagem aqui</div>
+        <div class="upload-sub" id="upload-sub">PNG, JPG ou PDF · máx. 10MB</div>
+      </label>
+    </div>
+    <div id="foto-loading" class="content-panel hidden" style="margin-top:12px">
+      <div class="loading-state">
+        <div class="spinner-ring"></div>
+        <div class="loading-label">Analisando comprovante...</div>
+        <div class="loading-sub">Extraindo dados do documento</div>
+      </div>
+    </div>
+    <div id="foto-result" class="ai-card hidden">
+      <div class="ai-header">
+        <div class="ai-chip">⬡ OCR + IA</div>
+        <div class="ai-title">Dados extraídos</div>
+      </div>
+      <div class="ai-row"><span class="ai-key">Estabelecimento</span><span class="ai-val">Madero Burger</span></div>
+      <div class="ai-row"><span class="ai-key">Valor total</span><span class="ai-val red">R$ 92,00</span></div>
+      <div class="ai-row"><span class="ai-key">Data</span><span class="ai-val">13/05/2025</span></div>
+      <div class="ai-row"><span class="ai-key">Categoria sugerida</span><span class="ai-val">Alimentação</span></div>
+    </div>
+    <div class="actions">
+      <button class="btn-ghost" onclick="resetPanel()">Cancelar</button>
+      <button class="btn-primary" id="btn-salvar-foto" onclick="saveFoto()">Salvar registro</button>
+    </div>
+  </div>
+
+  <!-- MANUAL -->
+  <div class="panel" id="panel-manual">
+    <div class="content-panel">
+      <div class="type-pills">
+        <button class="pill despesa active" onclick="setType(this,'despesa')">Despesa</button>
+        <button class="pill receita" onclick="setType(this,'receita')">Receita</button>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Valor</label>
+          <input type="number" placeholder="0,00" />
+        </div>
+        <div class="form-group">
+          <label>Data</label>
+          <input type="text" placeholder="13/05/2025" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group full">
+          <label>Descrição</label>
+          <input type="text" placeholder="ex: Conta do restaurante" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Categoria</label>
+          <select>
+            <option>Alimentação</option>
+            <option>Transporte</option>
+            <option>Saúde</option>
+            <option>Lazer</option>
+            <option>Moradia</option>
+            <option>Outros</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Conta</label>
+          <select>
+            <option>Nubank</option>
+            <option>Bradesco</option>
+            <option>Dinheiro</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn-ghost" onclick="resetPanel()">Cancelar</button>
+      <button class="btn-primary" onclick="saveManual()">Salvar registro</button>
+    </div>
+  </div>
+
+  <!-- Demo states -->
+  <div class="demo-bar">
+    <div class="demo-btn" onclick="showLoading()">⟳ Loading</div>
+    <div class="demo-btn" onclick="showAIResult()">✦ IA Result</div>
+    <div class="demo-btn" onclick="showError()">⚠ Error</div>
+    <div class="demo-btn" onclick="showFotoFlow()">⬡ Foto flow</div>
+  </div>
+</div>
+
+<script>
+  let currentMethod = 'texto';
+  let aiState = 'idle';
+
+  function toggleTheme() {
+    const html = document.documentElement;
+    const btn = document.querySelector('.theme-toggle');
+    if (html.dataset.theme === 'dark') {
+      html.dataset.theme = 'light';
+      btn.textContent = '☽ Dark';
+    } else {
+      html.dataset.theme = 'dark';
+      btn.textContent = '☀︎ Light';
+    }
+  }
+
+  function selectMethod(method, card) {
+    document.querySelectorAll('.method-card').forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + method).classList.add('active');
+    currentMethod = method;
+    resetPanel(false);
+  }
+
+  function resetPanel(full = true) {
+    if (full) {
+      document.getElementById('texto-input').value = '';
+    }
+    hide('ai-loading'); hide('ai-result'); hide('ai-error');
+    hide('foto-loading'); hide('foto-result');
+    aiState = 'idle';
+  }
+
+  function hide(id) { document.getElementById(id)?.classList.add('hidden'); }
+  function show(id) { document.getElementById(id)?.classList.remove('hidden'); }
+
+  function checkText() {
+    const val = document.getElementById('texto-input').value.trim();
+    const btn = document.getElementById('btn-analisar');
+    if (btn) btn.style.opacity = val.length > 5 ? '1' : '0.5';
+  }
+
+  function analyzeText() {
+    hide('ai-result'); hide('ai-error');
+    show('ai-loading');
+    setTimeout(() => {
+      hide('ai-loading');
+      const rand = Math.random();
+      if (rand > 0.25) show('ai-result');
+      else show('ai-error');
+    }, 1800);
+  }
+
+  function retryAnalysis() {
+    hide('ai-error');
+    analyzeText();
+  }
+
+  function handleUpload(input) {
+    if (!input.files.length) return;
+    document.getElementById('upload-icon').textContent = '✓';
+    document.getElementById('upload-title').textContent = input.files[0].name;
+    document.getElementById('upload-sub').textContent = 'Analisando...';
+    show('foto-loading');
+    setTimeout(() => {
+      hide('foto-loading');
+      show('foto-result');
+      document.getElementById('upload-sub').textContent = 'Extraído com sucesso';
+    }, 2200);
+  }
+
+  function setType(btn, type) {
+    document.querySelectorAll('.type-pills .pill').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function saveManual() { showToast('Registro salvo!'); }
+  function saveFoto() { showToast('Registro salvo!'); }
+
+  function showToast(msg) {
+    const t = document.createElement('div');
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#16A34A;color:#fff;padding:12px 24px;border-radius:999px;font-family:DM Sans,sans-serif;font-weight:600;font-size:14px;animation:slideIn 0.3s ease;z-index:999';
+    t.textContent = '✓ ' + msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2500);
+  }
+
+  // Demo controls
+  function showLoading() {
+    selectMethod('texto', document.querySelector('[data-method="texto"]'));
+    hide('ai-result'); hide('ai-error');
+    show('ai-loading');
+  }
+  function showAIResult() {
+    selectMethod('texto', document.querySelector('[data-method="texto"]'));
+    hide('ai-loading'); hide('ai-error');
+    show('ai-result');
+  }
+  function showError() {
+    selectMethod('texto', document.querySelector('[data-method="texto"]'));
+    hide('ai-loading'); hide('ai-result');
+    show('ai-error');
+  }
+  function showFotoFlow() {
+    const card = document.querySelector('[data-method="foto"]');
+    selectMethod('foto', card);
+    setTimeout(() => {
+      show('foto-loading');
+      setTimeout(() => { hide('foto-loading'); show('foto-result'); }, 1800);
+    }, 400);
+  }
+</script>
+</body>
+</html>

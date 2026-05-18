@@ -1,64 +1,18 @@
-# Open Finance - Integração Supabase
+# Openfy (Open Finance-ready)
 
-## Arquivos Incluídos
+Este repositório está em refatoração para transformar a Openfy em uma plataforma financeira mais automática, simples e preparada para Open Finance.
 
-- **lib/** - Pasta com arquivos de conexão com Supabase
-  - `supabase.ts` - Configuração do Supabase
-  - `types.ts` - Tipos TypeScript
-  - `queries.ts` - Funções para buscar dados
+## Docs
 
-- **DashboardWithSupabase.tsx** - Dashboard com dados reais do Supabase
-- **routes.tsx** - Rotas atualizadas
-- **.env.local** - Variáveis de ambiente (Supabase)
-- **package.json** - Dependências (adicione o script "dev")
+- `docs/WORKFLOW.md`: branches (`main`, `develop`, `feature/*`) e Conventional Commits
+- `docs/STRUCTURE.md`: estrutura-alvo de diretórios
 
-## Como Instalar no Seu PC
+## Dev
 
-### Passo 1: Copiar Arquivos
+- Rodar: `npm.cmd run dev`
+- Build: `npm.cmd run build`
 
-1. Abra seu projeto no VS Code
-2. Copie a pasta `lib` para `src/lib`
-3. Copie `DashboardWithSupabase.tsx` para `src/app/pages/`
-4. Copie `routes.tsx` para `src/app/` (substitua o arquivo existente)
-5. Copie `.env.local` para a raiz do projeto
+## Painéis (design)
 
-### Passo 2: Atualizar package.json
+Os protótipos e novos painéis de UI ficam em `paineis/` e serão integrados gradualmente (sem refazer o redesign aqui).
 
-Abra `package.json` e procure por:
-
-```json
-"scripts": {
-  "build": "vite build"
-}
-```
-
-Substitua por:
-
-```json
-"scripts": {
-  "dev": "vite",
-  "build": "vite build"
-}
-```
-
-### Passo 3: Instalar Dependências
-
-Abra o terminal (Ctrl + `) e execute:
-
-```bash
-npm install @supabase/supabase-js
-```
-
-### Passo 4: Rodar o Projeto
-
-Execute:
-
-```bash
-npm run dev
-```
-
-Seu app vai rodar em: `http://localhost:5173`
-
-## Pronto!
-
-Seu dashboard agora está conectado com Supabase e mostrando dados reais! 🚀

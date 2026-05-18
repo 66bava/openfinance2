@@ -1,6 +1,7 @@
 @import './fonts.css';
 @import './tailwind.css';
 @import './theme.css';
+@import './openfy-experience.css';
 
 @keyframes spin {
   to { transform: rotate(360deg); }

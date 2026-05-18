@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Openfy — Planejamento</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#16A34A;--green-b:#22C55E;--green-dim:rgba(22,163,74,.12);
+  --bg:#080808;--bg-s:#0A0A0A;--bg-c:#111111;--bg-c2:#161616;--bg-i:#1A1A1A;
+  --bd:rgba(255,255,255,.06);--bd-l:rgba(255,255,255,.10);
+  --t1:#EEEDE6;--t2:#8A8A7E;--t3:#444440;
+  --red:#EF4444;--amber:#F59E0B;--blue:#3B82F6;--purple:#8B5CF6;
+  --sw:240px;--sw-c:68px;--hh:60px;--r:12px;--rs:8px;
+  --tr:.22s cubic-bezier(.4,0,.2,1);
+  --fd:'DM Sans',sans-serif;--fb:'Inter',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--fb);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{width:var(--sw);min-width:var(--sw);height:100vh;background:var(--bg-s);border-right:1px solid var(--bd);display:flex;flex-direction:column;transition:width var(--tr),min-width var(--tr);position:relative;z-index:100;overflow:hidden}
+.sidebar.collapsed{width:var(--sw-c);min-width:var(--sw-c)}
+.sidebar-logo{height:var(--hh);display:flex;align-items:center;padding:0 18px;border-bottom:1px solid var(--bd);gap:10px;flex-shrink:0;overflow:hidden}
+.logo-mark{width:28px;height:28px;background:var(--green);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-mark svg{width:16px;height:16px;fill:#fff}
+.logo-text{font-family:var(--fd);font-weight:700;font-size:17px;color:var(--t1);white-space:nowrap;letter-spacing:-.3px;transition:opacity var(--tr)}
+.sidebar.collapsed .logo-text{opacity:0;width:0}
+.sidebar-nav{flex:1;padding:12px 8px;overflow-y:auto;overflow-x:hidden}
+.sidebar-nav::-webkit-scrollbar{display:none}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--rs);cursor:pointer;transition:background var(--tr),color var(--tr);color:var(--t2);white-space:nowrap;position:relative;text-decoration:none}
+.nav-item:hover{background:var(--bg-c);color:var(--t1)}
+.nav-item.active{background:var(--green-dim);color:var(--green-b)}
+.nav-icon{width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:var(--rs)}
+.nav-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav-label{font-size:13.5px;font-weight:500;font-family:var(--fd);transition:opacity var(--tr)}
+.sidebar.collapsed .nav-label{opacity:0;width:0;overflow:hidden}
+.nav-badge{margin-left:auto;background:var(--green);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;transition:opacity var(--tr)}
+.sidebar.collapsed .nav-badge{opacity:0}
+.sidebar.collapsed .nav-item[data-tip]:hover::after{content:attr(data-tip);position:absolute;left:calc(var(--sw-c) - 8px);top:50%;transform:translateY(-50%);background:var(--bg-c2);border:1px solid var(--bd-l);color:var(--t1);font-size:12px;font-weight:500;padding:6px 12px;border-radius:var(--rs);white-space:nowrap;z-index:999;pointer-events:none}
+.sidebar-footer{padding:8px 8px 16px;border-top:1px solid var(--bd);display:flex;flex-direction:column;gap:2px;overflow:hidden}
+.user-card{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--rs);cursor:pointer;transition:background var(--tr)}
+.user-card:hover{background:var(--bg-c)}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--green),#15803D);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.user-info{overflow:hidden;transition:opacity var(--tr),width var(--tr)}
+.sidebar.collapsed .user-info{opacity:0;width:0}
+.user-name{font-size:13px;font-weight:600;color:var(--t1);white-space:nowrap}
+.user-plan{font-size:11px;color:var(--t2)}
+.collapse-btn{position:absolute;top:50%;right:-12px;transform:translateY(-50%);width:24px;height:24px;background:var(--bg-c);border:1px solid var(--bd-l);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:200;transition:background var(--tr)}
+.collapse-btn:hover{background:var(--bg-i)}
+.collapse-btn svg{width:12px;height:12px;stroke:var(--t2);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform var(--tr)}
+.sidebar.collapsed .collapse-btn svg{transform:rotate(180deg)}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.header{height:var(--hh);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 24px;gap:12px;background:var(--bg-s);flex-shrink:0}
+.header-title{font-family:var(--fd);font-size:16px;font-weight:600;color:var(--t1)}
+.header-spacer{flex:1}
+.search-wrap{flex:1;max-width:360px;position:relative}
+.search-wrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:15px;height:15px;stroke:var(--t3);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.search-wrap input{width:100%;background:var(--bg-c);border:1px solid var(--bd);border-radius:var(--rs);padding:7px 12px 7px 36px;color:var(--t1);font-family:var(--fb);font-size:13px;outline:none;transition:border-color var(--tr)}
+.search-wrap input:focus{border-color:var(--bd-l)}
+.search-wrap input::placeholder{color:var(--t3)}
+.header-actions{display:flex;align-items:center;gap:4px}
+.icon-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:var(--rs);cursor:pointer;transition:background var(--tr);color:var(--t2)}
+.icon-btn:hover{background:var(--bg-c);color:var(--t1)}
+.icon-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.content{flex:1;overflow-y:auto;padding:24px}
+.content::-webkit-scrollbar{width:4px}
+.content::-webkit-scrollbar-track{background:transparent}
+.content::-webkit-scrollbar-thumb{background:var(--bg-i);border-radius:2px}
+
+/* PAGE */
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:16px}
+.page-title{font-family:var(--fd);font-size:22px;font-weight:700;color:var(--t1);letter-spacing:-.4px}
+.page-sub{font-size:13px;color:var(--t2);margin-top:2px}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:var(--rs);font-family:var(--fd);font-size:13px;font-weight:600;cursor:pointer;transition:all var(--tr);border:none;white-space:nowrap}
+.btn-primary{background:var(--green);color:#fff}
+.btn-primary:hover{background:#15803D}
+.btn-ghost{background:var(--bg-c);color:var(--t2);border:1px solid var(--bd)}
+.btn-ghost:hover{color:var(--t1);border-color:var(--bd-l)}
+.btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* SUMMARY ROW */
+.summary-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.sum-card{background:var(--bg-s);border:1px solid var(--bd);border-radius:var(--r);padding:18px 20px}
+.sum-label{font-size:11.5px;color:var(--t2);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.sum-val{font-family:var(--fd);font-size:22px;font-weight:700;color:var(--t1);letter-spacing:-.5px}
+.sum-val.red{color:var(--red)}
+.sum-val.amber{color:var(--amber)}
+.sum-val.green{color:var(--green-b)}
+.sum-delta{font-size:11.5px;color:var(--t2);margin-top:4px}
+.sum-delta span{color:var(--red)}
+.sum-delta span.pos{color:var(--green-b)}
+
+/* MAIN GRID */
+.plan-grid{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start}
+
+/* SECTION */
+.section{margin-bottom:20px}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.section-title{font-family:var(--fd);font-size:15px;font-weight:600;color:var(--t1);display:flex;align-items:center;gap:8px}
+.section-title .dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
+.section-title .dot.amber{background:var(--amber)}
+.section-title .dot.blue{background:var(--blue)}
+.section-title .dot.purple{background:var(--purple)}
+.section-count{font-size:11px;color:var(--t2)}
+
+/* SUBSCRIPTION CARDS */
+.sub-list{display:flex;flex-direction:column;gap:8px}
+.sub-item{background:var(--bg-s);border:1px solid var(--bd);border-radius:var(--r);padding:14px 16px;display:flex;align-items:center;gap:14px;transition:border-color var(--tr)}
+.sub-item:hover{border-color:var(--bd-l)}
+.sub-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:17px}
+.sub-info{flex:1;min-width:0}
+.sub-name{font-size:13.5px;font-weight:600;color:var(--t1);font-family:var(--fd)}
+.sub-meta{font-size:11.5px;color:var(--t2);margin-top:2px}
+.sub-right{text-align:right;flex-shrink:0}
+.sub-val{font-family:var(--fd);font-size:14px;font-weight:700;color:var(--t1)}
+.sub-cycle{font-size:11px;color:var(--t2);margin-top:2px}
+.sub-badge{display:inline-flex;align-items:center;font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:20px}
+.badge-ok{background:var(--green-dim);color:var(--green-b)}
+.badge-soon{background:rgba(245,158,11,.12);color:var(--amber)}
+.badge-late{background:rgba(239,68,68,.12);color:var(--red)}
+
+/* FIXED BILLS */
+.bill-list{display:flex;flex-direction:column;gap:8px}
+.bill-item{background:var(--bg-s);border:1px solid var(--bd);border-radius:var(--r);padding:14px 16px;display:flex;align-items:center;gap:14px;transition:border-color var(--tr)}
+.bill-item:hover{border-color:var(--bd-l)}
+.bill-ico{width:38px;height:38px;border-radius:10px;background:var(--bg-c);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.bill-ico svg{width:18px;height:18px;stroke:var(--t2);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.bill-info{flex:1}
+.bill-name{font-size:13.5px;font-weight:600;color:var(--t1);font-family:var(--fd)}
+.bill-due{font-size:11.5px;color:var(--t2);margin-top:2px}
+.bill-amount{font-family:var(--fd);font-size:14px;font-weight:700;color:var(--t1);text-align:right}
+.bill-status{font-size:11px;margin-top:2px;text-align:right}
+
+/* FINANCING */
+.fin-list{display:flex;flex-direction:column;gap:8px}
+.fin-item{background:var(--bg-s);border:1px solid var(--bd);border-radius:var(--r);padding:16px 18px;transition:border-color var(--tr)}
+.fin-item:hover{border-color:var(--bd-l)}
+.fin-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.fin-name{font-family:var(--fd);font-size:14px;font-weight:600;color:var(--t1)}
+.fin-tag{font-size:10.5px;font-weight:600;padding:2px 9px;border-radius:20px;background:var(--bg-c);color:var(--t2)}
+.fin-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px}
+.fin-stat label{font-size:10.5px;color:var(--t3);display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:.05em}
+.fin-stat span{font-family:var(--fd);font-size:13px;font-weight:600;color:var(--t1)}
+.progress-wrap{height:5px;background:var(--bg-c);border-radius:3px;overflow:hidden}
+.progress-bar{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--green),var(--green-b))}
+.progress-bar.amber{background:linear-gradient(90deg,var(--amber),#FCD34D)}
+.fin-progress-label{display:flex;justify-content:space-between;margin-top:5px}
+.fin-progress-label span{font-size:11px;color:var(--t2)}
+
+/* RIGHT SIDEBAR */
+.right-col{display:flex;flex-direction:column;gap:16px}
+.card{background:var(--bg-s);border:1px solid var(--bd);border-radius:var(--r);padding:18px}
+.card-title{font-family:var(--fd);font-size:13.5px;font-weight:600;color:var(--t1);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.card-title-link{font-size:11.5px;color:var(--green);font-weight:500;cursor:pointer}
+
+/* FORECAST CHART */
+.forecast-months{display:flex;flex-direction:column;gap:10px}
+.fc-row{display:flex;align-items:center;gap:10px}
+.fc-label{font-size:12px;color:var(--t2);width:36px;flex-shrink:0;font-weight:500}
+.fc-bars{flex:1;display:flex;flex-direction:column;gap:3px}
+.fc-bar-wrap{display:flex;align-items:center;gap:6px}
+.fc-bar{height:6px;border-radius:3px;transition:width var(--tr)}
+.fc-bar.income{background:var(--green)}
+.fc-bar.expense{background:var(--red)}
+.fc-bar.projected{background:var(--amber);opacity:.7}
+.fc-val{font-size:11px;color:var(--t2);width:60px;text-align:right;flex-shrink:0}
+
+/* UPCOMING */
+.upcoming-list{display:flex;flex-direction:column;gap:0}
+.upcoming-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd)}
+.upcoming-item:last-child{border-bottom:none}
+.upcoming-day{width:36px;height:36px;background:var(--bg-c);border-radius:var(--rs);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0}
+.upcoming-day .day{font-family:var(--fd);font-size:14px;font-weight:700;color:var(--t1);line-height:1}
+.upcoming-day .mon{font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.05em}
+.upcoming-info{flex:1}
+.upcoming-name{font-size:13px;font-weight:500;color:var(--t1)}
+.upcoming-cat{font-size:11.5px;color:var(--t2)}
+.upcoming-amount{font-family:var(--fd);font-size:13px;font-weight:700;color:var(--red)}
+
+/* TOTAL STRIP */
+.total-strip{background:var(--bg-c);border-radius:var(--rs);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+.total-strip label{font-size:11.5px;color:var(--t2)}
+.total-strip span{font-family:var(--fd);font-size:14px;font-weight:700;color:var(--t1)}
+
+/* MONTH TABS */
+.month-tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.mtab{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;transition:all var(--tr);border:1px solid var(--bd);color:var(--t2);background:transparent}
+.mtab.active{background:var(--green-dim);color:var(--green-b);border-color:transparent}
+.mtab:hover:not(.active){border-color:var(--bd-l);color:var(--t1)}
+
+/* RESPONSIVE */
+@media(max-width:1100px){.plan-grid{grid-template-columns:1fr}}
+@media(max-width:900px){.summary-row{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){
+  .sidebar{display:none}
+  .summary-row{grid-template-columns:1fr 1fr}
+  .content{padding:16px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    </div>
+    <span class="logo-text">Openfy</span>
+  </div>
+  <div class="sidebar-nav">
+    <a class="nav-item" data-tip="Dashboard" href="#">
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
+      <span class="nav-label">Dashboard</span>
+    </a>
+    <a class="nav-item" data-tip="Registro Rápido" href="#">
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div>
+      <span class="nav-label">Registro Rápido</span>
+      <span class="nav-badge">IA</span>
+    </a>
+    <a class="nav-item" data-tip="Score" href="#">
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+      <span class="nav-label">Score</span>
+    </a>
+    <a class="nav-item" data-tip="Insights IA" href="#">
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1M6.343 5.657l-.707.707M3 12H2M5.657 18.343l-.707.707M21 12h-1M18.343 5.657l.707.707M12 20v1"/><path d="M12 7a5 5 0 0 1 0 10"/></svg></div>
+      <span class="nav-label">Insights IA</span>
+    </a>
+    <a class="nav-item active" data-tip="Planejamento" href="#">
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+      <span class="nav-label">Planejamento</span>
+    </a>
+    <a class="nav-item" data-tip="Investimentos" href="#">
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
+      <span class="nav-label">Investimentos</span>
+    </a>
+    <a class="nav-item" data-tip="Pagamentos" href="#">
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+      <span class="nav-label">Pagamentos</span>
+    </a>
+  </div>
+  <div class="sidebar-footer">
+    <a class="nav-item" data-tip="Configurações" href="#">
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+      <span class="nav-label">Configurações</span>
+    </a>
+    <div class="user-card">
+      <div class="user-avatar">P</div>
+      <div class="user-info">
+        <div class="user-name">Pedro H.</div>
+        <div class="user-plan">Beta · Pro</div>
+      </div>
+    </div>
+  </div>
+  <div class="collapse-btn" onclick="toggleSidebar()">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <header class="header">
+    <span class="header-title">Planejamento</span>
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Buscar conta, assinatura...">
+    </div>
+    <div class="header-spacer"></div>
+    <div class="month-tabs" style="margin-bottom:0;flex-wrap:nowrap">
+      <div class="mtab">Abr</div>
+      <div class="mtab active">Mai</div>
+      <div class="mtab">Jun</div>
+    </div>
+    <div class="header-actions">
+      <div class="icon-btn"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+      <div class="icon-btn" style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#16A34A,#15803D);color:#fff;font-size:12px;font-weight:700">P</div>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <div>
+        <div class="page-title">Planejamento financeiro</div>
+        <div class="page-sub">Maio 2025 · 18 compromissos · próximo em 3 dias</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Exportar
+        </button>
+        <button class="btn btn-primary">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Adicionar
+        </button>
+      </div>
+    </div>
+
+    <!-- SUMMARY CARDS -->
+    <div class="summary-row">
+      <div class="sum-card">
+        <div class="sum-label">Total Comprometido</div>
+        <div class="sum-val red">R$ 6.840</div>
+        <div class="sum-delta">De R$ 12.450 disponíveis</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-label">Assinaturas</div>
+        <div class="sum-val amber">R$ 462</div>
+        <div class="sum-delta">8 serviços ativos</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-label">Contas Fixas</div>
+        <div class="sum-val">R$ 2.180</div>
+        <div class="sum-delta">5 contas · 2 a vencer</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-label">Livre após compromissos</div>
+        <div class="sum-val green">R$ 5.610</div>
+        <div class="sum-delta"><span class="pos">▲ 8%</span> vs. mês passado</div>
+      </div>
+    </div>
+
+    <!-- MAIN GRID -->
+    <div class="plan-grid">
+
+      <!-- LEFT COLUMN -->
+      <div>
+
+        <!-- ASSINATURAS -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">
+              <div class="dot purple"></div>
+              Assinaturas
+              <span class="section-count">8 ativas · R$ 462/mês</span>
+            </div>
+            <button class="btn btn-ghost" style="padding:5px 12px;font-size:12px">Gerenciar</button>
+          </div>
+          <div class="sub-list">
+            <div class="sub-item">
+              <div class="sub-icon" style="background:#1a0533">🎵</div>
+              <div class="sub-info">
+                <div class="sub-name">Spotify Premium</div>
+                <div class="sub-meta">Renovação em 3 dias · Cartão de crédito</div>
+              </div>
+              <div class="sub-right">
+                <div class="sub-val">R$ 21,90</div>
+                <div class="sub-cycle"><span class="sub-badge badge-soon">Vence em breve</span></div>
+              </div>
+            </div>
+            <div class="sub-item">
+              <div class="sub-icon" style="background:#0d0d0d">🎬</div>
+              <div class="sub-info">
+                <div class="sub-name">Netflix Standard</div>
+                <div class="sub-meta">Renovação em 12 dias · Crédito Nubank</div>
+              </div>
+              <div class="sub-right">
+                <div class="sub-val">R$ 39,90</div>
+                <div class="sub-cycle"><span class="sub-badge badge-ok">Ativo</span></div>
+              </div>
+            </div>
+            <div class="sub-item">
+              <div class="sub-icon" style="background:#001f3d">☁️</div>
+              <div class="sub-info">
+                <div class="sub-name">iCloud 200GB</div>
+                <div class="sub-meta">Renovação em 8 dias · Apple ID</div>
+              </div>
+              <div class="sub-right">
+                <div class="sub-val">R$ 12,90</div>
+                <div class="sub-cycle"><span class="sub-badge badge-ok">Ativo</span></div>
+              </div>
+            </div>
+            <div class="sub-item">
+              <div class="sub-icon" style="background:#0d1f0d">🤖</div>
+              <div class="sub-info">
+                <div class="sub-name">ChatGPT Plus</div>
+                <div class="sub-meta">Renovação em 21 dias · Pix automático</div>
+              </div>
+              <div class="sub-right">
+                <div class="sub-val">R$ 99,00</div>
+                <div class="sub-cycle"><span class="sub-badge badge-ok">Ativo</span></div>
+              </div>
+            </div>
+            <div class="sub-item">
+              <div class="sub-icon" style="background:#1a1a00">⚡</div>
+              <div class="sub-info">
+                <div class="sub-name">Adobe Creative Cloud</div>
+                <div class="sub-meta">Renovação anual · Vence em 45 dias</div>
+              </div>
+              <div class="sub-right">
+                <div class="sub-val">R$ 249,00</div>
+                <div class="sub-cycle"><span class="sub-badge badge-ok">Anual</span></div>
+              </div>
+            </div>
+            <div class="sub-item">
+              <div class="sub-icon" style="background:#001a33">🏋️</div>
+              <div class="sub-info">
+                <div class="sub-name">Academia SmartFit</div>
+                <div class="sub-meta">Débito automático · Todo dia 5</div>
+              </div>
+              <div class="sub-right">
+                <div class="sub-val">R$ 79,90</div>
+                <div class="sub-cycle"><span class="sub-badge badge-soon">Vence dia 5</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="total-strip">
+            <label>Total mensal em assinaturas</label>
+            <span>R$ 462,60</span>
+          </div>
+        </div>
+
+        <!-- CONTAS FIXAS -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">
+              <div class="dot amber"></div>
+              Contas Fixas
+              <span class="section-count">5 contas · R$ 2.180/mês</span>
+            </div>
+          </div>
+          <div class="bill-list">
+            <div class="bill-item">
+              <div class="bill-ico"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+              <div class="bill-info">
+                <div class="bill-name">Aluguel</div>
+                <div class="bill-due">Vence dia 10 · Transferência</div>
+              </div>
+              <div>
+                <div class="bill-amount">R$ 1.200,00</div>
+                <div class="bill-status" style="color:var(--green-b)">✓ Pago</div>
+              </div>
+            </div>
+            <div class="bill-item">
+              <div class="bill-ico"><svg viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg></div>
+              <div class="bill-info">
+                <div class="bill-name">Internet Vivo Fibra</div>
+                <div class="bill-due">Vence dia 15 · Débito automático</div>
+              </div>
+              <div>
+                <div class="bill-amount">R$ 119,90</div>
+                <div class="bill-status" style="color:var(--amber)">⚡ Vence em 5 dias</div>
+              </div>
+            </div>
+            <div class="bill-item">
+              <div class="bill-ico"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
+              <div class="bill-info">
+                <div class="bill-name">Energia Elétrica</div>
+                <div class="bill-due">Vence dia 20 · Boleto</div>
+              </div>
+              <div>
+                <div class="bill-amount">R$ 280,00</div>
+                <div class="bill-status" style="color:var(--t2)">· Aguardando</div>
+              </div>
+            </div>
+            <div class="bill-item">
+              <div class="bill-ico"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.5a16 16 0 0 0 6 6l.94-.94a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16"/></svg></div>
+              <div class="bill-info">
+                <div class="bill-name">Plano Celular TIM</div>
+                <div class="bill-due">Vence dia 25 · Débito automático</div>
+              </div>
+              <div>
+                <div class="bill-amount">R$ 89,90</div>
+                <div class="bill-status" style="color:var(--t2)">· Aguardando</div>
+              </div>
+            </div>
+            <div class="bill-item">
+              <div class="bill-ico"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+              <div class="bill-info">
+                <div class="bill-name">Plano de Saúde</div>
+                <div class="bill-due">Vence dia 5 · Débito automático</div>
+              </div>
+              <div>
+                <div class="bill-amount">R$ 490,20</div>
+                <div class="bill-status" style="color:var(--green-b)">✓ Pago</div>
+              </div>
+            </div>
+          </div>
+          <div class="total-strip">
+            <label>Total em contas fixas</label>
+            <span>R$ 2.180,00</span>
+          </div>
+        </div>
+
+        <!-- FINANCIAMENTOS -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">
+              <div class="dot blue"></div>
+              Financiamentos
+              <span class="section-count">2 ativos</span>
+            </div>
+          </div>
+          <div class="fin-list">
+            <div class="fin-item">
+              <div class="fin-top">
+                <div class="fin-name">Financiamento Moto Honda</div>
+                <div class="fin-tag">Veículo</div>
+              </div>
+              <div class="fin-stats">
+                <div class="fin-stat"><label>Parcela</label><span>R$ 520,00</span></div>
+                <div class="fin-stat"><label>Restam</label><span>24 meses</span></div>
+                <div class="fin-stat"><label>Total pago</label><span>R$ 12.480</span></div>
+              </div>
+              <div class="progress-wrap"><div class="progress-bar" style="width:52%"></div></div>
+              <div class="fin-progress-label"><span>52% quitado</span><span>R$ 18.720 total</span></div>
+            </div>
+            <div class="fin-item">
+              <div class="fin-top">
+                <div class="fin-name">Crédito Pessoal Nubank</div>
+                <div class="fin-tag">Crédito</div>
+              </div>
+              <div class="fin-stats">
+                <div class="fin-stat"><label>Parcela</label><span>R$ 380,00</span></div>
+                <div class="fin-stat"><label>Restam</label><span>8 meses</span></div>
+                <div class="fin-stat"><label>Total pago</label><span>R$ 1.520</span></div>
+              </div>
+              <div class="progress-wrap"><div class="progress-bar amber" style="width:27%"></div></div>
+              <div class="fin-progress-label"><span>27% quitado</span><span>R$ 4.560 total</span></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="right-col">
+
+        <!-- PREVISÃO PRÓXIMOS MESES -->
+        <div class="card">
+          <div class="card-title">
+            Previsão próximos meses
+            <span class="card-title-link">Ver tudo</span>
+          </div>
+          <div style="display:flex;gap:16px;margin-bottom:14px">
+            <div style="display:flex;align-items:center;gap:5px"><div style="width:8px;height:8px;border-radius:50%;background:var(--green)"></div><span style="font-size:11.5px;color:var(--t2)">Receita</span></div>
+            <div style="display:flex;align-items:center;gap:5px"><div style="width:8px;height:8px;border-radius:50%;background:var(--red)"></div><span style="font-size:11.5px;color:var(--t2)">Despesa</span></div>
+            <div style="display:flex;align-items:center;gap:5px"><div style="width:8px;height:8px;border-radius:50%;background:var(--amber)"></div><span style="font-size:11.5px;color:var(--t2)">Projetado</span></div>
+          </div>
+          <div class="forecast-months">
+            <div class="fc-row">
+              <div class="fc-label">Mai</div>
+              <div class="fc-bars">
+                <div class="fc-bar-wrap"><div class="fc-bar income" style="width:88%"></div><span class="fc-val">R$ 7.200</span></div>
+                <div class="fc-bar-wrap"><div class="fc-bar expense" style="width:67%"></div><span class="fc-val">R$ 5.490</span></div>
+              </div>
+            </div>
+            <div class="fc-row">
+              <div class="fc-label">Jun</div>
+              <div class="fc-bars">
+                <div class="fc-bar-wrap"><div class="fc-bar income" style="width:88%"></div><span class="fc-val">R$ 7.200</span></div>
+                <div class="fc-bar-wrap"><div class="fc-bar projected" style="width:70%"></div><span class="fc-val">R$ 5.720</span></div>
+              </div>
+            </div>
+            <div class="fc-row">
+              <div class="fc-label">Jul</div>
+              <div class="fc-bars">
+                <div class="fc-bar-wrap"><div class="fc-bar income" style="width:88%"></div><span class="fc-val">R$ 7.200</span></div>
+                <div class="fc-bar-wrap"><div class="fc-bar projected" style="width:58%"></div><span class="fc-val">R$ 4.740</span></div>
+              </div>
+            </div>
+            <div class="fc-row">
+              <div class="fc-label">Ago</div>
+              <div class="fc-bars">
+                <div class="fc-bar-wrap"><div class="fc-bar income" style="width:88%"></div><span class="fc-val">R$ 7.200</span></div>
+                <div class="fc-bar-wrap"><div class="fc-bar projected" style="width:72%"></div><span class="fc-val">R$ 5.890</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRÓXIMOS VENCIMENTOS -->
+        <div class="card">
+          <div class="card-title">
+            Próximos vencimentos
+            <span class="card-title-link">Calendário</span>
+          </div>
+          <div class="upcoming-list">
+            <div class="upcoming-item">
+              <div class="upcoming-day">
+                <div class="day">15</div>
+                <div class="mon">mai</div>
+              </div>
+              <div class="upcoming-info">
+                <div class="upcoming-name">Internet Vivo Fibra</div>
+                <div class="upcoming-cat">Conta fixa · 5 dias</div>
+              </div>
+              <div class="upcoming-amount">R$ 119,90</div>
+            </div>
+            <div class="upcoming-item">
+              <div class="upcoming-day">
+                <div class="day">17</div>
+                <div class="mon">mai</div>
+              </div>
+              <div class="upcoming-info">
+                <div class="upcoming-name">Spotify Premium</div>
+                <div class="upcoming-cat">Assinatura · 7 dias</div>
+              </div>
+              <div class="upcoming-amount">R$ 21,90</div>
+            </div>
+            <div class="upcoming-item">
+              <div class="upcoming-day">
+                <div class="day">20</div>
+                <div class="mon">mai</div>
+              </div>
+              <div class="upcoming-info">
+                <div class="upcoming-name">Energia Elétrica</div>
+                <div class="upcoming-cat">Conta fixa · 10 dias</div>
+              </div>
+              <div class="upcoming-amount">R$ 280,00</div>
+            </div>
+            <div class="upcoming-item">
+              <div class="upcoming-day">
+                <div class="day">22</div>
+                <div class="mon">mai</div>
+              </div>
+              <div class="upcoming-info">
+                <div class="upcoming-name">Parcela Moto Honda</div>
+                <div class="upcoming-cat">Financiamento · 12 dias</div>
+              </div>
+              <div class="upcoming-amount">R$ 520,00</div>
+            </div>
+            <div class="upcoming-item">
+              <div class="upcoming-day">
+                <div class="day">25</div>
+                <div class="mon">mai</div>
+              </div>
+              <div class="upcoming-info">
+                <div class="upcoming-name">Crédito Pessoal Nubank</div>
+                <div class="upcoming-cat">Financiamento · 15 dias</div>
+              </div>
+              <div class="upcoming-amount">R$ 380,00</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- IA TIP -->
+        <div class="card" style="border-color:rgba(22,163,74,.2);background:rgba(22,163,74,.04)">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <div style="width:32px;height:32px;background:var(--green-dim);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px">💡</div>
+            <div>
+              <div style="font-family:var(--fd);font-size:13px;font-weight:600;color:var(--green-b);margin-bottom:4px">Sugestão da IA</div>
+              <div style="font-size:12.5px;color:var(--t2);line-height:1.6">Suas assinaturas consomem <strong style="color:var(--t1)">R$ 462/mês</strong>. Cancelar 2 serviços com menor uso pode liberar <strong style="color:var(--green-b)">R$ 119/mês</strong> para sua reserva de emergência.</div>
+              <button class="btn btn-primary" style="margin-top:12px;font-size:12px;padding:6px 14px">Ver análise completa</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('collapsed');
+}
+</script>
+</body>
+</html>

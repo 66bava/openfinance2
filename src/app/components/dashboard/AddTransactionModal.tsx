@@ -1,10 +1,12 @@
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
-import { CalendarDays, Loader2, X } from "lucide-react"
+import { CalendarDays, Loader2, PlusCircle, TrendingDown, TrendingUp, X } from "lucide-react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { useAuth } from "../../../lib/auth-context"
 import { useLanguage } from "../../../lib/language-context"
 import { addTransacao, getOrCreateCategoria } from "../../../lib/queries"
+import { getCategoriasAtivas } from "../../../lib/queries/categorias"
+import type { Categoria, MetodoPagamento } from "../../../lib/types"
 
 interface AddTransactionModalProps {
   open: boolean
@@ -12,39 +14,54 @@ interface AddTransactionModalProps {
   onSuccess?: () => void
 }
 
-type Tipo = "despesa" | "receita"
+type UiTipo = "despesa" | "receita" | "aporte"
 
-const DESPESA_CATS = [
-  { nome: "Alimentação", emoji: "🍽️" },
-  { nome: "Transporte", emoji: "🚌" },
-  { nome: "Saúde", emoji: "🏥" },
-  { nome: "Educação", emoji: "📚" },
-  { nome: "Entretenimento", emoji: "🎬" },
-  { nome: "Moradia", emoji: "🏠" },
-  { nome: "Outros", emoji: "📦" },
+const METODOS_PAGAMENTO: { value: MetodoPagamento; label: string }[] = [
+  { value: "pix", label: "Pix" },
+  { value: "pix_qr_code", label: "Pix QR Code" },
+  { value: "credito", label: "Cartão de crédito" },
+  { value: "debito", label: "Cartão de débito" },
+  { value: "dinheiro", label: "Dinheiro" },
+  { value: "boleto", label: "Boleto" },
+  { value: "transferencia", label: "Transferência" },
+  { value: "debito_automatico", label: "Débito automático" },
+  { value: "outro", label: "Outro" },
 ]
 
-const RECEITA_CATS = [
-  { nome: "Salário", emoji: "💼" },
-  { nome: "Freelance", emoji: "💻" },
-  { nome: "Investimentos", emoji: "📈" },
-  { nome: "Aluguel", emoji: "🏠" },
-  { nome: "Outros", emoji: "💰" },
-]
+function clampDayISO(date: string) {
+  return date && date.length >= 10 ? date.slice(0, 10) : new Date().toISOString().split("T")[0]
+}
 
 export function AddTransactionModal({ open, onOpenChange, onSuccess }: AddTransactionModalProps) {
   const { user } = useAuth()
   const { t } = useLanguage()
 
-  const [tipo, setTipo] = useState<Tipo>("despesa")
+  const [tipo, setTipo] = useState<UiTipo>("despesa")
   const [amount, setAmount] = useState("")
-  const [categoria, setCategoria] = useState("")
+  const [categoriaId, setCategoriaId] = useState("")
   const [description, setDescription] = useState("")
   const [date, setDate] = useState(new Date().toISOString().split("T")[0])
+  const [metodo, setMetodo] = useState<MetodoPagamento | "">("")
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [submitting, setSubmitting] = useState(false)
 
-  const categories = tipo === "despesa" ? DESPESA_CATS : RECEITA_CATS
+  const [cats, setCats] = useState<Categoria[]>([])
+  const [catsLoading, setCatsLoading] = useState(false)
+
+  useEffect(() => {
+    if (!open || !user) return
+    setCatsLoading(true)
+    getCategoriasAtivas(user.id)
+      .then(setCats)
+      .catch(() => {})
+      .finally(() => setCatsLoading(false))
+  }, [open, user?.id])
+
+  const txTipo = tipo === "aporte" ? "despesa" : tipo
+  const categories = useMemo(() => {
+    if (tipo === "aporte") return cats.filter((c) => c.tipo === "despesa")
+    return cats.filter((c) => c.tipo === (tipo === "receita" ? "receita" : "despesa"))
+  }, [cats, tipo])
 
   const displayAmount = amount
     ? (parseInt(amount) / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })
@@ -56,18 +73,13 @@ export function AddTransactionModal({ open, onOpenChange, onSuccess }: AddTransa
     if (errors.amount) setErrors((p) => ({ ...p, amount: "" }))
   }
 
-  function handleTipoChange(next: Tipo) {
-    setTipo(next)
-    setCategoria("")
-    setErrors({})
-  }
-
   function reset() {
     setTipo("despesa")
     setAmount("")
-    setCategoria("")
+    setCategoriaId("")
     setDescription("")
     setDate(new Date().toISOString().split("T")[0])
+    setMetodo("")
     setErrors({})
   }
 
@@ -75,32 +87,47 @@ export function AddTransactionModal({ open, onOpenChange, onSuccess }: AddTransa
     const errs: Record<string, string> = {}
     const num = parseInt(amount)
     if (!amount || isNaN(num) || num <= 0) errs.amount = t("modalErroValor")
-    if (!categoria) errs.categoria = t("modalErroCategoria")
+    if (tipo !== "aporte" && !categoriaId) errs.categoria = t("modalErroCategoria")
     if (!date) errs.date = t("modalErroData")
     return errs
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    if (!user) return
+
     const errs = validate()
     if (Object.keys(errs).length > 0) { setErrors(errs); return }
 
     setSubmitting(true)
     try {
-      const userId = user!.id
-      const categoriaId = await getOrCreateCategoria(userId, categoria, tipo)
+      const userId = user.id
       const valor = parseInt(amount) / 100
 
+      let catId = categoriaId
+      if (tipo === "aporte") {
+        catId = catId || (await getOrCreateCategoria(userId, "Aportes", "despesa"))
+      }
+
       await addTransacao(userId, {
-        categoria_id: categoriaId,
-        descricao: description || categoria,
+        categoria_id: catId,
+        descricao: description || (tipo === "aporte" ? "Aporte em investimento" : "Transação"),
         valor,
-        tipo,
-        data: date,
+        tipo: txTipo,
+        data: clampDayISO(date),
+        metodo_pagamento: metodo || null,
+        confirmado: true,
       })
 
-      toast.success(tipo === "despesa" ? t("modalSuccessDespesa") : t("modalSuccessReceita"), {
-        description: `${categoria} · R$ ${displayAmount}`,
+      const title =
+        tipo === "receita"
+          ? t("modalSuccessReceita")
+          : tipo === "aporte"
+            ? "Aporte registrado!"
+            : t("modalSuccessDespesa")
+
+      toast.success(title, {
+        description: `${tipo === "aporte" ? "Investimento" : "Transação"} · R$ ${displayAmount}`,
         duration: 3000,
       })
 
@@ -113,6 +140,23 @@ export function AddTransactionModal({ open, onOpenChange, onSuccess }: AddTransa
       setSubmitting(false)
     }
   }
+
+  const tabBtn = (active: boolean, accent: string): React.CSSProperties => ({
+    flex: 1,
+    padding: "10px 0",
+    borderRadius: 12,
+    border: `1px solid ${active ? accent : "var(--of-border)"}`,
+    background: active ? accent + "14" : "transparent",
+    color: active ? accent : "var(--of-text-muted)",
+    fontSize: 13,
+    fontWeight: 800,
+    cursor: "pointer",
+    transition: "all 0.15s",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+  })
 
   return (
     <DialogPrimitive.Root open={open} onOpenChange={(v) => { if (!v) reset(); onOpenChange(v) }}>
@@ -131,211 +175,235 @@ export function AddTransactionModal({ open, onOpenChange, onSuccess }: AddTransa
             transform: "translate(-50%, -50%)",
             zIndex: 101,
             width: "100%",
-            maxWidth: 540,
+            maxWidth: 560,
             maxHeight: "90vh",
             overflowY: "auto",
             backgroundColor: "var(--of-surface)",
-            borderRadius: 16,
+            borderRadius: 18,
             border: "1px solid var(--of-border)",
             boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
-            padding: "28px 28px 24px",
+            padding: "24px 24px 18px",
           }}
         >
           {/* Header */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
-            <h2 style={{ fontSize: 20, fontWeight: 700, color: "var(--of-text)", letterSpacing: "-0.02em" }}>
-              {t("modalNovaTransacao")}
-            </h2>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 10, marginBottom: 14 }}>
+            <div>
+              <h2 style={{ fontSize: 18, fontWeight: 900, color: "var(--of-text)", letterSpacing: "-0.02em" }}>
+                Nova movimentação
+              </h2>
+              <p style={{ fontSize: 12, color: "var(--of-text-muted)", marginTop: 4, lineHeight: 1.5 }}>
+                Registre despesa, receita ou aporte. Tudo impacta seu saldo do ciclo atual.
+              </p>
+            </div>
             <DialogPrimitive.Close
               style={{
                 background: "none", border: "none", cursor: "pointer",
-                width: 32, height: 32, borderRadius: 8,
+                width: 36, height: 36, borderRadius: 10,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                color: "var(--of-text-muted)", transition: "all 0.15s",
+                color: "var(--of-text-secondary)",
               }}
-              onMouseOver={(e) => { e.currentTarget.style.color = "var(--of-text)"; e.currentTarget.style.background = "var(--of-hover)" }}
-              onMouseOut={(e) => { e.currentTarget.style.color = "var(--of-text-muted)"; e.currentTarget.style.background = "none" }}
             >
               <X size={18} />
             </DialogPrimitive.Close>
           </div>
 
-          {/* Tipo Toggle */}
-          <div style={{
-            display: "grid", gridTemplateColumns: "1fr 1fr",
-            backgroundColor: "var(--of-hover)", borderRadius: 10, padding: 4,
-            marginBottom: 24, gap: 4,
-          }}>
-            {(["despesa", "receita"] as Tipo[]).map((t_val) => (
-              <button
-                key={t_val}
-                type="button"
-                onClick={() => handleTipoChange(t_val)}
-                style={{
-                  padding: "9px 0",
-                  borderRadius: 7,
-                  border: "none",
-                  cursor: "pointer",
-                  fontSize: 13,
-                  fontWeight: 600,
-                  transition: "all 0.15s",
-                  backgroundColor: tipo === t_val ? (t_val === "receita" ? "#16A34A" : "#0A0A0A") : "transparent",
-                  color: tipo === t_val ? "#FFFFFF" : "var(--of-text-secondary)",
-                }}
-              >
-                {t_val === "despesa" ? t("modalDespesa") : t("modalReceita")}
-              </button>
-            ))}
+          {/* Tabs */}
+          <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+            <button type="button" onClick={() => { setTipo("despesa"); setCategoriaId(""); setErrors({}); }} style={tabBtn(tipo === "despesa", "#EF4444")}>
+              <TrendingDown size={16} /> Despesa
+            </button>
+            <button type="button" onClick={() => { setTipo("receita"); setCategoriaId(""); setErrors({}); }} style={tabBtn(tipo === "receita", "#16A34A")}>
+              <TrendingUp size={16} /> Receita
+            </button>
+            <button type="button" onClick={() => { setTipo("aporte"); setErrors({}); }} style={tabBtn(tipo === "aporte", "#7C3AED")}>
+              <PlusCircle size={16} /> Aporte
+            </button>
           </div>
 
-          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             {/* Valor */}
             <div>
-              <label style={{ fontSize: 11, fontWeight: 500, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 8 }}>
-                {t("modalValor")}
+              <label style={{ fontSize: 11, fontWeight: 800, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 8 }}>
+                Valor
               </label>
               <div style={{
-                display: "flex", alignItems: "center",
-                border: `1px solid ${errors.amount ? "#EF4444" : amount ? "var(--of-text)" : "var(--of-border)"}`,
-                borderRadius: 10, padding: "12px 16px",
-                transition: "border-color 0.15s",
+                border: `1px solid ${errors.amount ? "#EF4444" : "var(--of-border)"}`,
+                borderRadius: 12,
+                padding: "12px 14px",
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                background: "var(--of-page-bg)",
               }}>
-                <span style={{ fontSize: 18, fontWeight: 700, color: "var(--of-text-muted)", marginRight: 8 }}>R$</span>
+                <span style={{ fontSize: 14, fontWeight: 900, color: "var(--of-text-secondary)" }}>R$</span>
                 <input
                   type="text"
                   inputMode="numeric"
+                  placeholder="0,00"
                   value={displayAmount}
                   onChange={handleAmountChange}
-                  placeholder="0,00"
-                  autoFocus
                   style={{
-                    flex: 1, outline: "none", border: "none", background: "transparent",
-                    fontSize: 28, fontWeight: 700, color: "var(--of-text)",
+                    flex: 1,
+                    border: "none",
+                    outline: "none",
+                    background: "transparent",
+                    fontSize: 18,
+                    fontWeight: 900,
+                    color: "var(--of-text)",
+                    letterSpacing: "-0.02em",
                   }}
                 />
               </div>
-              {errors.amount && <p style={{ fontSize: 12, color: "#EF4444", marginTop: 4 }}>{errors.amount}</p>}
+              {errors.amount && <p style={{ fontSize: 12, color: "#EF4444", marginTop: 6 }}>{errors.amount}</p>}
             </div>
 
             {/* Categoria */}
-            <div>
-              <label style={{ fontSize: 11, fontWeight: 500, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 8 }}>
-                {t("modalCategoria")}
-              </label>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 }}>
-                {categories.map(({ nome, emoji }) => (
-                  <button
-                    key={nome}
-                    type="button"
-                    onClick={() => { setCategoria(nome); setErrors((p) => ({ ...p, categoria: "" })) }}
-                    style={{
-                      display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
-                      padding: "10px 8px", borderRadius: 10,
-                      border: `1px solid ${categoria === nome ? (tipo === "receita" ? "#16A34A" : "#0A0A0A") : "var(--of-border)"}`,
-                      backgroundColor: categoria === nome ? (tipo === "receita" ? "#DCFCE7" : "#0A0A0A") : "var(--of-surface)",
-                      cursor: "pointer", transition: "all 0.15s",
-                    }}
-                  >
-                    <span style={{ fontSize: 18 }}>{emoji}</span>
-                    <span style={{
-                      fontSize: 10, fontWeight: categoria === nome ? 600 : 400,
-                      color: categoria === nome ? (tipo === "receita" ? "#15803D" : "#FFFFFF") : "var(--of-text-secondary)",
-                      textAlign: "center", lineHeight: 1.2,
-                    }}>
-                      {nome}
-                    </span>
-                  </button>
-                ))}
+            {tipo !== "aporte" && (
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 800, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 8 }}>
+                  Categoria
+                </label>
+                <select
+                  value={categoriaId}
+                  onChange={(e) => { setCategoriaId(e.target.value); if (errors.categoria) setErrors((p) => ({ ...p, categoria: "" })) }}
+                  disabled={catsLoading}
+                  style={{
+                    width: "100%",
+                    border: `1px solid ${errors.categoria ? "#EF4444" : "var(--of-border)"}`,
+                    borderRadius: 12,
+                    padding: "12px 14px",
+                    fontSize: 14,
+                    background: "var(--of-page-bg)",
+                    color: "var(--of-text)",
+                    outline: "none",
+                  }}
+                >
+                  <option value="">{catsLoading ? "Carregando..." : "Selecione..."}</option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>{c.icone} {c.nome}</option>
+                  ))}
+                </select>
+                {errors.categoria && <p style={{ fontSize: 12, color: "#EF4444", marginTop: 6 }}>{errors.categoria}</p>}
               </div>
-              {errors.categoria && <p style={{ fontSize: 12, color: "#EF4444", marginTop: 4 }}>{errors.categoria}</p>}
-            </div>
+            )}
 
             {/* Descrição */}
             <div>
-              <label style={{ fontSize: 11, fontWeight: 500, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 8 }}>
-                {t("modalDescricao")}
+              <label style={{ fontSize: 11, fontWeight: 800, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 8 }}>
+                Descrição
               </label>
               <input
                 type="text"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Ex: Supermercado, iFood, Salário..."
+                placeholder={tipo === "aporte" ? "Ex: Aporte no CDB, Tesouro, ETF..." : "Ex: Supermercado, iFood, Salário..."}
                 style={{
-                  width: "100%", border: "1px solid var(--of-border)", borderRadius: 10,
-                  padding: "10px 14px", fontSize: 14, color: "var(--of-text)",
+                  width: "100%",
+                  border: "1px solid var(--of-border)",
+                  borderRadius: 12,
+                  padding: "12px 14px",
+                  fontSize: 14,
+                  color: "var(--of-text)",
                   background: "transparent",
-                  outline: "none", transition: "border-color 0.15s", boxSizing: "border-box",
+                  outline: "none",
+                  boxSizing: "border-box",
                 }}
-                onFocus={(e) => (e.currentTarget.style.borderColor = "var(--of-text)")}
-                onBlur={(e) => (e.currentTarget.style.borderColor = "var(--of-border)")}
               />
             </div>
 
-            {/* Data */}
-            <div>
-              <label style={{ fontSize: 11, fontWeight: 500, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 8 }}>
-                {t("modalData")}
-              </label>
-              <div style={{
-                display: "flex", alignItems: "center",
-                border: `1px solid ${errors.date ? "#EF4444" : "var(--of-border)"}`,
-                borderRadius: 10, padding: "10px 14px",
-                transition: "border-color 0.15s",
-              }}>
-                <CalendarDays size={16} style={{ color: "var(--of-text-muted)", marginRight: 8, flexShrink: 0 }} />
-                <input
-                  type="date"
-                  value={date}
-                  onChange={(e) => { setDate(e.target.value); setErrors((p) => ({ ...p, date: "" })) }}
-                  style={{
-                    flex: 1, border: "none", outline: "none",
-                    background: "transparent", fontSize: 14, color: "var(--of-text)",
-                  }}
-                />
+            {/* Data + método */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 800, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 8 }}>
+                  Data
+                </label>
+                <div style={{
+                  display: "flex", alignItems: "center", gap: 10,
+                  border: `1px solid ${errors.date ? "#EF4444" : "var(--of-border)"}`,
+                  borderRadius: 12, padding: "12px 14px",
+                  background: "var(--of-page-bg)",
+                }}>
+                  <CalendarDays size={16} style={{ color: "var(--of-text-muted)" }} />
+                  <input
+                    type="date"
+                    value={date}
+                    onChange={(e) => { setDate(e.target.value); if (errors.date) setErrors((p) => ({ ...p, date: "" })) }}
+                    style={{ flex: 1, border: "none", outline: "none", background: "transparent", fontSize: 14, color: "var(--of-text)" }}
+                  />
+                </div>
+                {errors.date && <p style={{ fontSize: 12, color: "#EF4444", marginTop: 6 }}>{errors.date}</p>}
               </div>
-              {errors.date && <p style={{ fontSize: 12, color: "#EF4444", marginTop: 4 }}>{errors.date}</p>}
+
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 800, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 8 }}>
+                  Pagamento (opcional)
+                </label>
+                <select
+                  value={metodo}
+                  onChange={(e) => setMetodo(e.target.value as any)}
+                  style={{
+                    width: "100%",
+                    border: "1px solid var(--of-border)",
+                    borderRadius: 12,
+                    padding: "12px 14px",
+                    fontSize: 14,
+                    background: "var(--of-page-bg)",
+                    color: "var(--of-text)",
+                    outline: "none",
+                  }}
+                >
+                  <option value="">Selecione...</option>
+                  {METODOS_PAGAMENTO.map((m) => (
+                    <option key={m.value} value={m.value}>{m.label}</option>
+                  ))}
+                </select>
+              </div>
             </div>
 
-            {/* Botões */}
-            <div style={{ display: "flex", gap: 12, paddingTop: 4 }}>
+            {/* Ações */}
+            <div style={{ display: "flex", gap: 12, paddingTop: 2 }}>
               <DialogPrimitive.Close asChild>
                 <button
                   type="button"
                   style={{
-                    flex: 1, padding: "12px 0", border: "1px solid var(--of-border)",
-                    borderRadius: 10, fontSize: 14, fontWeight: 600,
-                    color: "var(--of-text-secondary)", backgroundColor: "var(--of-surface)",
-                    cursor: "pointer", transition: "all 0.15s",
+                    flex: 1,
+                    padding: "12px 0",
+                    border: "1px solid var(--of-border)",
+                    borderRadius: 12,
+                    fontSize: 14,
+                    fontWeight: 800,
+                    color: "var(--of-text-secondary)",
+                    backgroundColor: "var(--of-surface)",
+                    cursor: "pointer",
                   }}
-                  onMouseOver={(e) => { e.currentTarget.style.backgroundColor = "var(--of-hover)"; e.currentTarget.style.borderColor = "var(--of-text)" }}
-                  onMouseOut={(e) => { e.currentTarget.style.backgroundColor = "var(--of-surface)"; e.currentTarget.style.borderColor = "var(--of-border)" }}
                 >
-                  {t("modalCancelar")}
+                  Cancelar
                 </button>
               </DialogPrimitive.Close>
               <button
                 type="submit"
                 disabled={submitting}
                 style={{
-                  flex: 1, padding: "12px 0", border: "none",
-                  borderRadius: 10, fontSize: 14, fontWeight: 600,
+                  flex: 1,
+                  padding: "12px 0",
+                  border: "none",
+                  borderRadius: 12,
+                  fontSize: 14,
+                  fontWeight: 900,
                   color: "var(--of-btn-text)",
-                  backgroundColor: submitting ? "#A3A3A3" : (tipo === "receita" ? "#16A34A" : "#0A0A0A"),
+                  backgroundColor: submitting
+                    ? "var(--of-border)"
+                    : (tipo === "receita" ? "#16A34A" : tipo === "aporte" ? "#7C3AED" : "#0A0A0A"),
                   cursor: submitting ? "not-allowed" : "pointer",
-                  display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                  transition: "background 0.15s",
-                }}
-                onMouseOver={(e) => {
-                  if (!submitting) e.currentTarget.style.backgroundColor = tipo === "receita" ? "#15803D" : "#262626"
-                }}
-                onMouseOut={(e) => {
-                  if (!submitting) e.currentTarget.style.backgroundColor = tipo === "receita" ? "#16A34A" : "#0A0A0A"
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
                 }}
               >
                 {submitting
-                  ? <><Loader2 size={15} style={{ animation: "spin 0.7s linear infinite" }} /> {t("modalSalvando")}</>
-                  : tipo === "despesa" ? t("modalRegistrarDespesa") : t("modalRegistrarReceita")
-                }
+                  ? <><Loader2 size={16} style={{ animation: "spin 0.7s linear infinite" }} /> Salvando...</>
+                  : "Salvar"}
               </button>
             </div>
           </form>

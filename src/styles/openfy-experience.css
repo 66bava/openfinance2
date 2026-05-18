@@ -1,0 +1,4889 @@
+.ofx {
+  --green: #16A34A;
+  --green-b: #22C55E;
+  --green-dim: rgba(22, 163, 74, 0.12);
+  --bg: #080808;
+  --bg-s: #0A0A0A;
+  --bg-c: #111111;
+  --bg-c2: #161616;
+  --bg-i: #1A1A1A;
+  --bd: rgba(255, 255, 255, 0.06);
+  --bd-l: rgba(255, 255, 255, 0.10);
+  --t1: #EEEDE6;
+  --t2: #8A8A7E;
+  --t3: #444440;
+  --red: #EF4444;
+  --red-dim: rgba(239, 68, 68, 0.12);
+  --amber: #F59E0B;
+  --amber-dim: rgba(245, 158, 11, 0.12);
+  --blue: #3B82F6;
+  --blue-dim: rgba(59, 130, 246, 0.12);
+  --purple: #8B5CF6;
+  --purple-dim: rgba(139, 92, 246, 0.12);
+  --sw: 240px;
+  --sw-c: 68px;
+  --hh: 60px;
+  --r: 12px;
+  --rs: 8px;
+  --tr: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  --fd: var(--font-display);
+  --fb: var(--font-body);
+
+  background: var(--bg);
+  color: var(--t1);
+  font-family: var(--fb);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+.ofx *,
+.ofx *::before,
+.ofx *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.ofx .app {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* SIDEBAR */
+.ofx .sidebar {
+  width: var(--sw);
+  min-width: var(--sw);
+  height: 100vh;
+  background: var(--bg-s);
+  border-right: 1px solid var(--bd);
+  display: flex;
+  flex-direction: column;
+  transition: width var(--tr), min-width var(--tr);
+  position: relative;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.ofx .sidebar.collapsed {
+  width: var(--sw-c);
+  min-width: var(--sw-c);
+}
+
+.ofx .sidebar-logo {
+  height: var(--hh);
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  border-bottom: 1px solid var(--bd);
+  gap: 10px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.ofx .logo-mark {
+  width: 36px;
+  height: 36px;
+  background: var(--green);
+  border-radius: var(--rs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ofx .logo-mark svg {
+  width: 20px;
+  height: 20px;
+  fill: #fff;
+}
+
+.ofx .logo-text {
+  font-family: var(--fd);
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--t1);
+  white-space: nowrap;
+  letter-spacing: -0.3px;
+  transition: opacity var(--tr);
+}
+
+.ofx .sidebar.collapsed .logo-text {
+  opacity: 0;
+  width: 0;
+}
+
+.ofx .sidebar-nav {
+  flex: 1;
+  padding: 12px 8px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.ofx .sidebar-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.ofx .nav-group {
+  margin-bottom: 24px;
+}
+
+.ofx .nav-group-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--t3);
+  padding: 0 10px;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  transition: opacity var(--tr);
+}
+
+.ofx .sidebar.collapsed .nav-group-label {
+  opacity: 0;
+}
+
+.ofx .nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: var(--rs);
+  cursor: pointer;
+  transition: background var(--tr), color var(--tr);
+  color: var(--t2);
+  white-space: nowrap;
+  position: relative;
+  text-decoration: none;
+}
+
+.ofx .nav-item:hover {
+  background: var(--bg-c);
+  color: var(--t1);
+}
+
+.ofx .nav-item.active {
+  background: var(--green-dim);
+  color: var(--green-b);
+}
+
+.ofx .nav-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: var(--rs);
+}
+
+.ofx .nav-icon svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ofx .nav-label {
+  font-size: 13.5px;
+  font-weight: 500;
+  font-family: var(--fd);
+  transition: opacity var(--tr);
+}
+
+.ofx .sidebar.collapsed .nav-label {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+}
+
+.ofx .nav-badge {
+  margin-left: auto;
+  background: var(--green);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 20px;
+  transition: opacity var(--tr);
+}
+
+.ofx .sidebar.collapsed .nav-badge {
+  opacity: 0;
+}
+
+.ofx .sidebar.collapsed .nav-item[data-tip]:hover::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: calc(var(--sw-c) - 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--bg-c2);
+  border: 1px solid var(--bd-l);
+  color: var(--t1);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: var(--rs);
+  white-space: nowrap;
+  z-index: 999;
+  pointer-events: none;
+}
+
+.ofx .sidebar-footer {
+  padding: 8px 8px 16px;
+  border-top: 1px solid var(--bd);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.ofx .user-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--rs);
+  cursor: pointer;
+  transition: background var(--tr);
+}
+
+.ofx .user-card:hover {
+  background: var(--bg-c);
+}
+
+.ofx .user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--green), #15803D);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.ofx .user-info {
+  overflow: hidden;
+  transition: opacity var(--tr), width var(--tr);
+}
+
+.ofx .sidebar.collapsed .user-info {
+  opacity: 0;
+  width: 0;
+}
+
+.ofx .user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--t1);
+  white-space: nowrap;
+}
+
+.ofx .user-plan {
+  font-size: 11px;
+  color: var(--t2);
+}
+
+.ofx .collapse-btn {
+  position: absolute;
+  top: 50%;
+  right: -12px;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  background: var(--bg-c);
+  border: 1px solid var(--bd-l);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 200;
+  transition: background var(--tr);
+}
+
+.ofx .collapse-btn:hover {
+  background: var(--bg-i);
+}
+
+.ofx .collapse-btn svg {
+  width: 12px;
+  height: 12px;
+  stroke: var(--t2);
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform var(--tr);
+}
+
+.ofx .sidebar.collapsed .collapse-btn svg {
+  transform: rotate(180deg);
+}
+
+/* ================================================================
+   LEGAL (Termos/Privacidade)
+   ================================================================ */
+
+.ofx.ofx-legal .legal-nav {
+  height: var(--hh);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  border-bottom: 1px solid var(--bd);
+  background: var(--bg-s);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.ofx.ofx-legal .legal-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--t1);
+}
+
+.ofx.ofx-legal .legal-brand-text {
+  font-family: var(--fd);
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+
+.ofx.ofx-legal .legal-back {
+  text-decoration: none;
+  color: var(--t2);
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.ofx.ofx-legal .legal-back:hover {
+  color: var(--t1);
+}
+
+.ofx.ofx-legal .legal-container {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 42px 18px 64px;
+}
+
+.ofx.ofx-legal .legal-hero {
+  margin-bottom: 18px;
+}
+
+.ofx.ofx-legal .legal-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--bd);
+  background: var(--bg-c);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--green-b);
+}
+
+.ofx.ofx-legal .legal-title {
+  margin-top: 14px;
+  font-family: var(--fd);
+  font-size: 36px;
+  line-height: 1.1;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  color: var(--t1);
+}
+
+.ofx.ofx-legal .legal-meta {
+  margin-top: 10px;
+  color: var(--t2);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ofx.ofx-legal .legal-card {
+  border: 1px solid var(--bd);
+  background: var(--bg-c);
+  border-radius: 16px;
+  padding: 22px 20px;
+}
+
+.ofx.ofx-legal .legal-section + .legal-section {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--bd);
+}
+
+.ofx.ofx-legal .legal-h2 {
+  font-family: var(--fd);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-size: 14px;
+  color: var(--t1);
+}
+
+.ofx.ofx-legal .legal-p {
+  margin-top: 8px;
+  color: var(--t2);
+  font-size: 13px;
+  line-height: 1.7;
+  font-weight: 550;
+}
+
+.ofx.ofx-legal .legal-note {
+  margin-top: 14px;
+  border: 1px solid var(--bd);
+  background: var(--bg-s);
+  border-radius: 16px;
+  padding: 16px 18px;
+}
+
+.ofx.ofx-legal .legal-note-title {
+  font-family: var(--fd);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  font-size: 13px;
+  color: var(--t1);
+}
+
+.ofx.ofx-legal .legal-note-text {
+  margin-top: 6px;
+  color: var(--t2);
+  font-size: 12.5px;
+  line-height: 1.7;
+  font-weight: 600;
+}
+
+@media (max-width: 480px) {
+  .ofx.ofx-legal .legal-title {
+    font-size: 30px;
+  }
+  .ofx.ofx-legal .legal-card {
+    padding: 18px 16px;
+  }
+}
+
+/* MAIN + HEADER */
+.ofx .main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.ofx .header {
+  height: var(--hh);
+  border-bottom: 1px solid var(--bd);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 12px;
+  background: var(--bg-s);
+  flex-shrink: 0;
+}
+
+.ofx .header-title {
+  font-family: var(--fd);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--t1);
+  margin-right: 8px;
+}
+
+.ofx .search-wrap {
+  flex: 1;
+  max-width: 520px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--bg-c);
+  border: 1px solid var(--bd);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  transition: border-color var(--tr);
+}
+
+.ofx .search-wrap:focus-within {
+  border-color: rgba(34, 197, 94, 0.35);
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.08);
+}
+
+.ofx .search-wrap svg {
+  width: 16px;
+  height: 16px;
+  stroke: var(--t2);
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+
+.ofx .search-wrap input {
+  flex: 1;
+  height: 100%;
+  border: none;
+  background: transparent;
+  color: var(--t1);
+  outline: none;
+  font-size: 13.5px;
+  font-family: var(--fd);
+  font-weight: 500;
+}
+
+.ofx .search-wrap input::placeholder {
+  color: var(--t3);
+}
+
+.ofx .search-kbd {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--t3);
+  background: var(--bg-i);
+  border: 1px solid var(--bd);
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.ofx .header-spacer {
+  flex: 1;
+}
+
+.ofx .header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ofx .sync-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 1px solid var(--bd);
+  background: var(--bg-c);
+  color: var(--t1);
+  font-family: var(--fd);
+  font-size: 13px;
+  font-weight: 600;
+  transition: background var(--tr), border-color var(--tr);
+  user-select: none;
+}
+
+.ofx .sync-btn:hover {
+  border-color: var(--bd-l);
+  background: var(--bg-i);
+}
+
+.ofx .sync-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ofx .divider {
+  width: 1px;
+  height: 26px;
+  background: var(--bd);
+}
+
+.ofx .icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: var(--bg-c);
+  border: 1px solid var(--bd);
+  transition: background var(--tr), border-color var(--tr);
+  position: relative;
+}
+
+.ofx .icon-btn:hover {
+  background: var(--bg-i);
+  border-color: var(--bd-l);
+}
+
+.ofx .icon-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke: var(--t2);
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ofx .notif-dot {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 0 2px var(--bg-c);
+}
+
+.ofx .header-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--fd);
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, var(--green), #15803D);
+}
+
+.ofx .page-content {
+  flex: 1;
+  overflow: auto;
+  padding: 28px 28px 40px;
+}
+
+.ofx .page-content::-webkit-scrollbar {
+  width: 10px;
+}
+
+.ofx .page-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 999px;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .ofx .sidebar {
+    display: none;
+  }
+  .ofx .header-title {
+    display: none;
+  }
+  .ofx .search-wrap {
+    max-width: none;
+  }
+  .ofx .sync-btn span {
+    display: none;
+  }
+  .ofx .page-content {
+    padding-bottom: 80px;
+  }
+}
+
+.ofx .mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: var(--bg-s);
+  border-top: 1px solid var(--bd);
+  z-index: 1000;
+  padding: 0 8px;
+}
+
+.ofx .mobile-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  cursor: pointer;
+  color: var(--t3);
+  transition: color var(--tr);
+  text-decoration: none;
+}
+
+.ofx .mobile-nav-item.active {
+  color: var(--green-b);
+}
+
+.ofx .mobile-nav-item svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ofx .mobile-nav-item span {
+  font-size: 10px;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .ofx .mobile-nav {
+    display: flex !important;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Dashboard (02-dashboard.html)                                              */
+/* -------------------------------------------------------------------------- */
+
+.ofx .ofx-dashboard .page {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.ofx .ofx-dashboard .page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  gap: 16px;
+}
+
+.ofx .ofx-dashboard .greeting-sub {
+  font-size: 12px;
+  color: var(--t3);
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.ofx .ofx-dashboard .greeting-title {
+  font-family: var(--fd);
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--t1);
+  letter-spacing: -0.4px;
+}
+
+.ofx .ofx-dashboard .greeting-title span {
+  color: var(--green-b);
+}
+
+.ofx .ofx-dashboard .page-header-right {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.ofx .ofx-dashboard .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 16px;
+  height: 36px;
+  border-radius: var(--rs);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--tr);
+  font-family: var(--fd);
+  text-decoration: none;
+  user-select: none;
+}
+
+.ofx .ofx-dashboard .btn-primary {
+  background: var(--green);
+  color: #fff;
+  border: none;
+}
+
+.ofx .ofx-dashboard .btn-primary:hover {
+  background: #15803D;
+}
+
+.ofx .ofx-dashboard .btn-ghost {
+  background: transparent;
+  color: var(--t2);
+  border: 1px solid var(--bd);
+}
+
+.ofx .ofx-dashboard .btn-ghost:hover {
+  border-color: var(--bd-l);
+  color: var(--t1);
+}
+
+.ofx .ofx-dashboard .btn svg {
+  width: 15px;
+  height: 15px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ofx .ofx-dashboard .stats-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.ofx .ofx-dashboard .stat-card {
+  background: var(--bg-c);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  padding: 18px 20px;
+  transition: border-color var(--tr);
+}
+
+.ofx .ofx-dashboard .stat-card:hover {
+  border-color: var(--bd-l);
+}
+
+.ofx .ofx-dashboard .stat-card.highlight {
+  background: var(--green-dim);
+  border-color: rgba(34, 197, 94, 0.15);
+}
+
+.ofx .ofx-dashboard .stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--t3);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ofx .ofx-dashboard .stat-label svg {
+  width: 13px;
+  height: 13px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ofx .ofx-dashboard .stat-value {
+  font-family: var(--fd);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--t1);
+  margin-bottom: 6px;
+}
+
+.ofx .ofx-dashboard .stat-card.highlight .stat-value {
+  color: var(--green-b);
+}
+
+.ofx .ofx-dashboard .stat-delta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.ofx .ofx-dashboard .delta-up {
+  color: var(--green-b);
+}
+
+.ofx .ofx-dashboard .delta-down {
+  color: var(--red);
+}
+
+.ofx .ofx-dashboard .stat-progress {
+  height: 3px;
+  background: var(--bg-i);
+  border-radius: 10px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.ofx .ofx-dashboard .stat-progress-bar {
+  height: 100%;
+  background: var(--green);
+  border-radius: 10px;
+  transition: width 0.8s ease;
+}
+
+.ofx .ofx-dashboard .grid-main {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.ofx .ofx-dashboard .grid-left,
+.ofx .ofx-dashboard .grid-right {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.ofx .ofx-dashboard .card {
+  background: var(--bg-c);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  overflow: hidden;
+  transition: border-color var(--tr);
+}
+
+.ofx .ofx-dashboard .card:hover {
+  border-color: var(--bd-l);
+}
+
+.ofx .ofx-dashboard .card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--bd);
+}
+
+.ofx .ofx-dashboard .card-title {
+  font-family: var(--fd);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--t1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ofx .ofx-dashboard .card-title svg {
+  width: 15px;
+  height: 15px;
+  stroke: var(--t2);
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ofx .ofx-dashboard .card-action {
+  font-size: 12px;
+  color: var(--t2);
+  cursor: pointer;
+  transition: color var(--tr);
+  text-decoration: none;
+}
+
+.ofx .ofx-dashboard .card-action:hover {
+  color: var(--t1);
+}
+
+.ofx .ofx-dashboard .card-body {
+  padding: 20px;
+}
+
+.ofx .ofx-dashboard .ai-insight {
+  background: linear-gradient(135deg, rgba(22, 163, 74, 0.08), rgba(22, 163, 74, 0.04));
+  border: 1px solid rgba(34, 197, 94, 0.15);
+  border-radius: var(--r);
+  padding: 20px;
+}
+
+.ofx .ofx-dashboard .ai-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--green-dim);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  color: var(--green-b);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+}
+
+.ofx .ofx-dashboard .ai-badge svg {
+  width: 11px;
+  height: 11px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+}
+
+.ofx .ofx-dashboard .ai-text {
+  font-size: 14px;
+  color: var(--t1);
+  line-height: 1.65;
+  margin-bottom: 14px;
+}
+
+.ofx .ofx-dashboard .ai-text strong {
+  color: var(--green-b);
+  font-weight: 600;
+}
+
+.ofx .ofx-dashboard .ai-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ofx .ofx-dashboard .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.ofx .ofx-dashboard .chip-warn {
+  background: var(--amber-dim);
+  color: var(--amber);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.ofx .ofx-dashboard .chip-info {
+  background: var(--blue-dim);
+  color: var(--blue);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.ofx .ofx-dashboard .chip-ok {
+  background: var(--green-dim);
+  color: var(--green-b);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.ofx .ofx-dashboard .chip svg {
+  width: 11px;
+  height: 11px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ofx .ofx-dashboard .tx-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--bd);
+}
+
+.ofx .ofx-dashboard .tx-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.ofx .ofx-dashboard .tx-item:first-child {
+  padding-top: 0;
+}
+
+.ofx .ofx-dashboard .tx-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 16px;
+}
+
+.ofx .ofx-dashboard .tx-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ofx .ofx-dashboard .tx-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--t1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ofx .ofx-dashboard .tx-meta {
+  font-size: 11px;
+  color: var(--t3);
+  margin-top: 1px;
+}
+
+.ofx .ofx-dashboard .tx-amount {
+  font-family: var(--fd);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ofx .ofx-dashboard .tx-amount.neg {
+  color: var(--red);
+}
+
+.ofx .ofx-dashboard .tx-amount.pos {
+  color: var(--green-b);
+}
+
+.ofx .ofx-dashboard .tx-method {
+  font-size: 10px;
+  color: var(--t3);
+  text-align: right;
+  margin-top: 2px;
+}
+
+.ofx .ofx-dashboard .score-mini-wrap {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 4px 0;
+}
+
+.ofx .ofx-dashboard .score-gauge {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.ofx .ofx-dashboard .score-gauge svg {
+  width: 110px;
+  height: 68px;
+}
+
+.ofx .ofx-dashboard .score-num {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--fd);
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--t1);
+  letter-spacing: -1px;
+  white-space: nowrap;
+}
+
+.ofx .ofx-dashboard .score-mini-info {
+  flex: 1;
+}
+
+.ofx .ofx-dashboard .score-mini-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--t3);
+  margin-bottom: 8px;
+}
+
+.ofx .ofx-dashboard .score-hist {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 40px;
+}
+
+.ofx .ofx-dashboard .score-bar {
+  flex: 1;
+  background: var(--bg-i);
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+}
+
+.ofx .ofx-dashboard .score-bar-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--green-dim);
+  border-radius: 3px;
+  transition: height 0.6s ease;
+}
+
+.ofx .ofx-dashboard .score-bar.active .score-bar-fill {
+  background: var(--green);
+}
+
+.ofx .ofx-dashboard .pay-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ofx .ofx-dashboard .pay-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ofx .ofx-dashboard .pay-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+.ofx .ofx-dashboard .pay-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--t2);
+  flex: 1;
+}
+
+.ofx .ofx-dashboard .pay-bar-wrap {
+  width: 80px;
+  height: 4px;
+  background: var(--bg-i);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.ofx .ofx-dashboard .pay-bar-fill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.8s ease;
+}
+
+.ofx .ofx-dashboard .pay-pct {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--t1);
+  min-width: 30px;
+  text-align: right;
+  font-family: var(--fd);
+}
+
+.ofx .ofx-dashboard .pay-total {
+  font-size: 11px;
+  color: var(--t3);
+  min-width: 70px;
+  text-align: right;
+}
+
+.ofx .ofx-dashboard .invest-mini-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.ofx .ofx-dashboard .invest-mini-item {
+  background: var(--bg-c2);
+  border-radius: var(--rs);
+  padding: 12px;
+}
+
+.ofx .ofx-dashboard .invest-mini-label {
+  font-size: 10px;
+  color: var(--t3);
+  font-weight: 500;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ofx .ofx-dashboard .invest-mini-val {
+  font-family: var(--fd);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--t1);
+}
+
+.ofx .ofx-dashboard .invest-mini-delta {
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.ofx .ofx-dashboard .plan-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--bd);
+}
+
+.ofx .ofx-dashboard .plan-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.ofx .ofx-dashboard .plan-item:first-child {
+  padding-top: 0;
+}
+
+.ofx .ofx-dashboard .plan-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ofx .ofx-dashboard .plan-info {
+  flex: 1;
+}
+
+.ofx .ofx-dashboard .plan-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--t1);
+}
+
+.ofx .ofx-dashboard .plan-date {
+  font-size: 11px;
+  color: var(--t3);
+  margin-top: 1px;
+}
+
+.ofx .ofx-dashboard .plan-val {
+  font-family: var(--fd);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--t1);
+}
+
+.ofx .ofx-dashboard .donut-wrap {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.ofx .ofx-dashboard .donut-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  flex: 1;
+}
+
+.ofx .ofx-dashboard .donut-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--t2);
+}
+
+.ofx .ofx-dashboard .donut-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 1100px) {
+  .ofx .ofx-dashboard .stats-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .ofx .ofx-dashboard .grid-main {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .ofx .ofx-dashboard .stats-row {
+    grid-template-columns: 1fr 1fr;
+  }
+  .ofx .ofx-dashboard .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Registro Rápido (03-registro-rapido.html)                                  */
+/* -------------------------------------------------------------------------- */
+
+.ofx .ofx-quickadd .page {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.ofx .ofx-quickadd .page-header {
+  margin-bottom: 28px;
+}
+
+.ofx .ofx-quickadd .page-title {
+  font-family: var(--fd);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: var(--t1);
+  margin-bottom: 4px;
+}
+
+.ofx .ofx-quickadd .page-sub {
+  font-size: 14px;
+  color: var(--t2);
+}
+
+.ofx .ofx-quickadd .ia-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--green-dim);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  color: var(--green-b);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 2px 9px;
+  border-radius: 20px;
+  margin-left: 10px;
+  vertical-align: middle;
+}
+
+.ofx .ofx-quickadd .ia-badge svg {
+  width: 11px;
+  height: 11px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+}
+
+.ofx .ofx-quickadd .layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 20px;
+}
+
+.ofx .ofx-quickadd .method-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.ofx .ofx-quickadd .method-card {
+  background: var(--bg-c);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  padding: 14px 14px 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--tr);
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 104px;
+}
+
+.ofx .ofx-quickadd .method-card:hover {
+  border-color: var(--bd-l);
+  transform: translateY(-1px);
+}
+
+.ofx .ofx-quickadd .method-card:focus-visible {
+  outline: 2px solid rgba(34, 197, 94, 0.45);
+  outline-offset: 2px;
+}
+
+.ofx .ofx-quickadd .method-card.selected {
+  border-color: rgba(34, 197, 94, 0.45);
+  background: linear-gradient(180deg, rgba(34, 197, 94, 0.08), transparent 65%), var(--bg-c);
+}
+
+.ofx .ofx-quickadd .check-indicator {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: var(--green);
+  box-shadow: 0 0 0 2px var(--bg-c);
+  opacity: 0;
+  transform: scale(0.92);
+  transition: opacity var(--tr), transform var(--tr);
+}
+
+.ofx .ofx-quickadd .method-card.selected .check-indicator {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.ofx .ofx-quickadd .check-indicator svg {
+  width: 10px;
+  height: 10px;
+}
+
+.ofx .ofx-quickadd .method-ico {
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  background: var(--bg-c2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--bd);
+}
+
+.ofx .ofx-quickadd .method-ico svg {
+  width: 18px;
+  height: 18px;
+  stroke: var(--t2);
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ofx .ofx-quickadd .method-name {
+  font-family: var(--fd);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--t1);
+  letter-spacing: -0.1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ofx .ofx-quickadd .method-copy {
+  font-size: 12px;
+  color: var(--t3);
+  line-height: 1.45;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.ofx .ofx-quickadd .file-name {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.ofx .ofx-quickadd .pick-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.ofx .ofx-quickadd .pick-card {
+  background: var(--bg-c);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--tr);
+  min-width: 0;
+}
+
+.ofx .ofx-quickadd .pick-card:hover {
+  border-color: var(--bd-l);
+  transform: translateY(-1px);
+}
+
+.ofx .ofx-quickadd .pick-card:focus-visible {
+  outline: 2px solid rgba(34, 197, 94, 0.35);
+  outline-offset: 2px;
+}
+
+.ofx .ofx-quickadd .confirm-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.ofx .ofx-quickadd .tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-c);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  padding: 4px;
+  margin-bottom: 20px;
+}
+
+.ofx .ofx-quickadd .tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 16px;
+  border-radius: var(--rs);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--fd);
+  color: var(--t2);
+  transition: all var(--tr);
+  user-select: none;
+}
+
+.ofx .ofx-quickadd .tab:hover {
+  color: var(--t1);
+}
+
+.ofx .ofx-quickadd .tab.active {
+  background: var(--bg-s);
+  color: var(--t1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.ofx .ofx-quickadd .tab svg {
+  width: 15px;
+  height: 15px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ofx .ofx-quickadd .text-input-wrap {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.ofx .ofx-quickadd .text-input {
+  width: 100%;
+  background: var(--bg-c);
+  border: 1px solid var(--bd-l);
+  border-radius: var(--r);
+  padding: 16px 52px 16px 16px;
+  color: var(--t1);
+  font-family: var(--fd);
+  font-size: 16px;
+  font-weight: 500;
+  outline: none;
+  resize: none;
+  min-height: 80px;
+  transition: border-color var(--tr);
+  line-height: 1.5;
+}
+
+.ofx .ofx-quickadd .text-input:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.08);
+}
+
+.ofx .ofx-quickadd .text-input::placeholder {
+  color: var(--t3);
+  font-size: 15px;
+}
+
+.ofx .ofx-quickadd .text-send-btn {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  background: var(--green);
+  border-radius: var(--rs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background var(--tr);
+  border: none;
+}
+
+.ofx .ofx-quickadd .text-send-btn:hover {
+  background: #15803D;
+}
+
+.ofx .ofx-quickadd .text-send-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke: #fff;
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ofx .ofx-quickadd .ai-detect-box {
+  background: linear-gradient(135deg, rgba(22, 163, 74, 0.06), rgba(22, 163, 74, 0.02));
+  border: 1px solid rgba(34, 197, 94, 0.15);
+  border-radius: var(--r);
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.ofx .ofx-quickadd .ai-detect-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.ofx .ofx-quickadd .ai-detect-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--green-b);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ofx .ofx-quickadd .ai-detect-title svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ofx .ofx-quickadd .ai-detect-confidence {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--green-b);
+  background: var(--green-dim);
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+.ofx .ofx-quickadd .detect-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+
+.ofx .ofx-quickadd .detect-field {
+  background: var(--bg-c);
+  border: 1px solid var(--bd);
+  border-radius: var(--rs);
+  padding: 10px 12px;
+  position: relative;
+  min-width: 0;
+}
+
+.ofx .ofx-quickadd .detect-field.full {
+  grid-column: 1 / -1;
+}
+
+.ofx .ofx-quickadd .detect-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--t3);
+  margin-bottom: 5px;
+}
+
+.ofx .ofx-quickadd .detect-value {
+  font-family: var(--fd);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--t1);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.ofx .ofx-quickadd .ai-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.ofx .ofx-quickadd .drop-zone {
+  border: 2px dashed var(--bd-l);
+  border-radius: var(--r);
+  padding: 48px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--tr);
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.ofx .ofx-quickadd .drop-zone:hover,
+.ofx .ofx-quickadd .drop-zone.drag {
+  border-color: var(--green);
+  background: var(--green-dim);
+}
+
+.ofx .ofx-quickadd .drop-icon {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 16px;
+  background: var(--bg-c2);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ofx .ofx-quickadd .drop-icon svg {
+  width: 24px;
+  height: 24px;
+  stroke: var(--t2);
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ofx .ofx-quickadd .drop-title {
+  font-family: var(--fd);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--t1);
+  margin-bottom: 6px;
+}
+
+.ofx .ofx-quickadd .drop-sub {
+  font-size: 12px;
+  color: var(--t3);
+  line-height: 1.6;
+}
+
+.ofx .ofx-quickadd .drop-badge {
+  display: inline-block;
+  margin-top: 12px;
+  background: var(--green-dim);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  color: var(--green-b);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.ofx .ofx-quickadd .file-types {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.ofx .ofx-quickadd .file-type {
+  background: var(--bg-c2);
+  border: 1px solid var(--bd);
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 11px;
+  color: var(--t3);
+  font-weight: 500;
+}
+
+.ofx .ofx-quickadd .type-toggle {
+  display: flex;
+  gap: 0;
+  background: var(--bg-c);
+  border: 1px solid var(--bd);
+  border-radius: var(--rs);
+  overflow: hidden;
+  margin-bottom: 20px;
+  width: fit-content;
+}
+
+.ofx .ofx-quickadd .type-btn {
+  padding: 8px 24px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--tr);
+  color: var(--t2);
+  font-family: var(--fd);
+  background: transparent;
+  border: none;
+}
+
+.ofx .ofx-quickadd .type-btn.active.desp {
+  background: var(--red-dim);
+  color: var(--red);
+}
+
+.ofx .ofx-quickadd .type-btn.active.rec {
+  background: var(--green-dim);
+  color: var(--green-b);
+}
+
+.ofx .ofx-quickadd .form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.ofx .ofx-quickadd .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ofx .ofx-quickadd .form-group.full {
+  grid-column: 1 / -1;
+}
+
+.ofx .ofx-quickadd .form-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--t3);
+}
+
+.ofx .ofx-quickadd .form-input {
+  background: var(--bg-c);
+  border: 1px solid var(--bd);
+  border-radius: var(--rs);
+  padding: 10px 12px;
+  color: var(--t1);
+  font-family: var(--fb);
+  font-size: 14px;
+  outline: none;
+  transition: border-color var(--tr);
+  width: 100%;
+}
+
+.ofx .ofx-quickadd .form-input:focus {
+  border-color: var(--bd-l);
+}
+
+.ofx .ofx-quickadd .form-input::placeholder {
+  color: var(--t3);
+}
+
+.ofx .ofx-quickadd select.form-input option {
+  background: var(--bg-c2);
+}
+
+.ofx .ofx-quickadd .cat-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.ofx .ofx-quickadd .cat-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--tr);
+  background: var(--bg-c);
+  border: 1px solid var(--bd);
+  color: var(--t2);
+  user-select: none;
+}
+
+.ofx .ofx-quickadd .cat-chip:hover,
+.ofx .ofx-quickadd .cat-chip.active {
+  background: var(--green-dim);
+  border-color: rgba(34, 197, 94, 0.25);
+  color: var(--green-b);
+}
+
+.ofx .ofx-quickadd .submit-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.ofx .ofx-quickadd .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 20px;
+  height: 42px;
+  border-radius: var(--rs);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--tr);
+  font-family: var(--fd);
+  border: none;
+  user-select: none;
+}
+
+.ofx .ofx-quickadd .btn-primary {
+  background: var(--green);
+  color: #fff;
+  flex: 1;
+}
+
+.ofx .ofx-quickadd .btn-primary:hover {
+  background: #15803D;
+}
+
+.ofx .ofx-quickadd .btn-ghost {
+  background: transparent;
+  color: var(--t2);
+  border: 1px solid var(--bd);
+}
+
+.ofx .ofx-quickadd .btn-ghost:hover {
+  border-color: var(--bd-l);
+  color: var(--t1);
+}
+
+.ofx .ofx-quickadd .btn svg {
+  width: 15px;
+  height: 15px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ofx .ofx-quickadd .sidebar-right {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ofx .ofx-quickadd .card {
+  background: var(--bg-c);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+
+.ofx .ofx-quickadd .card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--bd);
+}
+
+.ofx .ofx-quickadd .card-title {
+  font-family: var(--fd);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--t1);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.ofx .ofx-quickadd .card-title svg {
+  width: 14px;
+  height: 14px;
+  stroke: var(--t2);
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ofx .ofx-quickadd .card-body {
+  padding: 16px 18px;
+}
+
+.ofx .ofx-quickadd .recent-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--bd);
+}
+
+.ofx .ofx-quickadd .recent-item:last-child {
+  border: none;
+  padding-bottom: 0;
+}
+
+.ofx .ofx-quickadd .recent-item:first-child {
+  padding-top: 0;
+}
+
+.ofx .ofx-quickadd .recent-icon {
+  font-size: 16px;
+}
+
+.ofx .ofx-quickadd .recent-info {
+  flex: 1;
+}
+
+.ofx .ofx-quickadd .recent-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--t1);
+}
+
+.ofx .ofx-quickadd .recent-meta {
+  font-size: 10px;
+  color: var(--t3);
+  margin-top: 1px;
+}
+
+.ofx .ofx-quickadd .recent-val {
+  font-family: var(--fd);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--red);
+}
+
+.ofx .ofx-quickadd .recorrente-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--bd);
+}
+
+.ofx .ofx-quickadd .recorrente-item:last-child {
+  border: none;
+  padding-bottom: 0;
+}
+
+.ofx .ofx-quickadd .recorrente-item:first-child {
+  padding-top: 0;
+}
+
+.ofx .ofx-quickadd .rec-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--t1);
+}
+
+.ofx .ofx-quickadd .rec-date {
+  font-size: 10px;
+  color: var(--t3);
+  margin-top: 1px;
+}
+
+.ofx .ofx-quickadd .rec-val {
+  font-family: var(--fd);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--amber);
+}
+
+.ofx .ofx-quickadd .tip-box {
+  background: var(--green-dim);
+  border: 1px solid rgba(34, 197, 94, 0.15);
+  border-radius: var(--r);
+  padding: 14px 16px;
+}
+
+.ofx .ofx-quickadd .tip-icon {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.ofx .ofx-quickadd .tip-text {
+  font-size: 12px;
+  color: var(--t2);
+  line-height: 1.6;
+}
+
+.ofx .ofx-quickadd .tip-text strong {
+  color: var(--green-b);
+}
+
+@media (max-width: 900px) {
+  .ofx .ofx-quickadd .layout {
+    grid-template-columns: 1fr;
+  }
+  .ofx .ofx-quickadd .detect-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .ofx .ofx-quickadd .method-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .ofx .ofx-quickadd .tabs {
+    flex-direction: column;
+  }
+  .ofx .ofx-quickadd .drop-zone {
+    padding: 32px 16px;
+  }
+  .ofx .ofx-quickadd .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .ofx .ofx-quickadd .detect-grid {
+    grid-template-columns: 1fr;
+  }
+  .ofx .ofx-quickadd .pick-grid {
+    grid-template-columns: 1fr;
+  }
+  .ofx .ofx-quickadd .confirm-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Configurações (configuracoes.html)                                         */
+/* -------------------------------------------------------------------------- */
+
+.ofx .ofx-settings .page {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.ofx .ofx-settings .page-header {
+  margin-bottom: 28px;
+}
+
+.ofx .ofx-settings .page-title {
+  font-family: var(--fd);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: var(--t1);
+  margin-bottom: 4px;
+}
+
+.ofx .ofx-settings .page-sub {
+  font-size: 14px;
+  color: var(--t2);
+}
+
+.ofx .ofx-settings .layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 20px;
+  align-items: start;
+}
+
+.ofx .ofx-settings .layout > * {
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .ofx .ofx-settings .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Investimentos                                                              */
+/* -------------------------------------------------------------------------- */
+
+.ofx .ofx-investments .page {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.ofx .ofx-investments .layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 20px;
+  align-items: start;
+}
+
+.ofx .ofx-investments .layout > * {
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .ofx .ofx-investments .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Transações (/app/transacoes)                                               */
+/* -------------------------------------------------------------------------- */
+
+.ofx .ofx-transacoes .page {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.ofx .ofx-transacoes .page-header {
+  margin-bottom: 22px;
+}
+
+.ofx .ofx-transacoes .page-title {
+  font-family: var(--fd);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: var(--t1);
+  margin-bottom: 4px;
+}
+
+.ofx .ofx-transacoes .page-sub {
+  font-size: 14px;
+  color: var(--t2);
+}
+
+.ofx .ofx-transacoes .card {
+  background: var(--bg-c);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  overflow: hidden;
+  transition: border-color var(--tr);
+}
+
+.ofx .ofx-transacoes .card:hover {
+  border-color: var(--bd-l);
+}
+
+.ofx .ofx-transacoes .card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--bd);
+  gap: 12px;
+}
+
+.ofx .ofx-transacoes .card-title {
+  font-family: var(--fd);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--t1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ofx .ofx-transacoes .card-title svg {
+  width: 15px;
+  height: 15px;
+  stroke: var(--t2);
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ofx .ofx-transacoes .card-action {
+  font-size: 12px;
+  color: var(--t2);
+  cursor: pointer;
+  transition: color var(--tr);
+  text-decoration: none;
+}
+
+.ofx .ofx-transacoes .card-action:hover {
+  color: var(--t1);
+}
+
+.ofx .ofx-transacoes .card-body {
+  padding: 20px;
+}
+
+.ofx .ofx-transacoes .range-tabs {
+  display: inline-flex;
+  gap: 6px;
+  background: var(--bg-i);
+  border: 1px solid var(--bd);
+  border-radius: 999px;
+  padding: 3px;
+}
+
+.ofx .ofx-transacoes .range-tab {
+  height: 32px;
+  padding: 0 13px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--t2);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--tr);
+  font-family: var(--fd);
+}
+
+.ofx .ofx-transacoes .range-tab:hover {
+  color: var(--t1);
+}
+
+.ofx .ofx-transacoes .range-tab.active {
+  background: rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.22);
+  color: var(--t1);
+}
+
+.ofx .ofx-transacoes .tx-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.ofx .ofx-transacoes .tx-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--bd);
+}
+
+.ofx .ofx-transacoes .tx-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.ofx .ofx-transacoes .tx-row:first-child {
+  padding-top: 0;
+}
+
+.ofx .ofx-transacoes .tx-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 16px;
+}
+
+.ofx .ofx-transacoes .tx-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ofx .ofx-transacoes .tx-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--t1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ofx .ofx-transacoes .tx-meta {
+  font-size: 11px;
+  color: var(--t3);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ofx .ofx-transacoes .tx-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.ofx .ofx-transacoes .tx-amount {
+  font-family: var(--fd);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ofx .ofx-transacoes .tx-amount.pos {
+  color: var(--green-b);
+}
+
+.ofx .ofx-transacoes .tx-amount.neg {
+  color: #EF4444;
+}
+
+.ofx .ofx-transacoes .tx-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ofx .ofx-transacoes .tx-link {
+  font-size: 12px;
+  color: var(--t2);
+  text-decoration: none;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--bd);
+  background: var(--bg-i);
+  transition: color var(--tr), background var(--tr), border-color var(--tr);
+}
+
+.ofx .ofx-transacoes .tx-link:hover {
+  color: var(--t1);
+  background: var(--bg-c);
+  border-color: var(--bd-l);
+}
+
+.ofx .ofx-transacoes .tx-danger {
+  font-size: 12px;
+  font-weight: 700;
+  color: #EF4444;
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 5px 12px;
+  transition: opacity var(--tr), background var(--tr);
+}
+
+.ofx .ofx-transacoes .tx-danger:hover {
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.ofx .ofx-transacoes .tx-danger:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+@media (max-width: 768px) {
+  .ofx .ofx-transacoes .card-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ofx .ofx-transacoes .tx-row {
+    align-items: flex-start;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Notificações (/app/notificacoes)                                           */
+/* -------------------------------------------------------------------------- */
+
+.ofx .ofx-notifs .page {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.ofx .ofx-notifs .page-header {
+  margin-bottom: 22px;
+}
+
+.ofx .ofx-notifs .page-title {
+  font-family: var(--fd);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: var(--t1);
+  margin-bottom: 4px;
+}
+
+.ofx .ofx-notifs .page-sub {
+  font-size: 14px;
+  color: var(--t2);
+}
+
+.ofx .ofx-notifs .card {
+  background: var(--bg-c);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  overflow: hidden;
+  transition: border-color var(--tr);
+}
+
+.ofx .ofx-notifs .card:hover {
+  border-color: var(--bd-l);
+}
+
+.ofx .ofx-notifs .card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--bd);
+  gap: 12px;
+}
+
+.ofx .ofx-notifs .card-title {
+  font-family: var(--fd);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--t1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ofx .ofx-notifs .card-title svg {
+  width: 15px;
+  height: 15px;
+  stroke: var(--t2);
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ofx .ofx-notifs .card-action {
+  font-size: 12px;
+  color: var(--t2);
+  cursor: pointer;
+  transition: color var(--tr);
+  text-decoration: none;
+  background: none;
+  border: none;
+  font-weight: 600;
+  padding: 0;
+}
+
+.ofx .ofx-notifs .card-action:hover {
+  color: var(--t1);
+}
+
+.ofx .ofx-notifs .card-body {
+  padding: 20px;
+}
+
+.ofx .ofx-notifs .notif-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.ofx .ofx-notifs .notif-item {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--bd);
+}
+
+.ofx .ofx-notifs .notif-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.ofx .ofx-notifs .notif-item:first-child {
+  padding-top: 0;
+}
+
+.ofx .ofx-notifs .notif-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--t1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ofx .ofx-notifs .notif-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  display: inline-block;
+}
+
+.ofx .ofx-notifs .notif-msg {
+  margin-top: 3px;
+  font-size: 12px;
+  color: var(--t2);
+  line-height: 1.5;
+}
+
+.ofx .ofx-notifs .notif-meta {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--t3);
+}
+
+.ofx .ofx-notifs .notif-actions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.ofx .ofx-notifs .notif-action {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--t2);
+  background: transparent;
+  border: 1px solid var(--bd);
+  border-radius: 12px;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: all var(--tr);
+}
+
+.ofx .ofx-notifs .notif-action:hover {
+  border-color: var(--bd-l);
+  color: var(--t1);
+}
+
+.ofx .ofx-notifs .notif-link {
+  color: var(--t2);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.ofx .ofx-notifs .notif-link:hover {
+  color: var(--t1);
+}
+
+.ofx .ofx-notifs .muted {
+  color: var(--t3);
+}
+
+@media (max-width: 768px) {
+  .ofx .ofx-notifs .card-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Ciclos (/app/ciclos)                                                       */
+/* -------------------------------------------------------------------------- */
+
+.ofx .ofx-cycles .page {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.ofx .ofx-cycles .page-header {
+  margin-bottom: 22px;
+}
+
+.ofx .ofx-cycles .page-title {
+  font-family: var(--fd);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: var(--t1);
+  margin-bottom: 4px;
+}
+
+.ofx .ofx-cycles .page-sub {
+  font-size: 14px;
+  color: var(--t2);
+}
+
+.ofx .ofx-cycles .card {
+  background: var(--bg-c);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  overflow: hidden;
+  transition: border-color var(--tr);
+}
+
+.ofx .ofx-cycles .card:hover {
+  border-color: var(--bd-l);
+}
+
+.ofx .ofx-cycles .card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--bd);
+  gap: 12px;
+}
+
+.ofx .ofx-cycles .card-title {
+  font-family: var(--fd);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--t1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ofx .ofx-cycles .card-title svg {
+  width: 15px;
+  height: 15px;
+  stroke: var(--t2);
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ofx .ofx-cycles .card-action {
+  font-size: 12px;
+  color: var(--t2);
+  cursor: pointer;
+  transition: color var(--tr);
+  text-decoration: none;
+}
+
+.ofx .ofx-cycles .card-action:hover {
+  color: var(--t1);
+}
+
+.ofx .ofx-cycles .card-body {
+  padding: 20px;
+}
+
+.ofx .ofx-cycles .cycle-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.ofx .ofx-cycles .cycle-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--bd);
+}
+
+.ofx .ofx-cycles .cycle-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.ofx .ofx-cycles .cycle-item:first-child {
+  padding-top: 0;
+}
+
+.ofx .ofx-cycles .cycle-title {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+.ofx .ofx-cycles .cycle-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--t1);
+}
+
+.ofx .ofx-cycles .cycle-range {
+  font-size: 11px;
+  color: var(--t3);
+}
+
+.ofx .ofx-cycles .cycle-meta {
+  margin-top: 4px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.ofx .ofx-cycles .pill {
+  font-size: 10px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--bd);
+  color: var(--t2);
+  background: var(--bg-i);
+  font-weight: 700;
+}
+
+.ofx .ofx-cycles .cycle-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.ofx .ofx-cycles .cycle-saldo {
+  font-family: var(--fd);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.ofx .ofx-cycles .cycle-saldo.pos {
+  color: var(--green-b);
+}
+
+.ofx .ofx-cycles .cycle-saldo.neg {
+  color: #EF4444;
+}
+
+.ofx .ofx-cycles .cycle-breakdown {
+  font-size: 11px;
+  display: flex;
+  gap: 10px;
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .ofx .ofx-cycles .card-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ofx .ofx-cycles .cycle-item {
+    align-items: flex-start;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Score (05-score.html)                                                      */
+/* -------------------------------------------------------------------------- */
+
+.ofx .ofx-score .page {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.ofx .ofx-score .page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  gap: 16px;
+}
+
+.ofx .ofx-score .page-title {
+  font-family: var(--fd);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: var(--t1);
+  margin-bottom: 4px;
+}
+
+.ofx .ofx-score .page-sub {
+  font-size: 14px;
+  color: var(--t2);
+}
+
+.ofx .ofx-score .main-grid {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 24px;
+}
+
+.ofx .ofx-score .score-hero {
+  background: var(--bg-c);
+  border: 1px solid var(--bd);
+  border-radius: 16px;
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.ofx .ofx-score .score-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(22, 163, 74, 0.08) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.ofx .ofx-score .score-period {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--t3);
+  margin-bottom: 20px;
+}
+
+.ofx .ofx-score .gauge-wrap {
+  position: relative;
+  width: 220px;
+  height: 136px;
+  margin: 0 auto 8px;
+}
+
+.ofx .ofx-score .gauge-number {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--fd);
+  font-size: 52px;
+  font-weight: 800;
+  letter-spacing: -3px;
+  color: var(--t1);
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.ofx .ofx-score .gauge-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--green-b);
+  margin-top: 8px;
+  letter-spacing: 0.03em;
+}
+
+.ofx .ofx-score .gauge-max {
+  font-size: 11px;
+  color: var(--t3);
+  margin-top: 2px;
+}
+
+.ofx .ofx-score .score-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--green-dim);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  color: var(--green-b);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin: 16px 0;
+}
+
+.ofx .ofx-score .score-delta svg {
+  width: 12px;
+  height: 12px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ofx .ofx-score .score-range {
+  width: 100%;
+  margin-top: 4px;
+}
+
+.ofx .ofx-score .range-bar {
+  height: 6px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #EF4444 0%, #F59E0B 33%, #EAB308 55%, #22C55E 80%, #16A34A 100%);
+  position: relative;
+  margin-bottom: 8px;
+}
+
+.ofx .ofx-score .range-marker {
+  position: absolute;
+  top: -5px;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border: 3px solid var(--green);
+  border-radius: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.2);
+}
+
+.ofx .ofx-score .range-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--t3);
+}
+
+.ofx .ofx-score .score-tiers {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 6px;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.ofx .ofx-score .tier {
+  background: var(--bg-c2);
+  border-radius: var(--rs);
+  padding: 8px;
+  text-align: center;
+}
+
+.ofx .ofx-score .tier-range {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--t3);
+  margin-bottom: 3px;
+}
+
+.ofx .ofx-score .tier-name {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.ofx .ofx-score .tier.active {
+  background: var(--green-dim);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.ofx .ofx-score .tier.active .tier-name {
+  color: var(--green-b);
+}
+
+.ofx .ofx-score .right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.ofx .ofx-score .card {
+  background: var(--bg-c);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+
+.ofx .ofx-score .card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--bd);
+}
+
+.ofx .ofx-score .card-title {
+  font-family: var(--fd);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--t1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ofx .ofx-score .card-title svg {
+  width: 15px;
+  height: 15px;
+  stroke: var(--t2);
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ofx .ofx-score .card-action {
+  font-size: 12px;
+  color: var(--t2);
+}
+
+.ofx .ofx-score .card-body {
+  padding: 20px;
+}
+
+.ofx .ofx-score .sparkline-wrap {
+  position: relative;
+  height: 80px;
+  margin-bottom: 8px;
+}
+
+.ofx .ofx-score .sparkline-months {
+  display: flex;
+  justify-content: space-between;
+}
+
+.ofx .ofx-score .sparkline-months span {
+  font-size: 10px;
+  color: var(--t3);
+}
+
+.ofx .ofx-score .sparkline-months span.cur {
+  color: var(--green-b);
+  font-weight: 600;
+}
+
+.ofx .ofx-score .factors-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.ofx .ofx-score .factor-card {
+  background: var(--bg-c2);
+  border-radius: var(--rs);
+  padding: 14px 16px;
+  border-left: 3px solid transparent;
+}
+
+.ofx .ofx-score .factor-card.pos {
+  border-left-color: var(--green);
+}
+
+.ofx .ofx-score .factor-card.neg {
+  border-left-color: var(--red);
+}
+
+.ofx .ofx-score .factor-card.neutral {
+  border-left-color: var(--amber);
+}
+
+.ofx .ofx-score .factor-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+
+.ofx .ofx-score .factor-label.pos {
+  color: var(--green-b);
+}
+
+.ofx .ofx-score .factor-label.neg {
+  color: var(--red);
+}
+
+.ofx .ofx-score .factor-label.neutral {
+  color: var(--amber);
+}
+
+.ofx .ofx-score .factor-label svg {
+  width: 12px;
+  height: 12px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ofx .ofx-score .factor-name {
+  font-family: var(--fd);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--t1);
+  margin-bottom: 4px;
+}
+
+.ofx .ofx-score .factor-desc {
+  font-size: 12px;
+  color: var(--t2);
+  line-height: 1.6;
+}
+
+.ofx .ofx-score .factor-pts {
+  margin-top: 10px;
+  font-family: var(--fd);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ofx .ofx-score .factor-pts.pos {
+  color: var(--green-b);
+}
+
+.ofx .ofx-score .factor-pts.neg {
+  color: var(--red);
+}
+
+.ofx .ofx-score .ai-box {
+  background: linear-gradient(135deg, rgba(22, 163, 74, 0.08), rgba(22, 163, 74, 0.03));
+  border: 1px solid rgba(34, 197, 94, 0.15);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.ofx .ofx-score .ai-box-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--green-b);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+}
+
+.ofx .ofx-score .ai-box-title svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ofx .ofx-score .ai-box-text {
+  font-size: 13px;
+  color: var(--t2);
+  line-height: 1.7;
+}
+
+.ofx .ofx-score .ai-box-text strong {
+  color: var(--t1);
+  font-weight: 600;
+}
+
+.ofx .ofx-score .actions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ofx .ofx-score .action-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--bd);
+}
+
+.ofx .ofx-score .action-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.ofx .ofx-score .action-item:first-child {
+  padding-top: 0;
+}
+
+.ofx .ofx-score .action-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--fd);
+  font-weight: 800;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.ofx .ofx-score .action-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ofx .ofx-score .action-title {
+  font-family: var(--fd);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--t1);
+  margin-bottom: 4px;
+}
+
+.ofx .ofx-score .action-sub {
+  font-size: 12px;
+  color: var(--t2);
+  line-height: 1.6;
+}
+
+.ofx .ofx-score .action-gain {
+  font-family: var(--fd);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+@media (max-width: 980px) {
+  .ofx .ofx-score .main-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Métodos de Pagamento (04-metodos-pagamento.html)                            */
+/* -------------------------------------------------------------------------- */
+
+.ofx .ofx-payments .page {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.ofx .ofx-payments .page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  gap: 16px;
+}
+
+.ofx .ofx-payments .page-title {
+  font-family: var(--fd);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: var(--t1);
+  margin-bottom: 4px;
+}
+
+.ofx .ofx-payments .page-sub {
+  font-size: 14px;
+  color: var(--t2);
+}
+
+.ofx .ofx-payments .period-tabs {
+  display: flex;
+  gap: 2px;
+  background: var(--bg-c);
+  border: 1px solid var(--bd);
+  border-radius: var(--rs);
+  padding: 3px;
+}
+
+.ofx .ofx-payments .period-tab {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--t3);
+  transition: all var(--tr);
+  font-family: var(--fd);
+  user-select: none;
+  background: transparent;
+  border: none;
+}
+
+.ofx .ofx-payments .period-tab.active {
+  background: var(--bg-s);
+  color: var(--t1);
+}
+
+.ofx .ofx-payments .methods-row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.ofx .ofx-payments .method-card {
+  background: var(--bg-c);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  padding: 18px 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--tr);
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+}
+
+.ofx .ofx-payments .method-card:hover {
+  border-color: var(--bd-l);
+  transform: translateY(-2px);
+}
+
+.ofx .ofx-payments .method-card.selected {
+  border-width: 1.5px;
+}
+
+.ofx .ofx-payments .method-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  opacity: 0;
+  transition: opacity var(--tr);
+}
+
+.ofx .ofx-payments .method-card.selected::before {
+  opacity: 1;
+}
+
+.ofx .ofx-payments .method-icon {
+  font-size: 28px;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.ofx .ofx-payments .method-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--t2);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+.ofx .ofx-payments .method-total {
+  font-family: var(--fd);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--t1);
+  margin-bottom: 4px;
+}
+
+.ofx .ofx-payments .method-pct {
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.ofx .ofx-payments .method-mini-bar {
+  height: 3px;
+  background: var(--bg-i);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.ofx .ofx-payments .method-mini-fill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.8s ease;
+}
+
+.ofx .ofx-payments .main-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 20px;
+}
+
+.ofx .ofx-payments .card {
+  background: var(--bg-c);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.ofx .ofx-payments .card:last-child {
+  margin-bottom: 0;
+}
+
+.ofx .ofx-payments .card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--bd);
+}
+
+.ofx .ofx-payments .card-title {
+  font-family: var(--fd);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--t1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ofx .ofx-payments .card-title svg {
+  width: 15px;
+  height: 15px;
+  stroke: var(--t2);
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ofx .ofx-payments .card-action {
+  font-size: 12px;
+  color: var(--t2);
+  cursor: pointer;
+  transition: color var(--tr);
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.ofx .ofx-payments .card-action:hover {
+  color: var(--t1);
+}
+
+.ofx .ofx-payments .card-body {
+  padding: 20px;
+}
+
+.ofx .ofx-payments .stacked-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--t3);
+  margin-bottom: 8px;
+}
+
+.ofx .ofx-payments .stacked-bar {
+  height: 14px;
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  gap: 2px;
+  background: var(--bg-i);
+}
+
+.ofx .ofx-payments .stacked-seg {
+  height: 100%;
+  transition: flex 0.8s ease;
+  border-radius: 6px;
+}
+
+.ofx .ofx-payments .detail-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--bd);
+}
+
+.ofx .ofx-payments .detail-row:last-child {
+  border: none;
+  padding-bottom: 0;
+}
+
+.ofx .ofx-payments .detail-row:first-child {
+  padding-top: 0;
+}
+
+.ofx .ofx-payments .detail-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.ofx .ofx-payments .detail-info {
+  min-width: 0;
+}
+
+.ofx .ofx-payments .detail-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--t1);
+  font-family: var(--fd);
+}
+
+.ofx .ofx-payments .detail-count {
+  font-size: 12px;
+  color: var(--t3);
+  margin-top: 2px;
+}
+
+.ofx .ofx-payments .detail-bar-wrap {
+  width: 120px;
+  height: 6px;
+  background: var(--bg-i);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.ofx .ofx-payments .detail-bar-fill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.8s ease;
+}
+
+.ofx .ofx-payments .detail-pct {
+  font-size: 13px;
+  font-weight: 700;
+  min-width: 36px;
+  text-align: right;
+  font-family: var(--fd);
+}
+
+.ofx .ofx-payments .detail-total {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--t1);
+  min-width: 80px;
+  text-align: right;
+  font-family: var(--fd);
+}
+
+.ofx .ofx-payments .monthly-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  align-items: end;
+}
+
+.ofx .ofx-payments .month-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.ofx .ofx-payments .month-bars {
+  height: 120px;
+  width: 100%;
+  display: flex;
+  gap: 2px;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.ofx .ofx-payments .month-bar {
+  width: 9px;
+  border-radius: 6px 6px 2px 2px;
+}
+
+.ofx .ofx-payments .month-label {
+  font-size: 11px;
+  color: var(--t2);
+  font-weight: 600;
+}
+
+.ofx .ofx-payments .stat-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.ofx .ofx-payments .stat-mini {
+  background: var(--bg-c);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  padding: 14px 16px;
+}
+
+.ofx .ofx-payments .stat-mini-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--t3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+
+.ofx .ofx-payments .stat-mini-val {
+  font-family: var(--fd);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--t1);
+}
+
+.ofx .ofx-payments .stat-mini-sub {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--t2);
+  font-weight: 600;
+}
+
+.ofx .ofx-payments .tx-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--bd);
+}
+
+.ofx .ofx-payments .tx-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.ofx .ofx-payments .tx-item:first-child {
+  padding-top: 0;
+}
+
+.ofx .ofx-payments .tx-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 16px;
+}
+
+.ofx .ofx-payments .tx-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ofx .ofx-payments .tx-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--t1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ofx .ofx-payments .tx-meta {
+  font-size: 11px;
+  color: var(--t3);
+  margin-top: 1px;
+}
+
+.ofx .ofx-payments .tx-amount {
+  font-family: var(--fd);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+@media (max-width: 980px) {
+  .ofx .ofx-payments .methods-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .ofx .ofx-payments .main-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .ofx .ofx-payments .methods-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Insights IA (06-insights-ia.html)                                          */
+/* -------------------------------------------------------------------------- */
+
+.ofx .ofx-insights .page {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.ofx .ofx-insights .page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  gap: 16px;
+}
+
+.ofx .ofx-insights .page-title {
+  font-family: var(--fd);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: var(--t1);
+  margin-bottom: 4px;
+}
+
+.ofx .ofx-insights .page-sub {
+  font-size: 14px;
+  color: var(--t2);
+}
+
+.ofx .ofx-insights .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 18px;
+  height: 38px;
+  border-radius: var(--rs);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--tr);
+  font-family: var(--fd);
+  border: none;
+  text-decoration: none;
+  user-select: none;
+}
+
+.ofx .ofx-insights .btn-primary {
+  background: var(--green);
+  color: #fff;
+}
+
+.ofx .ofx-insights .btn-primary:hover {
+  background: #15803D;
+}
+
+.ofx .ofx-insights .btn-ghost {
+  background: transparent;
+  color: var(--t2);
+  border: 1px solid var(--bd);
+}
+
+.ofx .ofx-insights .btn-ghost:hover {
+  border-color: var(--bd-l);
+  color: var(--t1);
+}
+
+.ofx .ofx-insights .btn svg {
+  width: 15px;
+  height: 15px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ofx .ofx-insights .next-action-hero {
+  background: linear-gradient(135deg, rgba(22, 163, 74, 0.10), rgba(22, 163, 74, 0.04));
+  border: 1px solid rgba(34, 197, 94, 0.18);
+  border-radius: 16px;
+  padding: 28px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.ofx .ofx-insights .next-action-hero::before {
+  content: "";
+  position: absolute;
+  right: -60px;
+  top: -60px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(22, 163, 74, 0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.ofx .ofx-insights .next-action-icon {
+  width: 56px;
+  height: 56px;
+  background: var(--green);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 26px;
+}
+
+.ofx .ofx-insights .next-action-content {
+  flex: 1;
+}
+
+.ofx .ofx-insights .next-action-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--green-b);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+
+.ofx .ofx-insights .next-action-title {
+  font-family: var(--fd);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--t1);
+  letter-spacing: -0.3px;
+  margin-bottom: 8px;
+}
+
+.ofx .ofx-insights .next-action-desc {
+  font-size: 14px;
+  color: var(--t2);
+  line-height: 1.6;
+  max-width: 520px;
+}
+
+.ofx .ofx-insights .insights-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.ofx .ofx-insights .insight-card {
+  background: var(--bg-c);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  padding: 20px;
+  transition: all var(--tr);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.ofx .ofx-insights .insight-card:hover {
+  border-color: var(--bd-l);
+  transform: translateY(-2px);
+}
+
+.ofx .ofx-insights .insight-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.ofx .ofx-insights .insight-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 3px 9px;
+  border-radius: 20px;
+}
+
+.ofx .ofx-insights .type-alert {
+  background: var(--red-dim);
+  color: var(--red);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.ofx .ofx-insights .type-opportunity {
+  background: var(--green-dim);
+  color: var(--green-b);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.ofx .ofx-insights .type-forecast {
+  background: var(--blue-dim);
+  color: var(--blue);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.ofx .ofx-insights .type-tip {
+  background: var(--purple-dim);
+  color: var(--purple);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.ofx .ofx-insights .type-info {
+  background: var(--amber-dim);
+  color: var(--amber);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.ofx .ofx-insights .insight-icon {
+  font-size: 22px;
+}
+
+.ofx .ofx-insights .insight-title {
+  font-family: var(--fd);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--t1);
+  margin-bottom: 8px;
+  line-height: 1.3;
+  letter-spacing: -0.2px;
+}
+
+.ofx .ofx-insights .insight-desc {
+  font-size: 13px;
+  color: var(--t2);
+  line-height: 1.65;
+}
+
+.ofx .ofx-insights .insight-desc strong {
+  color: var(--t1);
+  font-weight: 600;
+}
+
+.ofx .ofx-insights .insight-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--bd);
+}
+
+.ofx .ofx-insights .insight-action {
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color var(--tr);
+}
+
+.ofx .ofx-insights .insight-meta {
+  font-size: 11px;
+  color: var(--t3);
+}
+
+.ofx .ofx-insights .forecast-card {
+  background: var(--bg-c);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.ofx .ofx-insights .card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--bd);
+}
+
+.ofx .ofx-insights .card-title {
+  font-family: var(--fd);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--t1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ofx .ofx-insights .card-title svg {
+  width: 15px;
+  height: 15px;
+  stroke: var(--t2);
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ofx .ofx-insights .card-action {
+  font-size: 12px;
+  color: var(--t2);
+  cursor: pointer;
+  transition: color var(--tr);
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.ofx .ofx-insights .card-action:hover {
+  color: var(--t1);
+}
+
+.ofx .ofx-insights .card-body {
+  padding: 20px;
+}
+
+.ofx .ofx-insights .forecast-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  align-items: flex-end;
+  height: 140px;
+}
+
+.ofx .ofx-insights .forecast-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  height: 100%;
+}
+
+.ofx .ofx-insights .forecast-bar-wrap {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 3px;
+}
+
+.ofx .ofx-insights .forecast-seg {
+  width: 100%;
+  border-radius: 4px;
+  transition: height 0.8s ease;
+}
+
+.ofx .ofx-insights .forecast-seg.income {
+  background: var(--green);
+  opacity: 0.7;
+}
+
+.ofx .ofx-insights .forecast-seg.expense {
+  background: var(--red);
+  opacity: 0.7;
+}
+
+.ofx .ofx-insights .forecast-seg.projected {
+  background: var(--blue);
+  opacity: 0.5;
+  border: 1px dashed rgba(59, 130, 246, 0.5);
+}
+
+.ofx .ofx-insights .forecast-label {
+  font-size: 10px;
+  color: var(--t3);
+}
+
+.ofx .ofx-insights .forecast-label.cur {
+  color: var(--blue);
+  font-weight: 600;
+}
+
+.ofx .ofx-insights .forecast-val {
+  font-size: 9px;
+  color: var(--t3);
+}
+
+.ofx .ofx-insights .report-cta {
+  background: var(--bg-c);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.ofx .ofx-insights .report-icon {
+  width: 48px;
+  height: 48px;
+  background: var(--bg-c2);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ofx .ofx-insights .report-icon svg {
+  width: 22px;
+  height: 22px;
+  stroke: var(--t2);
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ofx .ofx-insights .report-content {
+  flex: 1;
+}
+
+.ofx .ofx-insights .report-title {
+  font-family: var(--fd);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--t1);
+  margin-bottom: 4px;
+}
+
+.ofx .ofx-insights .report-sub {
+  font-size: 13px;
+  color: var(--t3);
+}
+
+.ofx .ofx-insights .report-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .ofx .ofx-insights .insights-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .ofx .ofx-insights .insights-grid {
+    grid-template-columns: 1fr;
+  }
+  .ofx .ofx-insights .forecast-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .ofx .ofx-insights .report-cta {
+    flex-direction: column;
+  }
+  .ofx .ofx-insights .report-actions {
+    width: 100%;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Planejamento (07-planejamento.html)                                        */
+/* -------------------------------------------------------------------------- */
+
+.ofx .ofx-planning .page {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.ofx .ofx-planning .page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 22px;
+  gap: 16px;
+}
+
+.ofx .ofx-planning .page-title {
+  font-family: var(--fd);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: var(--t1);
+  margin-bottom: 4px;
+}
+
+.ofx .ofx-planning .page-sub {
+  font-size: 14px;
+  color: var(--t2);
+}
+
+.ofx .ofx-planning .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  border-radius: var(--rs);
+  font-family: var(--fd);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--tr);
+  border: none;
+  white-space: nowrap;
+  user-select: none;
+  text-decoration: none;
+}
+
+.ofx .ofx-planning .btn-primary {
+  background: var(--green);
+  color: #fff;
+}
+
+.ofx .ofx-planning .btn-primary:hover {
+  background: #15803D;
+}
+
+.ofx .ofx-planning .btn-ghost {
+  background: var(--bg-c);
+  color: var(--t2);
+  border: 1px solid var(--bd);
+}
+
+.ofx .ofx-planning .btn-ghost:hover {
+  color: var(--t1);
+  border-color: var(--bd-l);
+}
+
+.ofx .ofx-planning .btn svg {
+  width: 15px;
+  height: 15px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ofx .ofx-planning .summary-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.ofx .ofx-planning .sum-card {
+  background: var(--bg-c);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  padding: 16px 18px;
+}
+
+.ofx .ofx-planning .sum-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--t3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 10px;
+}
+
+.ofx .ofx-planning .sum-val {
+  font-family: var(--fd);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--t1);
+  letter-spacing: -0.3px;
+  margin-bottom: 6px;
+}
+
+.ofx .ofx-planning .sum-val.red {
+  color: var(--red);
+}
+
+.ofx .ofx-planning .sum-val.amber {
+  color: var(--amber);
+}
+
+.ofx .ofx-planning .sum-val.green {
+  color: var(--green-b);
+}
+
+.ofx .ofx-planning .sum-delta {
+  font-size: 12px;
+  color: var(--t2);
+}
+
+.ofx .ofx-planning .sum-delta .pos {
+  color: var(--green-b);
+  font-weight: 700;
+}
+
+.ofx .ofx-planning .plan-grid {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 20px;
+}
+
+.ofx .ofx-planning .section {
+  background: var(--bg-s);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  padding: 18px;
+  margin-bottom: 16px;
+}
+
+.ofx .ofx-planning .section:last-child {
+  margin-bottom: 0;
+}
+
+.ofx .ofx-planning .section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  gap: 12px;
+}
+
+.ofx .ofx-planning .section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--fd);
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--t1);
+}
+
+.ofx .ofx-planning .section-count {
+  font-size: 11.5px;
+  color: var(--t2);
+  font-weight: 500;
+}
+
+.ofx .ofx-planning .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 4px;
+  opacity: 0.95;
+}
+
+.ofx .ofx-planning .dot.purple {
+  background: var(--purple);
+}
+
+.ofx .ofx-planning .dot.amber {
+  background: var(--amber);
+}
+
+.ofx .ofx-planning .dot.blue {
+  background: var(--blue);
+}
+
+.ofx .ofx-planning .sub-list,
+.ofx .ofx-planning .bill-list,
+.ofx .ofx-planning .fin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.ofx .ofx-planning .sub-item,
+.ofx .ofx-planning .bill-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--bd);
+}
+
+.ofx .ofx-planning .sub-item:last-child,
+.ofx .ofx-planning .bill-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.ofx .ofx-planning .sub-item:first-child,
+.ofx .ofx-planning .bill-item:first-child {
+  padding-top: 0;
+}
+
+.ofx .ofx-planning .sub-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+  background: var(--bg-c);
+}
+
+.ofx .ofx-planning .sub-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ofx .ofx-planning .sub-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--t1);
+  font-family: var(--fd);
+}
+
+.ofx .ofx-planning .sub-meta {
+  font-size: 12px;
+  color: var(--t2);
+  margin-top: 2px;
+}
+
+.ofx .ofx-planning .sub-right {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.ofx .ofx-planning .sub-val {
+  font-family: var(--fd);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--t1);
+}
+
+.ofx .ofx-planning .sub-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-top: 6px;
+}
+
+.ofx .ofx-planning .badge-ok {
+  background: rgba(22, 163, 74, 0.12);
+  color: var(--green-b);
+  border: 1px solid rgba(34, 197, 94, 0.18);
+}
+
+.ofx .ofx-planning .badge-soon {
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--amber);
+  border: 1px solid rgba(245, 158, 11, 0.22);
+}
+
+.ofx .ofx-planning .bill-ico {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--bg-c);
+  border: 1px solid var(--bd);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ofx .ofx-planning .bill-ico svg {
+  width: 18px;
+  height: 18px;
+  stroke: var(--t2);
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ofx .ofx-planning .bill-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ofx .ofx-planning .bill-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--t1);
+  font-family: var(--fd);
+}
+
+.ofx .ofx-planning .bill-due {
+  font-size: 12px;
+  color: var(--t2);
+  margin-top: 2px;
+}
+
+.ofx .ofx-planning .bill-amount {
+  font-family: var(--fd);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--t1);
+  text-align: right;
+}
+
+.ofx .ofx-planning .bill-status {
+  font-size: 11px;
+  color: var(--t2);
+  margin-top: 4px;
+  text-align: right;
+  font-weight: 600;
+}
+
+.ofx .ofx-planning .fin-item {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--bd);
+}
+
+.ofx .ofx-planning .fin-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.ofx .ofx-planning .fin-item:first-child {
+  padding-top: 0;
+}
+
+.ofx .ofx-planning .fin-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ofx .ofx-planning .fin-name {
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--fd);
+  color: var(--t1);
+}
+
+.ofx .ofx-planning .fin-tag {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--t2);
+  background: var(--bg-c);
+  border: 1px solid var(--bd);
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.ofx .ofx-planning .fin-progress {
+  margin-top: 10px;
+  height: 6px;
+  background: var(--bg-c);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.ofx .ofx-planning .fin-fill {
+  height: 100%;
+  background: var(--blue);
+  border-radius: 10px;
+}
+
+.ofx .ofx-planning .fin-meta {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--t2);
+}
+
+.ofx .ofx-planning .total-strip {
+  background: var(--bg-c);
+  border-radius: var(--rs);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.ofx .ofx-planning .total-strip label {
+  font-size: 11.5px;
+  color: var(--t2);
+}
+
+.ofx .ofx-planning .total-strip span {
+  font-family: var(--fd);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--t1);
+}
+
+.ofx .ofx-planning .sidebar-right {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ofx .ofx-planning .card {
+  background: var(--bg-s);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  padding: 18px;
+}
+
+.ofx .ofx-planning .card-title {
+  font-family: var(--fd);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--t1);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ofx .ofx-planning .forecast-months {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ofx .ofx-planning .fc-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ofx .ofx-planning .fc-label {
+  font-size: 12px;
+  color: var(--t2);
+  width: 36px;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+.ofx .ofx-planning .fc-bars {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ofx .ofx-planning .fc-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ofx .ofx-planning .fc-bar {
+  height: 6px;
+  border-radius: 3px;
+}
+
+.ofx .ofx-planning .fc-bar.income {
+  background: var(--green);
+}
+
+.ofx .ofx-planning .fc-bar.expense {
+  background: var(--red);
+}
+
+.ofx .ofx-planning .fc-bar.projected {
+  background: var(--amber);
+  opacity: 0.7;
+}
+
+.ofx .ofx-planning .fc-val {
+  font-size: 11px;
+  color: var(--t2);
+  width: 72px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.ofx .ofx-planning .upcoming-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.ofx .ofx-planning .upcoming-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--bd);
+}
+
+.ofx .ofx-planning .upcoming-item:last-child {
+  border-bottom: none;
+}
+
+.ofx .ofx-planning .upcoming-day {
+  width: 36px;
+  height: 36px;
+  background: var(--bg-c);
+  border-radius: var(--rs);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ofx .ofx-planning .upcoming-day .day {
+  font-family: var(--fd);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--t1);
+  line-height: 1;
+}
+
+.ofx .ofx-planning .upcoming-day .mon {
+  font-size: 9px;
+  color: var(--t2);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ofx .ofx-planning .upcoming-info {
+  flex: 1;
+}
+
+.ofx .ofx-planning .upcoming-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--t1);
+}
+
+.ofx .ofx-planning .upcoming-cat {
+  font-size: 11.5px;
+  color: var(--t2);
+}
+
+.ofx .ofx-planning .upcoming-amount {
+  font-family: var(--fd);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--red);
+}
+
+@media (max-width: 1100px) {
+  .ofx .ofx-planning .plan-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .ofx .ofx-planning .summary-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .ofx .ofx-planning .summary-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}

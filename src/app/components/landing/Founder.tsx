@@ -1,14 +1,11 @@
 import { motion } from "motion/react"
 import { useLanguage } from "../../../lib/language-context"
+import { OFLogo } from "../OFLogo"
 
 function OpenfyIcon() {
   return (
-    <div style={{ width: 48, height: 48, background: "#16A34A", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-      <svg width="22" height="22" viewBox="0 0 14 14" fill="none">
-        <rect x="0" y="8" width="4" height="6" rx="1" fill="white" />
-        <rect x="5" y="4" width="4" height="10" rx="1" fill="white" />
-        <rect x="10" y="0" width="4" height="14" rx="1" fill="white" />
-      </svg>
+    <div style={{ transform: "scale(1.1)" }}>
+      <OFLogo size="lg" variant="icon" ariaLabel="Openfy" />
     </div>
   )
 }

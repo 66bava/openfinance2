@@ -1,8 +1,11 @@
 import { defineConfig, loadEnv } from 'vite'
 import path from 'path'
+import { fileURLToPath } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import type { Plugin } from 'vite'
+
+const projectRoot = fileURLToPath(new URL('.', import.meta.url))
 
 function apiDevPlugin(): Plugin {
   return {
@@ -52,7 +55,7 @@ export default defineConfig({
   resolve: {
     alias: {
       // Alias @ to the src directory
-      '@': path.resolve(__dirname, './src'),
+      '@': path.resolve(projectRoot, './src'),
     },
   },
 
@@ -61,5 +64,13 @@ export default defineConfig({
 
   esbuild: {
     drop: ['console', 'debugger'],
+  },
+
+  // Evita que o Vite tente detectar a raiz do workspace subindo diretÃ³rios
+  // (o que pode falhar em ambientes com sandbox/permissÃµes restritas).
+  server: {
+    fs: {
+      allow: [projectRoot],
+    },
   },
 })

@@ -3,6 +3,7 @@ import { useNavigate, Navigate, Link } from "react-router"
 import { supabase } from "../../lib/supabase"
 import { useAuth } from "../../lib/auth-context"
 import { emailSchema, senhaSchema, nomeSchema, telefoneSchema } from "../../lib/validations"
+import { CURRENT_TERMS_VERSION } from "../../lib/terms"
 import { Lock } from "lucide-react"
 
 export default function Login() {
@@ -100,7 +101,7 @@ export default function Login() {
     setServerError(null)
     setSuccessMessage(null)
 
-    if (!termosAceitos) {
+    if (isSignUp && !termosAceitos) {
       setTermosErro(true)
       return
     }
@@ -163,7 +164,9 @@ export default function Login() {
           meta_economia: 0,
           consentimento_politica: true,
           data_consentimento: new Date().toISOString(),
-          versao_politica: "1.0",
+          versao_politica: CURRENT_TERMS_VERSION,
+          versao_termos_aceita: CURRENT_TERMS_VERSION,
+          data_aceite_termos: new Date().toISOString(),
         }, { onConflict: "id" })
 
         if (betaFechado) {
@@ -181,15 +184,6 @@ export default function Login() {
       setServerError(signInError.message)
       setLoading(false)
       return
-    }
-
-    // Registra aceite dos termos ao fazer login (se ainda não registrado)
-    if (signInData.user) {
-      supabase.from("profiles").update({
-        consentimento_politica: true,
-        data_consentimento: new Date().toISOString(),
-        versao_politica: "1.0",
-      }).eq("id", signInData.user.id).then(() => {})
     }
 
     navigate("/app", { replace: true })
@@ -432,42 +426,43 @@ export default function Login() {
             )}
           </div>
 
-          {/* Aceite obrigatório de termos */}
-          <div style={{
-            padding: "12px 14px",
-            borderRadius: 8,
-            border: termosErro ? "1px solid #D32F2F" : "1px solid #E0E0E0",
-            background: termosErro ? "#FEF2F2" : "#FAFAFA",
-            transition: "border-color 0.15s, background 0.15s",
-          }}>
-            <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer" }}>
-              <input
-                type="checkbox"
-                checked={termosAceitos}
-                onChange={(e) => {
-                  setTermosAceitos(e.target.checked)
-                  if (e.target.checked) setTermosErro(false)
-                }}
-                style={{ marginTop: 2, width: 15, height: 15, cursor: "pointer", accentColor: "#16A34A", flexShrink: 0 }}
-              />
-              <span style={{ fontSize: 12, color: termosErro ? "#D32F2F" : "#555555", lineHeight: 1.55 }}>
-                Li e aceito os{" "}
-                <a href="/termos" target="_blank" style={{ color: "#16A34A", fontWeight: 600, textDecoration: "underline" }}>
-                  Termos de Uso
-                </a>{" "}
-                e a{" "}
-                <a href="/privacidade" target="_blank" style={{ color: "#16A34A", fontWeight: 600, textDecoration: "underline" }}>
-                  Política de Privacidade
-                </a>{" "}
-                do Openfy. *
-              </span>
-            </label>
-            {termosErro && (
-              <p style={{ fontSize: 11, color: "#D32F2F", marginTop: 6, marginLeft: 25 }}>
-                Você precisa aceitar os termos para continuar.
-              </p>
-            )}
-          </div>
+          {isSignUp && (
+            <div style={{
+              padding: "12px 14px",
+              borderRadius: 8,
+              border: termosErro ? "1px solid #D32F2F" : "1px solid #E0E0E0",
+              background: termosErro ? "#FEF2F2" : "#FAFAFA",
+              transition: "border-color 0.15s, background 0.15s",
+            }}>
+              <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer" }}>
+                <input
+                  type="checkbox"
+                  checked={termosAceitos}
+                  onChange={(e) => {
+                    setTermosAceitos(e.target.checked)
+                    if (e.target.checked) setTermosErro(false)
+                  }}
+                  style={{ marginTop: 2, width: 15, height: 15, cursor: "pointer", accentColor: "#16A34A", flexShrink: 0 }}
+                />
+                <span style={{ fontSize: 12, color: termosErro ? "#D32F2F" : "#555555", lineHeight: 1.55 }}>
+                  Li e aceito os{" "}
+                  <a href="/termos" target="_blank" style={{ color: "#16A34A", fontWeight: 600, textDecoration: "underline" }}>
+                    Termos de Uso
+                  </a>{" "}
+                  e a{" "}
+                  <a href="/privacidade" target="_blank" style={{ color: "#16A34A", fontWeight: 600, textDecoration: "underline" }}>
+                    Política de Privacidade
+                  </a>{" "}
+                  do Openfy. *
+                </span>
+              </label>
+              {termosErro && (
+                <p style={{ fontSize: 11, color: "#D32F2F", marginTop: 6, marginLeft: 25 }}>
+                  Você precisa aceitar os termos para continuar.
+                </p>
+              )}
+            </div>
+          )}
 
           {serverError && (
             <p style={{ fontSize: 13 }} className="text-[#D32F2F]">{serverError}</p>

@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Openfy — Ciclos Financeiros</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:      #0A0A0A;
+  --bg2:     #111111;
+  --bg3:     #1A1A1A;
+  --bg4:     #222222;
+  --border:  rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text:    #F0F0EC;
+  --text2:   #9CA3AF;
+  --text3:   #52525B;
+  --accent:  #16A34A;
+  --accent2: #15803D;
+  --accentFg:#4ADE80;
+  --accentGlow: rgba(22,163,74,0.15);
+  --red:     #EF4444;
+  --redGlow: rgba(239,68,68,0.12);
+  --yellow:  #EAB308;
+  --yellowGlow: rgba(234,179,8,0.12);
+  --blue:    #60A5FA;
+  --radius:  14px;
+  --sidebar: 64px;
+  --font-title: 'DM Sans', sans-serif;
+  --font-body:  'Inter', sans-serif;
+}
+
+[data-theme="light"] {
+  --bg:      #F5F5F0;
+  --bg2:     #FFFFFF;
+  --bg3:     #ECEEE9;
+  --bg4:     #E2E4DF;
+  --border:  rgba(0,0,0,0.07);
+  --border2: rgba(0,0,0,0.12);
+  --text:    #0A0A0A;
+  --text2:   #52525B;
+  --text3:   #A1A1AA;
+  --accentGlow: rgba(22,163,74,0.08);
+  --redGlow: rgba(239,68,68,0.07);
+  --yellowGlow: rgba(234,179,8,0.07);
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  overflow: hidden;
+}
+
+/* Sidebar */
+.sidebar {
+  width: var(--sidebar);
+  height: 100vh;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.sidebar-logo {
+  width: 36px; height: 36px;
+  background: var(--accent); border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-title); font-weight: 700; font-size: 14px; color: #fff;
+  margin-bottom: 12px;
+}
+.nav-item {
+  width: 44px; height: 44px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: background 0.15s, color 0.15s; color: var(--text3);
+}
+.nav-item:hover { background: var(--bg3); color: var(--text2); }
+.nav-item.active { background: var(--accentGlow); color: var(--accent); }
+.nav-item svg { width: 18px; height: 18px; }
+.theme-btn {
+  width: 44px; height: 44px; border-radius: 10px;
+  background: var(--bg3); border: 1px solid var(--border);
+  color: var(--text2); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: auto; margin-bottom: 4px;
+}
+.theme-btn:hover { color: var(--text); }
+
+/* Main */
+.main {
+  flex: 1; height: 100vh;
+  overflow-y: auto;
+  display: flex; flex-direction: column;
+}
+
+.topbar {
+  height: 56px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 32px; gap: 10px;
+  flex-shrink: 0; background: var(--bg);
+  position: sticky; top: 0; z-index: 10;
+}
+.breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text2); }
+.breadcrumb .sep { color: var(--text3); }
+.breadcrumb .current { color: var(--text); font-weight: 500; }
+.topbar-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 8px;
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  transition: all 0.15s; border: none; font-family: var(--font-body);
+}
+.btn-ghost { background: transparent; color: var(--text2); border: 1px solid var(--border); }
+.btn-ghost:hover { background: var(--bg3); color: var(--text); border-color: var(--border2); }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent2); }
+.btn-danger { background: var(--redGlow); color: var(--red); border: 1px solid rgba(239,68,68,0.2); }
+.btn-danger:hover { background: rgba(239,68,68,0.18); }
+.btn-edit { background: var(--bg3); color: var(--text); border: 1px solid var(--border2); }
+.btn-edit:hover { background: var(--bg4); }
+
+/* Content */
+.content { padding: 32px 40px 80px; max-width: 1100px; margin: 0 auto; width: 100%; }
+
+/* Current cycle hero */
+.cycle-hero {
+  position: relative;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.cycle-hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), #4ADE80, var(--accent));
+  background-size: 200% 100%;
+  animation: shimmer 3s ease infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.cycle-hero-glow {
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(22,163,74,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.cycle-status-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  gap: 24px;
+}
+
+.cycle-status-left { display: flex; flex-direction: column; gap: 8px; }
+
+.cycle-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 600;
+  background: var(--accentGlow); color: var(--accentFg);
+  border: 1px solid rgba(74,222,128,0.2);
+  width: fit-content;
+}
+.cycle-badge .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent);
+  animation: blink 2s ease infinite;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.cycle-title {
+  font-family: var(--font-title);
+  font-size: 28px; font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.cycle-period {
+  font-size: 14px; color: var(--text2);
+  display: flex; align-items: center; gap: 8px;
+}
+
+.cycle-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+/* Cycle progress */
+.cycle-progress-section {
+  display: flex; align-items: center; gap: 24px;
+  margin-bottom: 28px;
+}
+
+.progress-wrap { flex: 1; }
+.progress-track {
+  width: 100%; height: 8px;
+  background: var(--bg3); border-radius: 99px;
+  overflow: hidden; position: relative;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), #4ADE80);
+  border-radius: 99px;
+  width: 55%;
+  position: relative;
+}
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  right: 0; top: 50%;
+  transform: translateY(-50%);
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: #4ADE80;
+  border: 2px solid var(--bg2);
+  box-shadow: 0 0 8px rgba(74,222,128,0.6);
+}
+.progress-labels {
+  display: flex; justify-content: space-between;
+  margin-top: 8px; font-size: 12px; color: var(--text2);
+}
+
+.progress-meta {
+  text-align: right; flex-shrink: 0;
+}
+.progress-meta .days { font-size: 24px; font-weight: 700; font-family: var(--font-title); }
+.progress-meta .days-lbl { font-size: 12px; color: var(--text2); }
+
+/* Stats grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  display: flex; flex-direction: column; gap: 8px;
+  transition: border-color 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card:hover { border-color: var(--border2); }
+
+.stat-card-icon {
+  width: 36px; height: 36px;
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 4px;
+  flex-shrink: 0;
+}
+.stat-card-icon svg { width: 16px; height: 16px; }
+
+.stat-card-icon.green { background: var(--accentGlow); color: var(--accentFg); }
+.stat-card-icon.red { background: var(--redGlow); color: var(--red); }
+.stat-card-icon.blue { background: rgba(96,165,250,0.12); color: var(--blue); }
+.stat-card-icon.yellow { background: var(--yellowGlow); color: var(--yellow); }
+
+.stat-card .lbl {
+  font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.6px;
+  color: var(--text3);
+}
+.stat-card .val {
+  font-family: var(--font-title);
+  font-size: 26px; font-weight: 700;
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+.stat-card .val.positive { color: var(--accentFg); }
+.stat-card .val.negative { color: var(--red); }
+.stat-card .val.blue { color: var(--blue); }
+
+.stat-card .delta {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 12px; color: var(--text2);
+}
+.delta-up { color: var(--accentFg); }
+.delta-down { color: var(--red); }
+
+/* Saldo row */
+.saldo-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 20px;
+  background: var(--bg3);
+  border-radius: var(--radius);
+  margin-bottom: 24px;
+  border: 1px solid var(--border);
+}
+
+.saldo-item { display: flex; flex-direction: column; gap: 4px; }
+.saldo-item .lbl { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text3); }
+.saldo-item .val { font-family: var(--font-title); font-size: 22px; font-weight: 700; }
+.saldo-item .val.projected { color: var(--text2); }
+
+.saldo-arrow {
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text3);
+}
+.saldo-arrow svg { width: 20px; height: 20px; }
+
+/* Imports done */
+.imports-done {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 18px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 13px;
+}
+.imports-done .icon { color: var(--accent); }
+.imports-done strong { font-weight: 600; }
+.imports-done .meta { color: var(--text2); }
+.imports-done .btn-sm {
+  margin-left: auto;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 12px; font-weight: 500;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  cursor: pointer;
+}
+
+/* Recent cycles */
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.section-title { font-family: var(--font-title); font-size: 15px; font-weight: 600; }
+.see-all { font-size: 13px; color: var(--accent); cursor: pointer; font-weight: 500; }
+
+.cycles-list { display: flex; flex-direction: column; gap: 2px; }
+
+.cycle-item {
+  display: flex; align-items: center; gap: 16px;
+  padding: 14px 18px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.cycle-item:hover { background: var(--bg3); border-color: var(--border2); }
+
+.cycle-item-month {
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  background: var(--bg3);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;
+  color: var(--text2);
+  line-height: 1.3;
+}
+.cycle-item-month .month-num { font-size: 17px; font-weight: 700; font-family: var(--font-title); color: var(--text); }
+
+.cycle-item-info { flex: 1; }
+.cycle-item-info strong { display: block; font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.cycle-item-info span { font-size: 12px; color: var(--text2); }
+
+.cycle-item-stats {
+  display: flex; gap: 20px; text-align: right;
+}
+.cycle-stat { display: flex; flex-direction: column; gap: 2px; }
+.cycle-stat .cv { font-size: 13px; font-weight: 600; }
+.cycle-stat .cv.pos { color: var(--accentFg); }
+.cycle-stat .cv.neg { color: var(--red); }
+.cycle-stat .cl { font-size: 11px; color: var(--text2); }
+
+.badge-closed {
+  padding: 3px 8px; border-radius: 20px;
+  font-size: 11px; font-weight: 600;
+  background: var(--bg3); color: var(--text3);
+  border: 1px solid var(--border2);
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: none; align-items: center; justify-content: center;
+  z-index: 50; backdrop-filter: blur(6px);
+}
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 18px;
+  width: 420px;
+  overflow: hidden;
+  animation: modal-in 0.22s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+}
+@keyframes modal-in {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-header { padding: 24px 24px 16px; }
+.modal-icon {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  background: var(--redGlow);
+  border: 1px solid rgba(239,68,68,0.2);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--red); margin-bottom: 16px;
+}
+.modal-icon svg { width: 22px; height: 22px; }
+.modal-title { font-family: var(--font-title); font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+.modal-desc { font-size: 14px; color: var(--text2); line-height: 1.6; }
+
+.modal-warning {
+  margin: 0 24px 20px;
+  padding: 12px 14px;
+  background: var(--redGlow);
+  border: 1px solid rgba(239,68,68,0.2);
+  border-radius: 10px;
+  font-size: 13px; color: var(--red);
+  line-height: 1.5;
+}
+
+.modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+
+/* Edit cycle modal */
+.modal-body { padding: 16px 24px 20px; display: flex; flex-direction: column; gap: 14px; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: 12px; font-weight: 500; color: var(--text2); }
+.field input, .field select {
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 9px 12px;
+  font-size: 14px; font-family: var(--font-body); color: var(--text);
+  outline: none; transition: border-color 0.15s;
+}
+.field input:focus, .field select:focus { border-color: var(--accent); }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 99px; }
+
+/* Score mini */
+.score-ring-wrap {
+  position: absolute; right: 24px; bottom: 24px;
+  opacity: 0.15;
+}
+
+/* Divider */
+.divider { height: 1px; background: var(--border); margin: 24px 0; }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo">Of</div>
+  <div class="nav-item" title="Dashboard">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+  </div>
+  <div class="nav-item" title="Transações">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+  </div>
+  <div class="nav-item" title="Importação">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+  </div>
+  <div class="nav-item active" title="Ciclos">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+  </div>
+  <div class="nav-item" title="Planejamento">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+  </div>
+  <div class="nav-item" title="Score">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+  </div>
+  <button class="theme-btn" id="themeBtn">
+    <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+  </button>
+</aside>
+
+<!-- Main -->
+<main class="main">
+  <div class="topbar">
+    <div class="breadcrumb">
+      <span>Finanças</span>
+      <span class="sep">›</span>
+      <span class="current">Ciclos</span>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost" onclick="openEditModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Editar ciclo
+      </button>
+      <button class="btn btn-ghost btn-danger" onclick="openResetModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+        Resetar
+      </button>
+      <button class="btn btn-primary" onclick="openCloseModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14"><polyline points="20 6 9 17 4 12"/></svg>
+        Fechar ciclo
+      </button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- Cycle Hero -->
+    <div class="cycle-hero">
+      <div class="cycle-hero-glow"></div>
+
+      <div class="cycle-status-row">
+        <div class="cycle-status-left">
+          <div class="cycle-badge">
+            <div class="dot"></div>
+            Ciclo ativo
+          </div>
+          <div class="cycle-title">Maio 2025</div>
+          <div class="cycle-period">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            01 mai 2025 — 31 mai 2025
+          </div>
+        </div>
+        <div class="cycle-actions">
+          <!-- Actions in topbar -->
+        </div>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="cycle-progress-section">
+        <div class="progress-wrap">
+          <div class="progress-track">
+            <div class="progress-fill"></div>
+          </div>
+          <div class="progress-labels">
+            <span>01 mai</span>
+            <span style="color:var(--accentFg);font-weight:500">55% do ciclo</span>
+            <span>31 mai</span>
+          </div>
+        </div>
+        <div class="progress-meta">
+          <div class="days">17</div>
+          <div class="days-lbl">dias restantes</div>
+        </div>
+      </div>
+
+      <!-- Saldo row -->
+      <div class="saldo-row">
+        <div class="saldo-item">
+          <div class="lbl">Saldo inicial</div>
+          <div class="val" style="color:var(--accent)">R$ 3.240,00</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:2px">01 mai 2025</div>
+        </div>
+        <div class="saldo-arrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="saldo-item">
+          <div class="lbl">Saldo atual</div>
+          <div class="val" style="color:var(--accent)">R$ 5.870,00</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:2px">
+            <span style="color:var(--accentFg)">↑ R$ 2.630</span> este ciclo
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Stats grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-card-icon green">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        </div>
+        <div class="lbl">Receitas</div>
+        <div class="val positive">R$ 12.400</div>
+        <div class="delta">
+          <span class="delta-up">↑ 8%</span>
+          <span>vs mês anterior</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-icon red">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
+        </div>
+        <div class="lbl">Despesas</div>
+        <div class="val negative">R$ 8.742</div>
+        <div class="delta">
+          <span class="delta-down">↑ 3%</span>
+          <span>vs mês anterior</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-icon blue">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        </div>
+        <div class="lbl">Score Openfy</div>
+        <div class="val blue">742</div>
+        <div class="delta">
+          <span class="delta-up">↑ 18 pts</span>
+          <span>vs ciclo anterior</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-icon yellow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <div class="lbl">Importações</div>
+        <div class="val" style="color:var(--yellow)">3</div>
+        <div class="delta">
+          <span style="color:var(--text2)">432 transações importadas</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Imports done bar -->
+    <div class="imports-done" style="margin-bottom:24px">
+      <span class="icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <strong>3 importações</strong>
+      <span class="meta">· extrato-itau.csv, extrato-nubank.ofx, cartao-abril.xlsx</span>
+      <button class="btn-sm" onclick="">+ Importar</button>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Recent cycles -->
+    <div class="section-header">
+      <span class="section-title">Ciclos anteriores</span>
+      <a class="see-all">Ver todos</a>
+    </div>
+
+    <div class="cycles-list">
+      <div class="cycle-item">
+        <div class="cycle-item-month">
+          <div class="month-num">04</div>
+          ABR
+        </div>
+        <div class="cycle-item-info">
+          <strong>Abril 2025</strong>
+          <span>01 abr — 30 abr · 3 importações · 143 transações</span>
+        </div>
+        <div class="cycle-item-stats">
+          <div class="cycle-stat">
+            <span class="cv pos">+R$ 11.200</span>
+            <span class="cl">Receitas</span>
+          </div>
+          <div class="cycle-stat">
+            <span class="cv neg">−R$ 7.890</span>
+            <span class="cl">Despesas</span>
+          </div>
+          <div class="cycle-stat">
+            <span class="cv" style="color:var(--blue)">724 pts</span>
+            <span class="cl">Score</span>
+          </div>
+        </div>
+        <span class="badge-closed">Fechado</span>
+      </div>
+
+      <div class="cycle-item">
+        <div class="cycle-item-month">
+          <div class="month-num">03</div>
+          MAR
+        </div>
+        <div class="cycle-item-info">
+          <strong>Março 2025</strong>
+          <span>01 mar — 31 mar · 2 importações · 98 transações</span>
+        </div>
+        <div class="cycle-item-stats">
+          <div class="cycle-stat">
+            <span class="cv pos">+R$ 10.800</span>
+            <span class="cl">Receitas</span>
+          </div>
+          <div class="cycle-stat">
+            <span class="cv neg">−R$ 9.120</span>
+            <span class="cl">Despesas</span>
+          </div>
+          <div class="cycle-stat">
+            <span class="cv" style="color:var(--blue)">698 pts</span>
+            <span class="cl">Score</span>
+          </div>
+        </div>
+        <span class="badge-closed">Fechado</span>
+      </div>
+
+      <div class="cycle-item">
+        <div class="cycle-item-month">
+          <div class="month-num">02</div>
+          FEV
+        </div>
+        <div class="cycle-item-info">
+          <strong>Fevereiro 2025</strong>
+          <span>01 fev — 28 fev · 1 importação · 67 transações</span>
+        </div>
+        <div class="cycle-item-stats">
+          <div class="cycle-stat">
+            <span class="cv pos">+R$ 10.800</span>
+            <span class="cl">Receitas</span>
+          </div>
+          <div class="cycle-stat">
+            <span class="cv neg">−R$ 10.240</span>
+            <span class="cl">Despesas</span>
+          </div>
+          <div class="cycle-stat">
+            <span class="cv" style="color:var(--yellow)">681 pts</span>
+            <span class="cl">Score</span>
+          </div>
+        </div>
+        <span class="badge-closed">Fechado</span>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- ── MODALS ── -->
+
+<!-- Reset Modal -->
+<div class="modal-overlay" id="resetModal" onclick="if(event.target===this)closeModal('resetModal')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <div class="modal-title">Resetar ciclo atual?</div>
+      <div class="modal-desc">
+        Esta ação irá apagar <strong style="color:var(--text)">todas as importações e transações</strong> do ciclo de Maio 2025. O saldo inicial será restaurado para R$ 3.240,00.
+      </div>
+    </div>
+    <div class="modal-warning">
+      ⚠ Esta ação é irreversível. 432 transações serão permanentemente removidas do ciclo atual.
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('resetModal')">Cancelar</button>
+      <button class="btn btn-danger" onclick="closeModal('resetModal')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+        Sim, resetar ciclo
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Close Modal -->
+<div class="modal-overlay" id="closeModal" onclick="if(event.target===this)closeModal('closeModal')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-icon" style="background:var(--accentGlow);border-color:rgba(22,163,74,0.3);color:var(--accent)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="modal-title">Fechar ciclo de Maio?</div>
+      <div class="modal-desc">
+        O ciclo será encerrado com saldo final de <strong style="color:var(--accentFg)">R$ 5.870,00</strong>. Um novo ciclo será iniciado automaticamente.
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Saldo final (confirme)</label>
+        <input type="text" value="R$ 5.870,00" />
+      </div>
+      <div class="field">
+        <label>Observações (opcional)</label>
+        <input type="text" placeholder="Ex: Mês de férias…" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('closeModal')">Cancelar</button>
+      <button class="btn btn-primary" onclick="closeModal('closeModal')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><polyline points="20 6 9 17 4 12"/></svg>
+        Fechar ciclo
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-overlay" id="editModal" onclick="if(event.target===this)closeModal('editModal')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-icon" style="background:rgba(96,165,250,0.12);border-color:rgba(96,165,250,0.2);color:var(--blue)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </div>
+      <div class="modal-title">Editar ciclo</div>
+      <div class="modal-desc">Ajuste as configurações do ciclo atual.</div>
+    </div>
+    <div class="modal-body">
+      <div class="field-row">
+        <div class="field">
+          <label>Data início</label>
+          <input type="date" value="2025-05-01" />
+        </div>
+        <div class="field">
+          <label>Data fim</label>
+          <input type="date" value="2025-05-31" />
+        </div>
+      </div>
+      <div class="field">
+        <label>Saldo inicial</label>
+        <input type="text" value="R$ 3.240,00" />
+      </div>
+      <div class="field">
+        <label>Nome do ciclo (opcional)</label>
+        <input type="text" placeholder="Ex: Mês de férias" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('editModal')">Cancelar</button>
+      <button class="btn btn-primary" onclick="closeModal('editModal')">Salvar alterações</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const btn = document.getElementById('themeBtn');
+const icon = document.getElementById('themeIcon');
+btn.addEventListener('click', () => {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  icon.innerHTML = isDark
+    ? '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>'
+    : '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
+});
+
+function openResetModal() { document.getElementById('resetModal').classList.add('open'); }
+function openCloseModal() { document.getElementById('closeModal').classList.add('open'); }
+function openEditModal() { document.getElementById('editModal').classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    ['resetModal','closeModal','editModal'].forEach(id => closeModal(id));
+  }
+});
+</script>
+</body>
+</html>

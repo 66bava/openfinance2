@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Openfy — Métodos de Pagamento</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#16A34A;--green-b:#22C55E;--green-dim:rgba(22,163,74,.12);
+  --bg:#080808;--bg-s:#0A0A0A;--bg-c:#111111;--bg-c2:#161616;--bg-i:#1A1A1A;
+  --bd:rgba(255,255,255,.06);--bd-l:rgba(255,255,255,.10);
+  --t1:#EEEDE6;--t2:#8A8A7E;--t3:#444440;
+  --red:#EF4444;--amber:#F59E0B;--blue:#3B82F6;--purple:#8B5CF6;
+  --r:12px;--rs:8px;--tr:.22s cubic-bezier(.4,0,.2,1);
+  --fd:'DM Sans',sans-serif;--fb:'Inter',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t1);font-family:var(--fb);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+.page{max-width:1100px;margin:0 auto;padding:28px}
+
+/* HEADER */
+.page-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:28px;gap:16px}
+.page-title{font-family:var(--fd);font-size:24px;font-weight:700;letter-spacing:-.4px;color:var(--t1);margin-bottom:4px}
+.page-sub{font-size:14px;color:var(--t2)}
+.period-tabs{display:flex;gap:2px;background:var(--bg-c);border:1px solid var(--bd);border-radius:var(--rs);padding:3px}
+.period-tab{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;color:var(--t3);transition:all var(--tr);font-family:var(--fd)}
+.period-tab.active{background:var(--bg-s);color:var(--t1)}
+
+/* METHOD CARDS ROW */
+.methods-row{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:24px}
+.method-card{background:var(--bg-c);border:1px solid var(--bd);border-radius:var(--r);padding:18px 14px;text-align:center;cursor:pointer;transition:all var(--tr);position:relative;overflow:hidden}
+.method-card:hover{border-color:var(--bd-l);transform:translateY(-2px)}
+.method-card.selected{border-width:1.5px}
+.method-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:3px 3px 0 0;opacity:0;transition:opacity var(--tr)}
+.method-card.selected::before{opacity:1}
+.method-icon{font-size:28px;margin-bottom:10px;display:block}
+.method-name{font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px}
+.method-total{font-family:var(--fd);font-size:15px;font-weight:700;color:var(--t1);margin-bottom:4px}
+.method-pct{font-size:12px;font-weight:700;margin-bottom:8px}
+.method-mini-bar{height:3px;background:var(--bg-i);border-radius:10px;overflow:hidden}
+.method-mini-fill{height:100%;border-radius:10px;transition:width .8s ease}
+
+/* MAIN AREA */
+.main-grid{display:grid;grid-template-columns:1fr 380px;gap:20px}
+
+/* CARD */
+.card{background:var(--bg-c);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;margin-bottom:20px}
+.card:last-child{margin-bottom:0}
+.card-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--bd)}
+.card-title{font-family:var(--fd);font-size:14px;font-weight:600;color:var(--t1);display:flex;align-items:center;gap:8px}
+.card-title svg{width:15px;height:15px;stroke:var(--t2);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.card-action{font-size:12px;color:var(--t2);cursor:pointer;transition:color var(--tr)}
+.card-action:hover{color:var(--t1)}
+.card-body{padding:20px}
+
+/* DETAIL TABLE */
+.detail-row{display:grid;grid-template-columns:auto 1fr auto auto auto;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--bd)}
+.detail-row:last-child{border:none;padding-bottom:0}
+.detail-row:first-child{padding-top:0}
+.detail-icon-wrap{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.detail-info{min-width:0}
+.detail-name{font-size:14px;font-weight:600;color:var(--t1);font-family:var(--fd)}
+.detail-count{font-size:12px;color:var(--t3);margin-top:2px}
+.detail-bar-wrap{width:120px;height:6px;background:var(--bg-i);border-radius:10px;overflow:hidden}
+.detail-bar-fill{height:100%;border-radius:10px;transition:width .8s ease}
+.detail-pct{font-size:13px;font-weight:700;min-width:36px;text-align:right;font-family:var(--fd)}
+.detail-total{font-size:14px;font-weight:700;color:var(--t1);min-width:80px;text-align:right;font-family:var(--fd)}
+
+/* CHART AREA — stacked bar */
+.stacked-section{margin-bottom:20px}
+.stacked-label{display:flex;justify-content:space-between;font-size:11px;color:var(--t3);margin-bottom:8px}
+.stacked-bar{height:14px;border-radius:10px;overflow:hidden;display:flex;gap:2px;background:var(--bg-i)}
+.stacked-seg{height:100%;transition:flex .8s ease;border-radius:6px}
+
+/* MONTHLY COMPARISON */
+.monthly-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;align-items:flex-end;height:120px}
+.month-col{display:flex;flex-direction:column;align-items:center;gap:6px;height:100%}
+.month-bars{display:flex;gap:3px;align-items:flex-end;flex:1;width:100%}
+.month-bar{flex:1;border-radius:4px 4px 0 0;min-height:4px;transition:height .6s ease}
+.month-label{font-size:10px;color:var(--t3);text-align:center}
+
+/* TX RECENT */
+.tx-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd)}
+.tx-item:last-child{border:none;padding-bottom:0}
+.tx-item:first-child{padding-top:0}
+.tx-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.tx-info{flex:1;min-width:0}
+.tx-name{font-size:12px;font-weight:500;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-meta{font-size:10px;color:var(--t3);margin-top:1px}
+.tx-amount{font-family:var(--fd);font-size:13px;font-weight:700;color:var(--red)}
+
+/* STAT MINI */
+.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.stat-mini{background:var(--bg-c2);border-radius:var(--rs);padding:12px 14px}
+.stat-mini-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);margin-bottom:6px}
+.stat-mini-val{font-family:var(--fd);font-size:17px;font-weight:700;color:var(--t1)}
+.stat-mini-sub{font-size:11px;color:var(--t2);margin-top:2px}
+
+@media(max-width:1000px){.main-grid{grid-template-columns:1fr}.methods-row{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:600px){.page{padding:16px}.methods-row{grid-template-columns:repeat(2,1fr)}.detail-bar-wrap{display:none}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Métodos de Pagamento</div>
+      <div class="page-sub">Como seu dinheiro está saindo — por canal e volume.</div>
+    </div>
+    <div class="period-tabs">
+      <div class="period-tab">7d</div>
+      <div class="period-tab active">Mês</div>
+      <div class="period-tab">3m</div>
+      <div class="period-tab">Ano</div>
+    </div>
+  </div>
+
+  <!-- METHOD CARDS -->
+  <div class="methods-row">
+    <div class="method-card selected" style="border-color:#3B82F6;--mc:#3B82F6">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#3B82F6;border-radius:3px 3px 0 0"></div>
+      <span class="method-icon">💳</span>
+      <div class="method-name">Crédito</div>
+      <div class="method-total">R$ 3.229</div>
+      <div class="method-pct" style="color:#3B82F6">67%</div>
+      <div class="method-mini-bar"><div class="method-mini-fill" style="width:67%;background:#3B82F6"></div></div>
+    </div>
+    <div class="method-card" style="">
+      <span class="method-icon">🟢</span>
+      <div class="method-name">Pix</div>
+      <div class="method-total">R$ 964</div>
+      <div class="method-pct" style="color:var(--green-b)">20%</div>
+      <div class="method-mini-bar"><div class="method-mini-fill" style="width:20%;background:var(--green)"></div></div>
+    </div>
+    <div class="method-card">
+      <span class="method-icon">📷</span>
+      <div class="method-name">Pix QR</div>
+      <div class="method-total">R$ 241</div>
+      <div class="method-pct" style="color:var(--green-b)">5%</div>
+      <div class="method-mini-bar"><div class="method-mini-fill" style="width:5%;background:var(--green)"></div></div>
+    </div>
+    <div class="method-card">
+      <span class="method-icon">💵</span>
+      <div class="method-name">Dinheiro</div>
+      <div class="method-total">R$ 434</div>
+      <div class="method-pct" style="color:var(--amber)">9%</div>
+      <div class="method-mini-bar"><div class="method-mini-fill" style="width:9%;background:var(--amber)"></div></div>
+    </div>
+    <div class="method-card">
+      <span class="method-icon">🔀</span>
+      <div class="method-name">TED</div>
+      <div class="method-total">R$ 193</div>
+      <div class="method-pct" style="color:var(--purple)">4%</div>
+      <div class="method-mini-bar"><div class="method-mini-fill" style="width:4%;background:var(--purple)"></div></div>
+    </div>
+    <div class="method-card">
+      <span class="method-icon">🏧</span>
+      <div class="method-name">Débito</div>
+      <div class="method-total">R$ 241</div>
+      <div class="method-pct" style="color:var(--t2)">5%</div>
+      <div class="method-mini-bar"><div class="method-mini-fill" style="width:5%;background:var(--t3)"></div></div>
+    </div>
+  </div>
+
+  <!-- STACKED BAR -->
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-body">
+      <div class="stacked-label">
+        <span>Distribuição do mês</span>
+        <span style="font-weight:600;color:var(--t1)">R$ 5.302 total</span>
+      </div>
+      <div class="stacked-bar">
+        <div class="stacked-seg" style="flex:67;background:#3B82F6"></div>
+        <div class="stacked-seg" style="flex:20;background:#16A34A"></div>
+        <div class="stacked-seg" style="flex:5;background:#22C55E"></div>
+        <div class="stacked-seg" style="flex:9;background:#F59E0B"></div>
+        <div class="stacked-seg" style="flex:4;background:#8B5CF6"></div>
+        <div class="stacked-seg" style="flex:5;background:#444"></div>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:6px"><div style="width:10px;height:10px;border-radius:3px;background:#3B82F6"></div><span style="font-size:11px;color:var(--t2)">Crédito 67%</span></div>
+        <div style="display:flex;align-items:center;gap:6px"><div style="width:10px;height:10px;border-radius:3px;background:#16A34A"></div><span style="font-size:11px;color:var(--t2)">Pix 20%</span></div>
+        <div style="display:flex;align-items:center;gap:6px"><div style="width:10px;height:10px;border-radius:3px;background:#F59E0B"></div><span style="font-size:11px;color:var(--t2)">Dinheiro 9%</span></div>
+        <div style="display:flex;align-items:center;gap:6px"><div style="width:10px;height:10px;border-radius:3px;background:#8B5CF6"></div><span style="font-size:11px;color:var(--t2)">TED 4%</span></div>
+        <div style="display:flex;align-items:center;gap:6px"><div style="width:10px;height:10px;border-radius:3px;background:#444"></div><span style="font-size:11px;color:var(--t2)">Outros 5%</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-grid">
+    <div>
+      <!-- DETAIL TABLE -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Detalhamento por Método</div>
+          <span class="card-action">Exportar</span>
+        </div>
+        <div class="card-body">
+          <div class="detail-row">
+            <div class="detail-icon-wrap" style="background:rgba(59,130,246,.12)">💳</div>
+            <div class="detail-info">
+              <div class="detail-name">Cartão de Crédito</div>
+              <div class="detail-count">43 transações · Fatura: 25/05</div>
+            </div>
+            <div class="detail-bar-wrap"><div class="detail-bar-fill" style="width:67%;background:#3B82F6"></div></div>
+            <div class="detail-pct" style="color:#3B82F6">67%</div>
+            <div class="detail-total">R$ 3.229</div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-icon-wrap" style="background:rgba(22,163,74,.12)">🟢</div>
+            <div class="detail-info">
+              <div class="detail-name">Pix Chave</div>
+              <div class="detail-count">18 transações · Instantâneo</div>
+            </div>
+            <div class="detail-bar-wrap"><div class="detail-bar-fill" style="width:20%;background:var(--green)"></div></div>
+            <div class="detail-pct" style="color:var(--green-b)">20%</div>
+            <div class="detail-total">R$ 964</div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-icon-wrap" style="background:rgba(22,163,74,.08)">📷</div>
+            <div class="detail-info">
+              <div class="detail-name">Pix QR Code</div>
+              <div class="detail-count">5 transações · Lojas físicas</div>
+            </div>
+            <div class="detail-bar-wrap"><div class="detail-bar-fill" style="width:5%;background:var(--green)"></div></div>
+            <div class="detail-pct" style="color:var(--green-b)">5%</div>
+            <div class="detail-total">R$ 241</div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-icon-wrap" style="background:rgba(245,158,11,.12)">💵</div>
+            <div class="detail-info">
+              <div class="detail-name">Dinheiro</div>
+              <div class="detail-count">7 transações · Feiras e mercados</div>
+            </div>
+            <div class="detail-bar-wrap"><div class="detail-bar-fill" style="width:9%;background:var(--amber)"></div></div>
+            <div class="detail-pct" style="color:var(--amber)">9%</div>
+            <div class="detail-total">R$ 434</div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-icon-wrap" style="background:rgba(139,92,246,.12)">🔀</div>
+            <div class="detail-info">
+              <div class="detail-name">TED / DOC</div>
+              <div class="detail-count">2 transações · Aluguel, contas</div>
+            </div>
+            <div class="detail-bar-wrap"><div class="detail-bar-fill" style="width:4%;background:var(--purple)"></div></div>
+            <div class="detail-pct" style="color:var(--purple)">4%</div>
+            <div class="detail-total">R$ 193</div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-icon-wrap" style="background:rgba(255,255,255,.04)">🏧</div>
+            <div class="detail-info">
+              <div class="detail-name">Cartão de Débito</div>
+              <div class="detail-count">4 transações · Supermercado</div>
+            </div>
+            <div class="detail-bar-wrap"><div class="detail-bar-fill" style="width:5%;background:var(--t3)"></div></div>
+            <div class="detail-pct" style="color:var(--t2)">5%</div>
+            <div class="detail-total">R$ 241</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MONTHLY TREND -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>Evolução Mensal por Método</div>
+        </div>
+        <div class="card-body">
+          <div style="display:flex;gap:8px;margin-bottom:16px">
+            <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t2)"><div style="width:8px;height:8px;border-radius:2px;background:#3B82F6"></div>Crédito</div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t2)"><div style="width:8px;height:8px;border-radius:2px;background:#16A34A"></div>Pix</div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t2)"><div style="width:8px;height:8px;border-radius:2px;background:#F59E0B"></div>Outros</div>
+          </div>
+          <div class="monthly-grid">
+            <div class="month-col">
+              <div class="month-bars">
+                <div class="month-bar" style="height:58%;background:#3B82F6;opacity:.7"></div>
+                <div class="month-bar" style="height:22%;background:#16A34A;opacity:.7"></div>
+                <div class="month-bar" style="height:12%;background:#F59E0B;opacity:.7"></div>
+              </div>
+              <div class="month-label">Jan</div>
+            </div>
+            <div class="month-col">
+              <div class="month-bars">
+                <div class="month-bar" style="height:62%;background:#3B82F6;opacity:.7"></div>
+                <div class="month-bar" style="height:18%;background:#16A34A;opacity:.7"></div>
+                <div class="month-bar" style="height:14%;background:#F59E0B;opacity:.7"></div>
+              </div>
+              <div class="month-label">Fev</div>
+            </div>
+            <div class="month-col">
+              <div class="month-bars">
+                <div class="month-bar" style="height:55%;background:#3B82F6;opacity:.7"></div>
+                <div class="month-bar" style="height:25%;background:#16A34A;opacity:.7"></div>
+                <div class="month-bar" style="height:10%;background:#F59E0B;opacity:.7"></div>
+              </div>
+              <div class="month-label">Mar</div>
+            </div>
+            <div class="month-col">
+              <div class="month-bars">
+                <div class="month-bar" style="height:70%;background:#3B82F6;opacity:.8"></div>
+                <div class="month-bar" style="height:18%;background:#16A34A;opacity:.8"></div>
+                <div class="month-bar" style="height:10%;background:#F59E0B;opacity:.8"></div>
+              </div>
+              <div class="month-label">Abr</div>
+            </div>
+            <div class="month-col">
+              <div class="month-bars">
+                <div class="month-bar" style="height:67%;background:#3B82F6"></div>
+                <div class="month-bar" style="height:20%;background:#16A34A"></div>
+                <div class="month-bar" style="height:13%;background:#F59E0B"></div>
+              </div>
+              <div class="month-label" style="color:var(--green-b);font-weight:600">Mai</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDEBAR -->
+    <div>
+      <div class="stat-row">
+        <div class="stat-mini">
+          <div class="stat-mini-label">Total Gasto</div>
+          <div class="stat-mini-val">R$ 5.302</div>
+          <div class="stat-mini-sub" style="color:var(--red)">79 transações</div>
+        </div>
+        <div class="stat-mini">
+          <div class="stat-mini-label">Ticket Médio</div>
+          <div class="stat-mini-val">R$ 67</div>
+          <div class="stat-mini-sub">por transação</div>
+        </div>
+        <div class="stat-mini">
+          <div class="stat-mini-label">Mais Usado</div>
+          <div class="stat-mini-val" style="font-size:14px">💳 Crédito</div>
+          <div class="stat-mini-sub">43 transações</div>
+        </div>
+        <div class="stat-mini">
+          <div class="stat-mini-label">Cashback Est.</div>
+          <div class="stat-mini-val" style="color:var(--green-b)">R$ 48</div>
+          <div class="stat-mini-sub">1,5% crédito</div>
+        </div>
+      </div>
+
+      <!-- RECENT -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Recentes por Crédito</div>
+        </div>
+        <div class="card-body">
+          <div class="tx-item">
+            <div class="tx-icon" style="background:rgba(59,130,246,.12)">🍕</div>
+            <div class="tx-info"><div class="tx-name">iFood</div><div class="tx-meta">Hoje</div></div>
+            <div class="tx-amount">−R$ 89,90</div>
+          </div>
+          <div class="tx-item">
+            <div class="tx-icon" style="background:rgba(59,130,246,.12)">🎬</div>
+            <div class="tx-info"><div class="tx-name">Netflix</div><div class="tx-meta">11/05</div></div>
+            <div class="tx-amount">−R$ 39,90</div>
+          </div>
+          <div class="tx-item">
+            <div class="tx-icon" style="background:rgba(59,130,246,.12)">🛒</div>
+            <div class="tx-info"><div class="tx-name">Amazon</div><div class="tx-meta">10/05</div></div>
+            <div class="tx-amount">−R$ 220,00</div>
+          </div>
+          <div class="tx-item">
+            <div class="tx-icon" style="background:rgba(59,130,246,.12)">✈️</div>
+            <div class="tx-info"><div class="tx-name">LATAM Pass</div><div class="tx-meta">09/05</div></div>
+            <div class="tx-amount">−R$ 540,00</div>
+          </div>
+          <div class="tx-item">
+            <div class="tx-icon" style="background:rgba(59,130,246,.12)">💊</div>
+            <div class="tx-info"><div class="tx-name">Farmácia SP</div><div class="tx-meta">08/05</div></div>
+            <div class="tx-amount">−R$ 78,40</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI INSIGHT -->
+      <div style="margin-top:16px;background:linear-gradient(135deg,rgba(22,163,74,.08),rgba(22,163,74,.03));border:1px solid rgba(34,197,94,.15);border-radius:var(--r);padding:16px">
+        <div style="display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--green-b);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">
+          <svg width="13" height="13" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+          Insight IA
+        </div>
+        <div style="font-size:13px;color:var(--t2);line-height:1.65">Migrar <strong style="color:var(--t1)">20% dos gastos de crédito para Pix</strong> pode economizar até <strong style="color:var(--green-b)">R$ 120/mês</strong> em juros rotativos, caso a fatura não seja paga integralmente.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

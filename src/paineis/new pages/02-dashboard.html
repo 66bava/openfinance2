@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Openfy — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#16A34A;--green-b:#22C55E;--green-dim:rgba(22,163,74,.12);
+  --bg:#080808;--bg-s:#0A0A0A;--bg-c:#111111;--bg-c2:#161616;--bg-i:#1A1A1A;
+  --bd:rgba(255,255,255,.06);--bd-l:rgba(255,255,255,.10);
+  --t1:#EEEDE6;--t2:#8A8A7E;--t3:#444440;
+  --red:#EF4444;--red-dim:rgba(239,68,68,.12);
+  --amber:#F59E0B;--amber-dim:rgba(245,158,11,.12);
+  --blue:#3B82F6;--blue-dim:rgba(59,130,246,.12);
+  --r:12px;--rs:8px;--tr:.22s cubic-bezier(.4,0,.2,1);
+  --fd:'DM Sans',sans-serif;--fb:'Inter',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t1);font-family:var(--fb);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+
+/* PAGE */
+.page{max-width:1280px;margin:0 auto;padding:28px 28px 40px}
+
+/* HEADER ROW */
+.page-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:28px;gap:16px}
+.greeting-sub{font-size:12px;color:var(--t3);font-weight:500;letter-spacing:.03em;text-transform:uppercase;margin-bottom:6px}
+.greeting-title{font-family:var(--fd);font-size:26px;font-weight:700;color:var(--t1);letter-spacing:-.4px}
+.greeting-title span{color:var(--green-b)}
+.page-header-right{display:flex;gap:8px;align-items:center;flex-shrink:0}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:0 16px;height:36px;border-radius:var(--rs);font-size:13px;font-weight:600;cursor:pointer;transition:all var(--tr);font-family:var(--fd);text-decoration:none}
+.btn-primary{background:var(--green);color:#fff;border:none}
+.btn-primary:hover{background:#15803D}
+.btn-ghost{background:transparent;color:var(--t2);border:1px solid var(--bd)}
+.btn-ghost:hover{border-color:var(--bd-l);color:var(--t1)}
+.btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* STAT ROW */
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:var(--bg-c);border:1px solid var(--bd);border-radius:var(--r);padding:18px 20px;transition:border-color var(--tr)}
+.stat-card:hover{border-color:var(--bd-l)}
+.stat-card.highlight{background:var(--green-dim);border-color:rgba(34,197,94,.15)}
+.stat-label{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--t3);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.stat-label svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.stat-value{font-family:var(--fd);font-size:22px;font-weight:700;letter-spacing:-.5px;color:var(--t1);margin-bottom:6px}
+.stat-card.highlight .stat-value{color:var(--green-b)}
+.stat-delta{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:500}
+.delta-up{color:var(--green-b)}
+.delta-down{color:var(--red)}
+.stat-progress{height:3px;background:var(--bg-i);border-radius:10px;margin-top:10px;overflow:hidden}
+.stat-progress-bar{height:100%;background:var(--green);border-radius:10px;transition:width .8s ease}
+
+/* MAIN GRID */
+.grid-main{display:grid;grid-template-columns:1fr 320px;gap:20px;margin-bottom:20px}
+.grid-left{display:flex;flex-direction:column;gap:20px}
+.grid-right{display:flex;flex-direction:column;gap:20px}
+
+/* CARD */
+.card{background:var(--bg-c);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;transition:border-color var(--tr)}
+.card:hover{border-color:var(--bd-l)}
+.card-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--bd)}
+.card-title{font-family:var(--fd);font-size:14px;font-weight:600;color:var(--t1);display:flex;align-items:center;gap:8px}
+.card-title svg{width:15px;height:15px;stroke:var(--t2);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.card-action{font-size:12px;color:var(--t2);cursor:pointer;transition:color var(--tr)}
+.card-action:hover{color:var(--t1)}
+.card-body{padding:20px}
+
+/* AI INSIGHT */
+.ai-insight{background:linear-gradient(135deg,rgba(22,163,74,.08),rgba(22,163,74,.04));border:1px solid rgba(34,197,94,.15);border-radius:var(--r);padding:20px}
+.ai-badge{display:inline-flex;align-items:center;gap:5px;background:var(--green-dim);border:1px solid rgba(34,197,94,.2);color:var(--green-b);font-size:10px;font-weight:700;letter-spacing:.06em;padding:2px 8px;border-radius:20px;margin-bottom:12px}
+.ai-badge svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2}
+.ai-text{font-size:14px;color:var(--t1);line-height:1.65;margin-bottom:14px}
+.ai-text strong{color:var(--green-b);font-weight:600}
+.ai-chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:500}
+.chip-warn{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(245,158,11,.2)}
+.chip-info{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(59,130,246,.2)}
+.chip-ok{background:var(--green-dim);color:var(--green-b);border:1px solid rgba(34,197,94,.2)}
+.chip svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* TRANSACTIONS */
+.tx-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--bd)}
+.tx-item:last-child{border-bottom:none;padding-bottom:0}
+.tx-item:first-child{padding-top:0}
+.tx-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px}
+.tx-info{flex:1;min-width:0}
+.tx-name{font-size:13px;font-weight:500;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-meta{font-size:11px;color:var(--t3);margin-top:1px}
+.tx-amount{font-family:var(--fd);font-size:14px;font-weight:600;white-space:nowrap}
+.tx-amount.neg{color:var(--red)}
+.tx-amount.pos{color:var(--green-b)}
+.tx-method{font-size:10px;color:var(--t3);text-align:right;margin-top:2px}
+
+/* SCORE MINI */
+.score-mini-wrap{display:flex;align-items:center;gap:16px;padding:4px 0}
+.score-gauge{position:relative;flex-shrink:0}
+.score-gauge svg{width:110px;height:68px}
+.score-num{position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-family:var(--fd);font-size:26px;font-weight:700;color:var(--t1);letter-spacing:-1px;white-space:nowrap}
+.score-mini-info{flex:1}
+.score-mini-label{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--t3);margin-bottom:8px}
+.score-hist{display:flex;align-items:flex-end;gap:4px;height:40px}
+.score-bar{flex:1;background:var(--bg-i);border-radius:3px;position:relative;overflow:hidden}
+.score-bar-fill{position:absolute;bottom:0;left:0;right:0;background:var(--green-dim);border-radius:3px;transition:height .6s ease}
+.score-bar.active .score-bar-fill{background:var(--green)}
+.score-bar-val{font-size:9px;color:var(--t3);text-align:center;margin-top:4px}
+
+/* PAYMENT METHODS */
+.pay-list{display:flex;flex-direction:column;gap:10px}
+.pay-item{display:flex;align-items:center;gap:12px}
+.pay-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px}
+.pay-name{font-size:12px;font-weight:500;color:var(--t2);flex:1}
+.pay-bar-wrap{width:80px;height:4px;background:var(--bg-i);border-radius:10px;overflow:hidden}
+.pay-bar-fill{height:100%;border-radius:10px;transition:width .8s ease}
+.pay-pct{font-size:12px;font-weight:600;color:var(--t1);min-width:30px;text-align:right;font-family:var(--fd)}
+.pay-total{font-size:11px;color:var(--t3);min-width:70px;text-align:right}
+
+/* INVESTMENTS MINI */
+.invest-mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.invest-mini-item{background:var(--bg-c2);border-radius:var(--rs);padding:12px}
+.invest-mini-label{font-size:10px;color:var(--t3);font-weight:500;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
+.invest-mini-val{font-family:var(--fd);font-size:15px;font-weight:700;color:var(--t1)}
+.invest-mini-delta{font-size:11px;margin-top:2px}
+
+/* PLANNING */
+.plan-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd)}
+.plan-item:last-child{border-bottom:none;padding-bottom:0}
+.plan-item:first-child{padding-top:0}
+.plan-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.plan-info{flex:1}
+.plan-name{font-size:13px;font-weight:500;color:var(--t1)}
+.plan-date{font-size:11px;color:var(--t3);margin-top:1px}
+.plan-val{font-family:var(--fd);font-size:13px;font-weight:600;color:var(--t1)}
+
+/* DONUT */
+.donut-wrap{display:flex;align-items:center;gap:16px}
+.donut-legend{display:flex;flex-direction:column;gap:7px;flex:1}
+.donut-legend-item{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--t2)}
+.donut-legend-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+
+/* BOTTOM GRID */
+.grid-bottom{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px}
+
+@media(max-width:1100px){
+  .stats-row{grid-template-columns:repeat(3,1fr)}
+  .grid-main{grid-template-columns:1fr}
+  .grid-bottom{grid-template-columns:1fr 1fr}
+}
+@media(max-width:700px){
+  .stats-row{grid-template-columns:1fr 1fr}
+  .page{padding:16px}
+  .grid-bottom{grid-template-columns:1fr}
+  .page-header{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div>
+      <div class="greeting-sub">Terça, 13 de maio de 2025</div>
+      <div class="greeting-title">Bom dia, <span>Pedro</span> 👋</div>
+    </div>
+    <div class="page-header-right">
+      <div class="btn btn-ghost">
+        <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+        Sincronizar
+      </div>
+      <div class="btn btn-primary">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Novo Registro
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Saldo Atual</div>
+      <div class="stat-value">R$ 12.450</div>
+      <div class="stat-delta delta-up">
+        <svg width="11" height="11" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+        +R$ 890 este mês
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label" style="color:#22C55E"><svg viewBox="0 0 24 24" stroke="#22C55E"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Entradas</div>
+      <div class="stat-value">R$ 7.200</div>
+      <div class="stat-delta delta-up">
+        <svg width="11" height="11" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+        +12% vs. abril
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label" style="color:var(--red)"><svg viewBox="0 0 24 24" stroke="var(--red)"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>Saídas</div>
+      <div class="stat-value">R$ 4.820</div>
+      <div class="stat-delta delta-down">
+        <svg width="11" height="11" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        +5% vs. abril
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>Economia</div>
+      <div class="stat-value">R$ 2.380</div>
+      <div class="stat-delta delta-up">
+        <svg width="11" height="11" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+        33% da renda
+      </div>
+    </div>
+    <div class="stat-card highlight">
+      <div class="stat-label">Pode Gastar</div>
+      <div class="stat-value">R$ 1.560</div>
+      <div class="stat-delta delta-up" style="margin-bottom:6px">
+        <svg width="11" height="11" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+        ainda disponível
+      </div>
+      <div class="stat-progress"><div class="stat-progress-bar" style="width:68%"></div></div>
+      <div style="font-size:10px;color:var(--t3);margin-top:4px">68% do budget usado</div>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="grid-main">
+    <div class="grid-left">
+
+      <!-- AI INSIGHT -->
+      <div class="ai-insight">
+        <div class="ai-badge"><svg viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>Insight IA</div>
+        <div class="ai-text">Seus gastos com <strong>delivery aumentaram 73%</strong> em relação à média dos últimos 3 meses. Você está no caminho certo com a economia, mas esse padrão pode comprometer seu orçamento em <strong>junho</strong>.</div>
+        <div class="ai-chips">
+          <span class="chip chip-warn"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Delivery +73%</span>
+          <span class="chip chip-ok"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Meta de poupança</span>
+          <span class="chip chip-info"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Previsão: R$ 5.200 em junho</span>
+        </div>
+      </div>
+
+      <!-- TRANSACTIONS -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title"><svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Últimas Transações</div>
+          <span class="card-action">Ver todas →</span>
+        </div>
+        <div class="card-body">
+          <div class="tx-item">
+            <div class="tx-icon" style="background:rgba(239,68,68,.12)">🍕</div>
+            <div class="tx-info"><div class="tx-name">iFood</div><div class="tx-meta">Hoje · Alimentação</div></div>
+            <div><div class="tx-amount neg">−R$ 89,90</div><div class="tx-method">Crédito</div></div>
+          </div>
+          <div class="tx-item">
+            <div class="tx-icon" style="background:rgba(59,130,246,.12)">⛽</div>
+            <div class="tx-info"><div class="tx-name">Posto Ipiranga</div><div class="tx-meta">Ontem · Transporte</div></div>
+            <div><div class="tx-amount neg">−R$ 145,00</div><div class="tx-method">Pix</div></div>
+          </div>
+          <div class="tx-item">
+            <div class="tx-icon" style="background:rgba(22,163,74,.12)">💼</div>
+            <div class="tx-info"><div class="tx-name">Salário maio</div><div class="tx-meta">12/05 · Receita</div></div>
+            <div><div class="tx-amount pos">+R$ 7.200,00</div><div class="tx-method">TED</div></div>
+          </div>
+          <div class="tx-item">
+            <div class="tx-icon" style="background:rgba(245,158,11,.12)">🎬</div>
+            <div class="tx-info"><div class="tx-name">Netflix</div><div class="tx-meta">11/05 · Assinatura</div></div>
+            <div><div class="tx-amount neg">−R$ 39,90</div><div class="tx-method">Crédito</div></div>
+          </div>
+          <div class="tx-item">
+            <div class="tx-icon" style="background:rgba(139,92,246,.12)">🛒</div>
+            <div class="tx-info"><div class="tx-name">Mercado Livre</div><div class="tx-meta">10/05 · Compras</div></div>
+            <div><div class="tx-amount neg">−R$ 220,00</div><div class="tx-method">Pix</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAYMENT METHODS -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Métodos de Pagamento</div>
+          <span class="card-action">Detalhes →</span>
+        </div>
+        <div class="card-body">
+          <div class="pay-list">
+            <div class="pay-item">
+              <div class="pay-icon" style="background:rgba(59,130,246,.12)">💳</div>
+              <div class="pay-name">Cartão de Crédito</div>
+              <div class="pay-bar-wrap"><div class="pay-bar-fill" style="width:67%;background:var(--blue)"></div></div>
+              <div class="pay-pct">67%</div>
+              <div class="pay-total">R$ 3.229</div>
+            </div>
+            <div class="pay-item">
+              <div class="pay-icon" style="background:rgba(22,163,74,.12)">🟢</div>
+              <div class="pay-name">Pix</div>
+              <div class="pay-bar-wrap"><div class="pay-bar-fill" style="width:20%;background:var(--green)"></div></div>
+              <div class="pay-pct">20%</div>
+              <div class="pay-total">R$ 964</div>
+            </div>
+            <div class="pay-item">
+              <div class="pay-icon" style="background:rgba(245,158,11,.12)">💵</div>
+              <div class="pay-name">Dinheiro</div>
+              <div class="pay-bar-wrap"><div class="pay-bar-fill" style="width:9%;background:var(--amber)"></div></div>
+              <div class="pay-pct">9%</div>
+              <div class="pay-total">R$ 434</div>
+            </div>
+            <div class="pay-item">
+              <div class="pay-icon" style="background:rgba(139,92,246,.12)">🔀</div>
+              <div class="pay-name">TED / DOC</div>
+              <div class="pay-bar-wrap"><div class="pay-bar-fill" style="width:4%;background:#8B5CF6"></div></div>
+              <div class="pay-pct">4%</div>
+              <div class="pay-total">R$ 193</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-right">
+
+      <!-- SCORE MINI -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title"><svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>Score Openfy</div>
+          <span class="card-action">Ver mais →</span>
+        </div>
+        <div class="card-body">
+          <div class="score-mini-wrap">
+            <div class="score-gauge">
+              <svg viewBox="0 0 110 68" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 60 A45 45 0 0 1 100 60" stroke="rgba(255,255,255,.06)" stroke-width="8" stroke-linecap="round" fill="none"/>
+                <path d="M10 60 A45 45 0 0 1 100 60" stroke="url(#scoreGrad)" stroke-width="8" stroke-linecap="round" fill="none" stroke-dasharray="141" stroke-dashoffset="35"/>
+                <defs><linearGradient id="scoreGrad" x1="10" y1="60" x2="100" y2="60"><stop offset="0%" stop-color="#F59E0B"/><stop offset="60%" stop-color="#22C55E"/><stop offset="100%" stop-color="#16A34A"/></linearGradient></defs>
+              </svg>
+              <div class="score-num">750</div>
+            </div>
+            <div class="score-mini-info">
+              <div class="score-mini-label">Histórico</div>
+              <div class="score-hist">
+                <div class="score-bar" style="height:55%"><div class="score-bar-fill" style="height:100%"></div></div>
+                <div class="score-bar" style="height:62%"><div class="score-bar-fill" style="height:100%"></div></div>
+                <div class="score-bar" style="height:70%"><div class="score-bar-fill" style="height:100%"></div></div>
+                <div class="score-bar" style="height:68%"><div class="score-bar-fill" style="height:100%"></div></div>
+                <div class="score-bar active" style="height:75%"><div class="score-bar-fill" style="height:100%"></div></div>
+              </div>
+              <div style="display:flex;gap:4px;margin-top:4px">
+                <div style="flex:1;font-size:9px;color:var(--t3);text-align:center">Jan</div>
+                <div style="flex:1;font-size:9px;color:var(--t3);text-align:center">Fev</div>
+                <div style="flex:1;font-size:9px;color:var(--t3);text-align:center">Mar</div>
+                <div style="flex:1;font-size:9px;color:var(--t3);text-align:center">Abr</div>
+                <div style="flex:1;font-size:9px;color:var(--green-b);text-align:center;font-weight:600">Mai</div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--bd)">
+            <div style="font-size:11px;color:var(--t3);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.04em">Fatores</div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:12px;color:var(--t2)">Poupança regular</span>
+                <span style="font-size:11px;font-weight:600;color:var(--green-b)">+40 pts</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:12px;color:var(--t2)">Delivery excessivo</span>
+                <span style="font-size:11px;font-weight:600;color:var(--red)">−20 pts</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:12px;color:var(--t2)">Investimentos</span>
+                <span style="font-size:11px;font-weight:600;color:var(--green-b)">+30 pts</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INVESTMENTS MINI -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>Investimentos</div>
+          <span class="card-action">Ver →</span>
+        </div>
+        <div class="card-body">
+          <div class="invest-mini-grid">
+            <div class="invest-mini-item">
+              <div class="invest-mini-label">Patrimônio</div>
+              <div class="invest-mini-val">R$ 34.200</div>
+              <div class="invest-mini-delta delta-up" style="font-size:11px">+R$ 1.240 (3,8%)</div>
+            </div>
+            <div class="invest-mini-item">
+              <div class="invest-mini-label">Aportado</div>
+              <div class="invest-mini-val">R$ 28.500</div>
+              <div class="invest-mini-delta" style="font-size:11px;color:var(--t3)">Total histórico</div>
+            </div>
+          </div>
+          <!-- Mini donut -->
+          <div class="donut-wrap">
+            <svg width="80" height="80" viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="30" fill="none" stroke="rgba(255,255,255,.04)" stroke-width="14"/>
+              <circle cx="40" cy="40" r="30" fill="none" stroke="#16A34A" stroke-width="14" stroke-dasharray="188.4" stroke-dashoffset="0" stroke-linecap="round" transform="rotate(-90 40 40)" style="stroke-dasharray:84 104"/>
+              <circle cx="40" cy="40" r="30" fill="none" stroke="#3B82F6" stroke-width="14" stroke-dasharray="188.4" stroke-dashoffset="-84" stroke-linecap="round" transform="rotate(-90 40 40)" style="stroke-dasharray:57 131"/>
+              <circle cx="40" cy="40" r="30" fill="none" stroke="#F59E0B" stroke-width="14" stroke-dasharray="188.4" stroke-dashoffset="-141" stroke-linecap="round" transform="rotate(-90 40 40)" style="stroke-dasharray:28 160"/>
+              <circle cx="40" cy="40" r="30" fill="none" stroke="#8B5CF6" stroke-width="14" stroke-dasharray="188.4" stroke-dashoffset="-169" stroke-linecap="round" transform="rotate(-90 40 40)" style="stroke-dasharray:19 169"/>
+              <text x="40" y="45" text-anchor="middle" font-size="11" fill="#EEEDE6" font-family="DM Sans,sans-serif" font-weight="700">4 ativos</text>
+            </svg>
+            <div class="donut-legend">
+              <div class="donut-legend-item"><div class="donut-legend-dot" style="background:#16A34A"></div><span>Renda Fixa</span><span style="margin-left:auto;color:var(--t1);font-weight:600">45%</span></div>
+              <div class="donut-legend-item"><div class="donut-legend-dot" style="background:#3B82F6"></div><span>Ações</span><span style="margin-left:auto;color:var(--t1);font-weight:600">30%</span></div>
+              <div class="donut-legend-item"><div class="donut-legend-dot" style="background:#F59E0B"></div><span>FIIs</span><span style="margin-left:auto;color:var(--t1);font-weight:600">15%</span></div>
+              <div class="donut-legend-item"><div class="donut-legend-dot" style="background:#8B5CF6"></div><span>Cripto</span><span style="margin-left:auto;color:var(--t1);font-weight:600">10%</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLANNING -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Próximos Compromissos</div>
+          <span class="card-action">Ver →</span>
+        </div>
+        <div class="card-body">
+          <div class="plan-item">
+            <div class="plan-dot" style="background:var(--red)"></div>
+            <div class="plan-info"><div class="plan-name">Aluguel</div><div class="plan-date">Vence em 3 dias</div></div>
+            <div class="plan-val">R$ 1.800</div>
+          </div>
+          <div class="plan-item">
+            <div class="plan-dot" style="background:var(--amber)"></div>
+            <div class="plan-info"><div class="plan-name">Seguro Auto</div><div class="plan-date">20 de maio</div></div>
+            <div class="plan-val">R$ 320</div>
+          </div>
+          <div class="plan-item">
+            <div class="plan-dot" style="background:var(--blue)"></div>
+            <div class="plan-info"><div class="plan-name">Fatura Nubank</div><div class="plan-date">25 de maio</div></div>
+            <div class="plan-val">R$ 2.140</div>
+          </div>
+          <div class="plan-item">
+            <div class="plan-dot" style="background:var(--green)"></div>
+            <div class="plan-info"><div class="plan-name">Aporte XP</div><div class="plan-date">30 de maio</div></div>
+            <div class="plan-val">R$ 500</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

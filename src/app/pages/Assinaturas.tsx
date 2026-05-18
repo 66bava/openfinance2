@@ -9,7 +9,8 @@ import {
   getAssinaturas, criarAssinatura, removerAssinatura,
   calcularTotalMensal, calcularTotalAnual,
 } from "../../lib/queries/assinaturas"
-import type { Assinatura, RecorrenciaAssinatura } from "../../lib/types"
+import { getCategoriasAtivas } from "../../lib/queries/categorias"
+import type { Assinatura, RecorrenciaAssinatura, MetodoPagamento, Categoria } from "../../lib/types"
 import { formatCurrency, formatDate } from "../../lib/format"
 import type { TranslationKey } from "../../lib/i18n"
 
@@ -113,6 +114,7 @@ interface ModalAssinaturaProps {
   onSuccess: () => void
   userId: string
   prefill?: Partial<typeof EMPTY_FORM>
+  categoriasDespesa: Categoria[]
 }
 
 const EMPTY_FORM = {
@@ -120,6 +122,9 @@ const EMPTY_FORM = {
   valor: "",
   recorrencia: "mensal" as RecorrenciaAssinatura,
   categoria: "outros" as CategoriaAssinaturaCode,
+  categoria_financeira_id: "",
+  metodo_pagamento: "" as "" | MetodoPagamento,
+  dia_cobranca: 10,
   proximo_pagamento: "",
   renovacao_automatica: true,
   icone: "",
@@ -127,7 +132,7 @@ const EMPTY_FORM = {
   observacoes: "",
 }
 
-function ModalAssinatura({ open, onClose, onSuccess, userId, prefill }: ModalAssinaturaProps) {
+function ModalAssinatura({ open, onClose, onSuccess, userId, prefill, categoriasDespesa }: ModalAssinaturaProps) {
   const { t, lang } = useLanguage()
   const [form, setForm] = useState(EMPTY_FORM)
   const [loading, setLoading] = useState(false)
@@ -157,6 +162,9 @@ function ModalAssinatura({ open, onClose, onSuccess, userId, prefill }: ModalAss
         recorrencia: form.recorrencia,
         categoria: form.categoria || null,
         proximo_pagamento: form.proximo_pagamento || null,
+        categoria_financeira_id: form.categoria_financeira_id || null,
+        metodo_pagamento: form.metodo_pagamento || null,
+        dia_cobranca: form.dia_cobranca ? Math.max(1, Math.min(31, Number(form.dia_cobranca))) : null,
         renovacao_automatica: form.renovacao_automatica,
         ativo: true,
         icone: form.icone || null,
@@ -262,9 +270,64 @@ function ModalAssinatura({ open, onClose, onSuccess, userId, prefill }: ModalAss
                 style={inputStyle}
                 type="date"
                 value={form.proximo_pagamento}
-                onChange={(e) => setField("proximo_pagamento", e.target.value)}
+                onChange={(e) => {
+                  const v = e.target.value
+                  setField("proximo_pagamento", v)
+                  const day = v && v.length >= 10 ? Number.parseInt(v.slice(8, 10), 10) : NaN
+                  if (Number.isFinite(day)) setField("dia_cobranca", Math.max(1, Math.min(31, day)))
+                }}
               />
             </div>
+          </div>
+
+          <div style={{ display: "flex", gap: 10 }}>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Categoria da despesa</label>
+              <select
+                style={inputStyle}
+                value={form.categoria_financeira_id}
+                onChange={(e) => setField("categoria_financeira_id", e.target.value)}
+              >
+                <option value="">Selecione...</option>
+                {categoriasDespesa.map((c) => (
+                  <option key={c.id} value={c.id}>{c.icone ? `${c.icone} ` : ""}{c.nome}</option>
+                ))}
+              </select>
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Forma de pagamento</label>
+              <select
+                style={inputStyle}
+                value={form.metodo_pagamento}
+                onChange={(e) => setField("metodo_pagamento", e.target.value as any)}
+              >
+                <option value="">Selecione...</option>
+                {[
+                  { v: "pix", l: "Pix" },
+                  { v: "credito", l: "Cartão de crédito" },
+                  { v: "debito", l: "Cartão de débito" },
+                  { v: "dinheiro", l: "Dinheiro" },
+                  { v: "boleto", l: "Boleto" },
+                  { v: "transferencia", l: "Transferência" },
+                  { v: "debito_automatico", l: "Débito automático" },
+                  { v: "outro", l: "Outro" },
+                ].map((m) => (
+                  <option key={m.v} value={m.v}>{m.l}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label style={labelStyle}>Dia de cobrança</label>
+            <input
+              style={inputStyle}
+              type="number"
+              min={1}
+              max={31}
+              value={form.dia_cobranca}
+              onChange={(e) => setField("dia_cobranca", Math.max(1, Math.min(31, Number.parseInt(e.target.value || "1", 10) || 1)) as any)}
+            />
           </div>
 
           <div style={{ display: "flex", gap: 10 }}>
@@ -470,6 +533,7 @@ export default function Assinaturas() {
   const userId = user!.id
 
   const [assinaturas, setAssinaturas] = useState<Assinatura[]>([])
+  const [cats, setCats] = useState<Categoria[]>([])
   const [loading, setLoading] = useState(true)
   const [modalOpen, setModalOpen] = useState(false)
   const [prefill, setPrefill] = useState<Partial<typeof EMPTY_FORM>>({})
@@ -478,9 +542,16 @@ export default function Assinaturas() {
 
   const load = useCallback(async () => {
     setLoading(true)
-    const data = await getAssinaturas(userId)
-    setAssinaturas(data)
-    setLoading(false)
+    try {
+      const [data, categorias] = await Promise.all([
+        getAssinaturas(userId),
+        getCategoriasAtivas(userId),
+      ])
+      setAssinaturas(data)
+      setCats(categorias)
+    } finally {
+      setLoading(false)
+    }
   }, [userId])
 
   useEffect(() => { load() }, [load])
@@ -786,6 +857,7 @@ export default function Assinaturas() {
         onSuccess={load}
         userId={userId}
         prefill={prefill}
+        categoriasDespesa={cats.filter((c) => c.tipo === "despesa")}
       />
     </div>
   )

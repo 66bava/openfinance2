@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Openfy — Score</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#16A34A;--green-b:#22C55E;--green-dim:rgba(22,163,74,.12);
+  --bg:#080808;--bg-s:#0A0A0A;--bg-c:#111111;--bg-c2:#161616;--bg-i:#1A1A1A;
+  --bd:rgba(255,255,255,.06);--bd-l:rgba(255,255,255,.10);
+  --t1:#EEEDE6;--t2:#8A8A7E;--t3:#444440;
+  --red:#EF4444;--red-dim:rgba(239,68,68,.12);
+  --amber:#F59E0B;--amber-dim:rgba(245,158,11,.12);
+  --blue:#3B82F6;
+  --r:12px;--rs:8px;--tr:.22s cubic-bezier(.4,0,.2,1);
+  --fd:'DM Sans',sans-serif;--fb:'Inter',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t1);font-family:var(--fb);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+.page{max-width:1100px;margin:0 auto;padding:28px}
+
+/* HEADER */
+.page-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:32px;gap:16px}
+.page-title{font-family:var(--fd);font-size:24px;font-weight:700;letter-spacing:-.4px;color:var(--t1);margin-bottom:4px}
+.page-sub{font-size:14px;color:var(--t2)}
+
+/* MAIN */
+.main-grid{display:grid;grid-template-columns:380px 1fr;gap:24px}
+
+/* SCORE HERO */
+.score-hero{background:var(--bg-c);border:1px solid var(--bd);border-radius:16px;padding:32px 28px;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;overflow:hidden}
+.score-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%, rgba(22,163,74,.08) 0%, transparent 65%);pointer-events:none}
+.score-period{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:20px}
+
+/* GAUGE */
+.gauge-wrap{position:relative;width:220px;height:136px;margin:0 auto 8px}
+.gauge-wrap svg{width:100%;height:100%}
+.gauge-number{position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-family:var(--fd);font-size:52px;font-weight:800;letter-spacing:-3px;color:var(--t1);white-space:nowrap;line-height:1}
+.gauge-label{font-size:13px;font-weight:600;color:var(--green-b);margin-top:8px;letter-spacing:.03em}
+.gauge-max{font-size:11px;color:var(--t3);margin-top:2px}
+
+.score-delta{display:inline-flex;align-items:center;gap:6px;background:var(--green-dim);border:1px solid rgba(34,197,94,.2);color:var(--green-b);font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;margin:16px 0}
+.score-delta svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+
+/* RANGE */
+.score-range{width:100%;margin-top:4px}
+.range-bar{height:6px;border-radius:10px;background:linear-gradient(90deg,#EF4444 0%,#F59E0B 33%,#EAB308 55%,#22C55E 80%,#16A34A 100%);position:relative;margin-bottom:8px}
+.range-marker{position:absolute;top:-5px;width:16px;height:16px;background:#fff;border:3px solid var(--green);border-radius:50%;transform:translateX(-50%);box-shadow:0 0 0 4px rgba(22,163,74,.2)}
+.range-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--t3)}
+
+.score-tiers{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-top:20px;width:100%}
+.tier{background:var(--bg-c2);border-radius:var(--rs);padding:8px;text-align:center}
+.tier-range{font-size:10px;font-weight:700;color:var(--t3);margin-bottom:3px}
+.tier-name{font-size:11px;font-weight:600}
+.tier.active{background:var(--green-dim);border:1px solid rgba(34,197,94,.2)}
+.tier.active .tier-name{color:var(--green-b)}
+
+/* RIGHT COLUMN */
+.right-col{display:flex;flex-direction:column;gap:20px}
+
+/* EVOLUTION */
+.card{background:var(--bg-c);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
+.card-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--bd)}
+.card-title{font-family:var(--fd);font-size:14px;font-weight:600;color:var(--t1);display:flex;align-items:center;gap:8px}
+.card-title svg{width:15px;height:15px;stroke:var(--t2);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.card-action{font-size:12px;color:var(--t2);cursor:pointer;transition:color var(--tr)}
+.card-action:hover{color:var(--t1)}
+.card-body{padding:20px}
+
+/* SPARKLINE */
+.sparkline-wrap{position:relative;height:80px;margin-bottom:8px}
+.sparkline-wrap svg{width:100%;height:100%}
+.sparkline-months{display:flex;justify-content:space-between}
+.sparkline-months span{font-size:10px;color:var(--t3)}
+.sparkline-months span.cur{color:var(--green-b);font-weight:600}
+
+/* FACTORS */
+.factors-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.factor-card{background:var(--bg-c2);border-radius:var(--rs);padding:14px 16px;border-left:3px solid transparent}
+.factor-card.pos{border-left-color:var(--green)}
+.factor-card.neg{border-left-color:var(--red)}
+.factor-card.neutral{border-left-color:var(--amber)}
+.factor-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.factor-label.pos{color:var(--green-b)}
+.factor-label.neg{color:var(--red)}
+.factor-label.neutral{color:var(--amber)}
+.factor-label svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.factor-name{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:4px}
+.factor-desc{font-size:11px;color:var(--t3);line-height:1.5}
+.factor-pts{font-family:var(--fd);font-size:16px;font-weight:800;margin-top:8px}
+.factor-pts.pos{color:var(--green-b)}
+.factor-pts.neg{color:var(--red)}
+
+/* AI EXPLAIN */
+.ai-box{background:linear-gradient(135deg,rgba(22,163,74,.08),rgba(22,163,74,.03));border:1px solid rgba(34,197,94,.15);border-radius:var(--r);padding:20px}
+.ai-box-title{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--green-b);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+.ai-box-title svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ai-box-text{font-size:14px;color:var(--t2);line-height:1.7}
+.ai-box-text strong{color:var(--t1);font-weight:600}
+
+/* ACTIONS */
+.actions-list{display:flex;flex-direction:column;gap:10px}
+.action-item{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg-c2);border-radius:var(--rs);cursor:pointer;transition:all var(--tr);border:1px solid transparent}
+.action-item:hover{border-color:var(--bd-l);background:var(--bg-i)}
+.action-num{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;font-family:var(--fd);flex-shrink:0}
+.action-info{flex:1}
+.action-title{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:2px}
+.action-sub{font-size:11px;color:var(--t3)}
+.action-gain{font-size:12px;font-weight:700;font-family:var(--fd)}
+
+@media(max-width:900px){.main-grid{grid-template-columns:1fr}.factors-grid{grid-template-columns:1fr}}
+@media(max-width:600px){.page{padding:16px}.factors-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Score Openfy</div>
+      <div class="page-sub">Sua saúde financeira medida com precisão. Atualizado em tempo real.</div>
+    </div>
+    <div style="font-size:12px;color:var(--t3)">Última atualização: agora</div>
+  </div>
+
+  <div class="main-grid">
+    <!-- SCORE HERO -->
+    <div class="score-hero">
+      <div class="score-period">Maio 2025</div>
+
+      <div class="gauge-wrap">
+        <svg viewBox="0 0 220 136" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Track -->
+          <path d="M20 120 A90 90 0 0 1 200 120" stroke="rgba(255,255,255,.05)" stroke-width="16" stroke-linecap="round" fill="none"/>
+          <!-- Gradient fill -->
+          <path d="M20 120 A90 90 0 0 1 200 120" stroke="url(#g1)" stroke-width="16" stroke-linecap="round" fill="none"
+            stroke-dasharray="282.7" stroke-dashoffset="70.7"/>
+          <defs>
+            <linearGradient id="g1" x1="20" y1="120" x2="200" y2="120">
+              <stop offset="0%" stop-color="#F59E0B"/>
+              <stop offset="50%" stop-color="#22C55E"/>
+              <stop offset="100%" stop-color="#16A34A"/>
+            </linearGradient>
+          </defs>
+          <!-- Glow dot at tip -->
+          <circle cx="163" cy="43" r="8" fill="#16A34A" opacity=".5" filter="blur(4px)"/>
+          <circle cx="163" cy="43" r="5" fill="#22C55E"/>
+        </svg>
+        <div class="gauge-number">750</div>
+      </div>
+
+      <div class="gauge-label">Muito Bom</div>
+      <div class="gauge-max">de 1.000 pontos</div>
+
+      <div class="score-delta">
+        <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+        +25 pts este mês
+      </div>
+
+      <div class="score-range">
+        <div class="range-bar">
+          <div class="range-marker" style="left:75%"></div>
+        </div>
+        <div class="range-labels">
+          <span>0</span>
+          <span>300</span>
+          <span>500</span>
+          <span>700</span>
+          <span>1000</span>
+        </div>
+      </div>
+
+      <div class="score-tiers">
+        <div class="tier">
+          <div class="tier-range">0–399</div>
+          <div class="tier-name" style="color:var(--red)">Crítico</div>
+        </div>
+        <div class="tier">
+          <div class="tier-range">400–599</div>
+          <div class="tier-name" style="color:var(--amber)">Regular</div>
+        </div>
+        <div class="tier active">
+          <div class="tier-range">600–799</div>
+          <div class="tier-name">Muito Bom</div>
+        </div>
+        <div class="tier">
+          <div class="tier-range">800+</div>
+          <div class="tier-name" style="color:var(--green-b)">Excelente</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="right-col">
+
+      <!-- EVOLUTION -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>Evolução do Score</div>
+          <span class="card-action">12 meses</span>
+        </div>
+        <div class="card-body">
+          <div class="sparkline-wrap">
+            <svg viewBox="0 0 600 80" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="lineGrad" x1="0" y1="0" x2="600" y2="0">
+                  <stop offset="0%" stop-color="#F59E0B"/>
+                  <stop offset="70%" stop-color="#22C55E"/>
+                  <stop offset="100%" stop-color="#16A34A"/>
+                </linearGradient>
+                <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#16A34A" stop-opacity=".15"/>
+                  <stop offset="100%" stop-color="#16A34A" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path d="M0,58 L60,54 L120,50 L180,46 L240,48 L300,44 L360,40 L420,38 L480,32 L540,26 L600,24 L600,80 L0,80 Z" fill="url(#areaGrad)"/>
+              <path d="M0,58 L60,54 L120,50 L180,46 L240,48 L300,44 L360,40 L420,38 L480,32 L540,26 L600,24" stroke="url(#lineGrad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="600" cy="24" r="4" fill="#22C55E"/>
+            </svg>
+          </div>
+          <div class="sparkline-months">
+            <span>Jun</span><span>Jul</span><span>Ago</span><span>Set</span><span>Out</span><span>Nov</span><span>Dez</span><span>Jan</span><span>Fev</span><span>Mar</span><span>Abr</span><span class="cur">Mai</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px">
+            <div style="background:var(--bg-c2);border-radius:var(--rs);padding:10px;text-align:center">
+              <div style="font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;margin-bottom:4px">Mínimo</div>
+              <div style="font-family:var(--fd);font-size:16px;font-weight:700;color:var(--amber)">620</div>
+              <div style="font-size:10px;color:var(--t3)">Jun 2024</div>
+            </div>
+            <div style="background:var(--bg-c2);border-radius:var(--rs);padding:10px;text-align:center">
+              <div style="font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;margin-bottom:4px">Máximo</div>
+              <div style="font-family:var(--fd);font-size:16px;font-weight:700;color:var(--green-b)">760</div>
+              <div style="font-size:10px;color:var(--t3)">Abr 2025</div>
+            </div>
+            <div style="background:var(--bg-c2);border-radius:var(--rs);padding:10px;text-align:center">
+              <div style="font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;margin-bottom:4px">Média</div>
+              <div style="font-family:var(--fd);font-size:16px;font-weight:700">698</div>
+              <div style="font-size:10px;color:var(--t3)">12 meses</div>
+            </div>
+            <div style="background:var(--green-dim);border:1px solid rgba(34,197,94,.15);border-radius:var(--rs);padding:10px;text-align:center">
+              <div style="font-size:10px;color:var(--green-b);font-weight:600;text-transform:uppercase;margin-bottom:4px">Atual</div>
+              <div style="font-family:var(--fd);font-size:16px;font-weight:700;color:var(--green-b)">750</div>
+              <div style="font-size:10px;color:var(--green-b)">+25 pts</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FACTORS -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Fatores do Score</div>
+        </div>
+        <div class="card-body">
+          <div class="factors-grid">
+            <div class="factor-card pos">
+              <div class="factor-label pos"><svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>Positivo</div>
+              <div class="factor-name">Poupança Regular</div>
+              <div class="factor-desc">Você poupa consistentemente há 5 meses seguidos.</div>
+              <div class="factor-pts pos">+40 pts</div>
+            </div>
+            <div class="factor-card pos">
+              <div class="factor-label pos"><svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>Positivo</div>
+              <div class="factor-name">Investindo</div>
+              <div class="factor-desc">Aportes regulares na XP e Nubank investimentos.</div>
+              <div class="factor-pts pos">+30 pts</div>
+            </div>
+            <div class="factor-card pos">
+              <div class="factor-label pos"><svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>Positivo</div>
+              <div class="factor-name">Sem Dívidas</div>
+              <div class="factor-desc">Fatura do cartão paga integralmente nos últimos 3 meses.</div>
+              <div class="factor-pts pos">+25 pts</div>
+            </div>
+            <div class="factor-card neg">
+              <div class="factor-label neg"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>Negativo</div>
+              <div class="factor-name">Delivery Excessivo</div>
+              <div class="factor-desc">Gastos com delivery 73% acima da média histórica.</div>
+              <div class="factor-pts neg">−20 pts</div>
+            </div>
+            <div class="factor-card neg">
+              <div class="factor-label neg"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>Negativo</div>
+              <div class="factor-name">Reserva Insuficiente</div>
+              <div class="factor-desc">Fundo emergencial cobre apenas 2,1 meses (meta: 6).</div>
+              <div class="factor-pts neg">−15 pts</div>
+            </div>
+            <div class="factor-card neutral">
+              <div class="factor-label neutral"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg>Neutro</div>
+              <div class="factor-name">Diversificação</div>
+              <div class="factor-desc">Carteira com 4 classes. Poderia incluir renda variável.</div>
+              <div class="factor-pts" style="color:var(--amber)">±0 pts</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI EXPLAIN -->
+      <div class="ai-box">
+        <div class="ai-box-title"><svg viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>Análise da IA</div>
+        <div class="ai-box-text">Seu score de <strong>750 pontos</strong> reflete uma saúde financeira <strong>consistente e em crescimento</strong>. O maior risco atual é a falta de uma reserva de emergência adequada — o que representa a <strong>maior oportunidade de ganho de pontos</strong>: chegar a 6 meses de reserva te levaria a cerca de <strong>+35 pontos</strong>. Seu comportamento de poupança é excelente; o próximo passo é consolidar isso em ativos líquidos.</div>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Ações Recomendadas</div>
+          <span class="card-action">+130 pts possíveis</span>
+        </div>
+        <div class="card-body">
+          <div class="actions-list">
+            <div class="action-item">
+              <div class="action-num" style="background:rgba(34,197,94,.12);color:var(--green-b)">1</div>
+              <div class="action-info">
+                <div class="action-title">Aumentar reserva de emergência</div>
+                <div class="action-sub">Adicionar R$ 500/mês por 4 meses → 6 meses de cobertura</div>
+              </div>
+              <div class="action-gain" style="color:var(--green-b)">+35 pts</div>
+            </div>
+            <div class="action-item">
+              <div class="action-num" style="background:rgba(34,197,94,.12);color:var(--green-b)">2</div>
+              <div class="action-info">
+                <div class="action-title">Reduzir gastos com delivery</div>
+                <div class="action-sub">Voltar à média histórica de R$ 250/mês em delivery</div>
+              </div>
+              <div class="action-gain" style="color:var(--green-b)">+20 pts</div>
+            </div>
+            <div class="action-item">
+              <div class="action-num" style="background:rgba(59,130,246,.12);color:var(--blue)">3</div>
+              <div class="action-info">
+                <div class="action-title">Diversificar carteira</div>
+                <div class="action-sub">Incluir ações ou FIIs para aumentar exposição a renda variável</div>
+              </div>
+              <div class="action-gain" style="color:var(--blue)">+15 pts</div>
+            </div>
+            <div class="action-item">
+              <div class="action-num" style="background:rgba(245,158,11,.12);color:var(--amber)">4</div>
+              <div class="action-info">
+                <div class="action-title">Registrar 100% das transações</div>
+                <div class="action-sub">Há 8 dias com menos de 80% de cobertura no mês</div>
+              </div>
+              <div class="action-gain" style="color:var(--amber)">+10 pts</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

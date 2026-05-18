@@ -5,11 +5,13 @@ import { useAuth } from '../../lib/auth-context'
 import { getProfile } from '../../lib/queries'
 import {
   getCategorias,
+  getCategoriasPadraoOcultas,
   criarCategoria,
   editarCategoria,
   deletarCategoria,
   contarCategoriasPersonalizadas,
   LIMITE_FREE,
+  setCategoriaPadraoOculta,
 } from '../../lib/queries/categorias'
 import CardCategoria from '../components/categorias/CardCategoria'
 import ModalNovaCategoria from '../components/categorias/ModalNovaCategoria'
@@ -21,6 +23,7 @@ export default function Categorias() {
   const userId = user!.id
 
   const [categorias, setCategorias] = useState<Categoria[]>([])
+  const [padraoOcultas, setPadraoOcultas] = useState<Categoria[]>([])
   const [plano, setPlano] = useState('free')
   const [contPersonalizadas, setContPersonalizadas] = useState(0)
   const [carregando, setCarregando] = useState(true)
@@ -40,6 +43,9 @@ export default function Categorias() {
       setCategorias(lista.filter((c) => c.ativo !== false))
       setPlano(profile?.plano ?? 'free')
       setContPersonalizadas(count)
+
+      const ocultas = await getCategoriasPadraoOcultas(userId)
+      setPadraoOcultas(ocultas.filter((c) => c.ativo !== false))
     } catch (err) {
       console.error(err)
       toast.error('Erro ao carregar categorias')
@@ -103,6 +109,26 @@ export default function Categorias() {
     }
   }
 
+  const handleOcultarPadrao = async (categoria: Categoria) => {
+    try {
+      await setCategoriaPadraoOculta(userId, categoria.id, true)
+      toast.success('Categoria padrão ocultada.')
+      carregar()
+    } catch {
+      toast.error('Erro ao ocultar categoria.')
+    }
+  }
+
+  const handleReexibirPadrao = async (categoria: Categoria) => {
+    try {
+      await setCategoriaPadraoOculta(userId, categoria.id, false)
+      toast.success('Categoria reexibida.')
+      carregar()
+    } catch {
+      toast.error('Erro ao reexibir categoria.')
+    }
+  }
+
   if (carregando) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 300 }}>
@@ -132,11 +158,30 @@ export default function Categorias() {
         ) : (
           <div style={{ display: 'grid', gap: 12 }} className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
             {padrao.map((c) => (
-              <CardCategoria key={c.id} categoria={c} />
+              <CardCategoria key={c.id} categoria={c} onOcultar={() => handleOcultarPadrao(c)} />
             ))}
           </div>
         )}
       </section>
+
+      {padraoOcultas.length > 0 && (
+        <section style={{ marginBottom: 40 }}>
+          <div style={{ marginBottom: 16 }}>
+            <h2 style={{ fontSize: 15, fontWeight: 700, color: 'var(--of-text)', marginBottom: 4 }}>
+              Categorias padrão ocultas
+            </h2>
+            <p style={{ fontSize: 13, color: 'var(--of-text-muted)' }}>
+              Somente você deixa de ver — reexiba quando quiser
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gap: 12 }} className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
+            {padraoOcultas.map((c) => (
+              <CardCategoria key={c.id} categoria={c} onReexibir={() => handleReexibirPadrao(c)} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* SEÇÃO 2 — Minhas categorias */}
       <section>
@@ -170,12 +215,12 @@ export default function Categorias() {
           <button
             onClick={handleNovaCategoria}
             style={{
-              display: 'flex', alignItems: 'center', gap: 6,
-              padding: '9px 16px',
+              display: 'flex', alignItems: 'center', gap: 7,
+              padding: '11px 20px',
               background: atingiuLimite ? 'var(--of-page-bg)' : 'var(--of-btn-bg)',
               color: atingiuLimite ? 'var(--of-text-secondary)' : 'var(--of-btn-text)',
               border: `1px solid ${atingiuLimite ? 'var(--of-border)' : 'transparent'}`,
-              borderRadius: 10, fontSize: 13, fontWeight: 600,
+              borderRadius: 12, fontSize: 14, fontWeight: 600,
               cursor: 'pointer', fontFamily: 'var(--font-body)',
               transition: 'all 0.15s',
             }}

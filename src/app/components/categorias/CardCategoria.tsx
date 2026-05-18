@@ -1,16 +1,19 @@
 ﻿import { useState } from 'react'
-import { Pencil, Trash2 } from 'lucide-react'
+import { Eye, EyeOff, Pencil, Trash2 } from 'lucide-react'
 import type { Categoria } from '../../../lib/types'
 
 interface Props {
   categoria: Categoria
   onEditar?: () => void
   onDeletar?: () => void
+  onOcultar?: () => void
+  onReexibir?: () => void
 }
 
-export default function CardCategoria({ categoria, onEditar, onDeletar }: Props) {
+export default function CardCategoria({ categoria, onEditar, onDeletar, onOcultar, onReexibir }: Props) {
   const [hover, setHover] = useState(false)
   const isPadrao = categoria.is_padrao
+  const hasActions = Boolean(onEditar || onDeletar || onOcultar || onReexibir)
 
   return (
     <div
@@ -18,7 +21,7 @@ export default function CardCategoria({ categoria, onEditar, onDeletar }: Props)
       onMouseLeave={() => setHover(false)}
       style={{
         background: 'var(--of-surface)',
-        border: `1px solid ${hover && !isPadrao ? 'var(--of-text)' : 'var(--of-border)'}`,
+        border: `1px solid ${hover && hasActions ? 'var(--of-text)' : 'var(--of-border)'}`,
         borderRadius: 14,
         padding: '18px',
         display: 'flex',
@@ -26,8 +29,8 @@ export default function CardCategoria({ categoria, onEditar, onDeletar }: Props)
         gap: 10,
         position: 'relative',
         transition: 'border-color 0.15s, box-shadow 0.15s',
-        boxShadow: hover && !isPadrao ? '0 4px 16px rgba(0,0,0,0.07)' : 'none',
-        cursor: isPadrao ? 'default' : 'pointer',
+        boxShadow: hover && hasActions ? '0 4px 16px rgba(0,0,0,0.07)' : 'none',
+        cursor: hasActions ? 'pointer' : 'default',
       }}
     >
       {/* Emoji + cor */}
@@ -65,11 +68,43 @@ export default function CardCategoria({ categoria, onEditar, onDeletar }: Props)
       </div>
 
       {/* Botões de ação (hover) */}
-      {!isPadrao && hover && (
+      {hasActions && hover && (
         <div style={{
           position: 'absolute', top: 12, right: 12,
           display: 'flex', gap: 4,
         }}>
+          {isPadrao && onOcultar && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onOcultar() }}
+              title="Ocultar"
+              style={{
+                width: 30, height: 30, borderRadius: 8,
+                background: 'var(--of-page-bg)', border: 'none', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                transition: 'background 0.15s',
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.background = 'var(--of-border)')}
+              onMouseOut={(e) => (e.currentTarget.style.background = 'var(--of-hover)')}
+            >
+              <EyeOff size={13} color="var(--of-text-secondary)" />
+            </button>
+          )}
+          {isPadrao && onReexibir && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onReexibir() }}
+              title="Reexibir"
+              style={{
+                width: 30, height: 30, borderRadius: 8,
+                background: '#F0FDF4', border: 'none', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                transition: 'background 0.15s',
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.background = '#DCFCE7')}
+              onMouseOut={(e) => (e.currentTarget.style.background = '#F0FDF4')}
+            >
+              <Eye size={13} color="#16A34A" />
+            </button>
+          )}
           {onEditar && (
             <button
               onClick={(e) => { e.stopPropagation(); onEditar() }}

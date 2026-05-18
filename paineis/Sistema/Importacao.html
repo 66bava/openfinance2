@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Openfy — Importação</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:      #0A0A0A;
+  --bg2:     #111111;
+  --bg3:     #1A1A1A;
+  --bg4:     #222222;
+  --border:  rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text:    #F0F0EC;
+  --text2:   #9CA3AF;
+  --text3:   #52525B;
+  --accent:  #16A34A;
+  --accent2: #15803D;
+  --accentFg:#DCFCE7;
+  --accentGlow: rgba(22,163,74,0.18);
+  --red:     #EF4444;
+  --yellow:  #EAB308;
+  --blue:    #3B82F6;
+  --radius:  14px;
+  --sidebar: 64px;
+  --font-title: 'DM Sans', sans-serif;
+  --font-body:  'Inter', sans-serif;
+}
+
+[data-theme="light"] {
+  --bg:      #F5F5F0;
+  --bg2:     #FFFFFF;
+  --bg3:     #ECEEE9;
+  --bg4:     #E2E4DF;
+  --border:  rgba(0,0,0,0.07);
+  --border2: rgba(0,0,0,0.12);
+  --text:    #0A0A0A;
+  --text2:   #52525B;
+  --text3:   #A1A1AA;
+  --accentFg:#14532D;
+  --accentGlow: rgba(22,163,74,0.10);
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  overflow: hidden;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar);
+  height: 100vh;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  gap: 6px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 20;
+}
+
+.sidebar-logo {
+  width: 36px;
+  height: 36px;
+  background: var(--accent);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  font-family: var(--font-title);
+  font-weight: 700;
+  font-size: 14px;
+  color: #fff;
+  letter-spacing: -0.5px;
+  flex-shrink: 0;
+}
+
+.sidebar-nav { display: flex; flex-direction: column; gap: 2px; width: 100%; padding: 0 10px; flex: 1; }
+
+.nav-item {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  color: var(--text3);
+  position: relative;
+}
+.nav-item:hover { background: var(--bg3); color: var(--text2); }
+.nav-item.active { background: var(--accentGlow); color: var(--accent); }
+.nav-item svg { width: 18px; height: 18px; }
+
+.sidebar-bottom { margin-top: auto; padding: 0 10px; display: flex; flex-direction: column; gap: 2px; }
+
+.theme-btn {
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.theme-btn:hover { border-color: var(--border2); color: var(--text); }
+
+/* ── MAIN ── */
+.main {
+  flex: 1;
+  height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  height: 56px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 32px;
+  gap: 8px;
+  flex-shrink: 0;
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text2);
+  font-family: var(--font-body);
+}
+.breadcrumb .sep { color: var(--text3); }
+.breadcrumb .current { color: var(--text); font-weight: 500; }
+
+.topbar-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: none;
+  font-family: var(--font-body);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.btn-ghost { background: transparent; color: var(--text2); border: 1px solid var(--border); }
+.btn-ghost:hover { background: var(--bg3); color: var(--text); border-color: var(--border2); }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent2); }
+
+/* ── CONTENT ── */
+.content { padding: 40px 40px 80px; max-width: 900px; margin: 0 auto; width: 100%; }
+
+/* Steps */
+.steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 40px;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text3);
+  position: relative;
+}
+
+.step-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text3);
+  flex-shrink: 0;
+  transition: all 0.3s;
+}
+
+.step.active .step-dot {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: 0 0 0 4px var(--accentGlow);
+}
+
+.step.done .step-dot {
+  background: var(--bg3);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.step.active { color: var(--text); }
+.step.done { color: var(--text2); }
+
+.step-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border2);
+  margin: 0 12px;
+  min-width: 40px;
+  max-width: 80px;
+}
+
+.step.done + .step-line { background: var(--accent); opacity: 0.4; }
+
+/* Upload zone */
+.upload-header {
+  margin-bottom: 28px;
+}
+
+.upload-header h1 {
+  font-family: var(--font-title);
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  margin-bottom: 6px;
+}
+
+.upload-header p {
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.5;
+}
+
+.format-pills {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.format-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  text-transform: uppercase;
+}
+
+.format-pill.csv { border-color: rgba(59,130,246,0.3); color: #60A5FA; background: rgba(59,130,246,0.08); }
+.format-pill.ofx { border-color: rgba(234,179,8,0.3); color: #FBBF24; background: rgba(234,179,8,0.08); }
+.format-pill.xlsx { border-color: rgba(34,197,94,0.3); color: #4ADE80; background: rgba(34,197,94,0.08); }
+
+/* Drop zone */
+.drop-zone {
+  border: 1.5px dashed var(--border2);
+  border-radius: var(--radius);
+  background: var(--bg2);
+  padding: 64px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+  position: relative;
+  overflow: hidden;
+}
+
+.drop-zone::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 50% at 50% 100%, var(--accentGlow), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.drop-zone:hover, .drop-zone.dragging {
+  border-color: var(--accent);
+  background: var(--bg3);
+}
+.drop-zone:hover::before, .drop-zone.dragging::before { opacity: 1; }
+
+.drop-zone.dragging {
+  border-style: solid;
+  box-shadow: 0 0 0 3px var(--accentGlow), inset 0 0 40px var(--accentGlow);
+}
+
+.drop-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text2);
+  transition: all 0.25s;
+}
+.drop-zone:hover .drop-icon, .drop-zone.dragging .drop-icon {
+  background: var(--accentGlow);
+  border-color: rgba(22,163,74,0.3);
+  color: var(--accent);
+}
+
+.drop-icon svg { width: 24px; height: 24px; }
+
+.drop-text {
+  text-align: center;
+}
+.drop-text strong {
+  display: block;
+  font-family: var(--font-title);
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+.drop-text span {
+  font-size: 13px;
+  color: var(--text2);
+}
+
+.drop-or {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 200px;
+}
+.drop-or::before, .drop-or::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border2);
+}
+.drop-or span {
+  font-size: 11px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  font-weight: 500;
+}
+
+/* Uploading state */
+.upload-progress {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 48px 40px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.upload-progress.visible { display: flex; }
+
+.progress-ring {
+  position: relative;
+  width: 64px;
+  height: 64px;
+}
+
+.progress-ring svg {
+  transform: rotate(-90deg);
+}
+
+.progress-ring circle.track {
+  fill: none;
+  stroke: var(--bg3);
+  stroke-width: 4;
+}
+
+.progress-ring circle.fill {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 163;
+  stroke-dashoffset: 163;
+  transition: stroke-dashoffset 0.3s ease;
+}
+
+.progress-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.progress-info { text-align: center; }
+.progress-info strong { display: block; font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+.progress-info span { font-size: 13px; color: var(--text2); }
+
+.progress-bar-wrap {
+  width: 100%;
+  max-width: 320px;
+  height: 3px;
+  background: var(--bg3);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 99px;
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+/* Recent imports */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  margin-top: 40px;
+}
+
+.section-title {
+  font-family: var(--font-title);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.see-all {
+  font-size: 13px;
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.imports-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.import-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.import-item:hover { background: var(--bg3); border-color: var(--border2); }
+
+.import-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+.import-icon.csv { background: rgba(59,130,246,0.12); color: #60A5FA; }
+.import-icon.ofx { background: rgba(234,179,8,0.12); color: #FBBF24; }
+.import-icon.xlsx { background: rgba(34,197,94,0.12); color: #4ADE80; }
+
+.import-info { flex: 1; }
+.import-info strong { display: block; font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+.import-info span { font-size: 12px; color: var(--text2); }
+
+.import-meta {
+  text-align: right;
+  flex-shrink: 0;
+}
+.import-meta strong { display: block; font-size: 13px; font-weight: 500; }
+.import-meta span { font-size: 12px; color: var(--text2); }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge-success { background: rgba(22,163,74,0.12); color: #4ADE80; }
+.badge-warning { background: rgba(234,179,8,0.12); color: #FBBF24; }
+.badge-error { background: rgba(239,68,68,0.12); color: #F87171; }
+
+/* Empty state */
+.empty-state {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 56px 32px;
+  text-align: center;
+}
+.empty-state.visible { display: flex; }
+
+.empty-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text3);
+}
+.empty-icon svg { width: 32px; height: 32px; }
+.empty-state h3 { font-family: var(--font-title); font-size: 16px; font-weight: 600; }
+.empty-state p { font-size: 14px; color: var(--text2); max-width: 280px; line-height: 1.5; }
+
+/* Success overlay */
+.success-toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  opacity: 0;
+  background: var(--bg2);
+  border: 1px solid rgba(22,163,74,0.3);
+  border-radius: 12px;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 100;
+  transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(22,163,74,0.1);
+  min-width: 320px;
+}
+.success-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.success-toast-icon {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: rgba(22,163,74,0.15);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.success-toast-icon svg { width: 16px; height: 16px; }
+.success-toast-text strong { display: block; font-size: 14px; font-weight: 600; }
+.success-toast-text span { font-size: 13px; color: var(--text2); }
+.success-toast-action {
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+  white-space: nowrap;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: var(--accentGlow);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 99px; }
+
+/* Drag highlight animation */
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.08); opacity: 0.3; }
+  100% { transform: scale(1); opacity: 0.6; }
+}
+
+.analyzing-spinner {
+  width: 48px; height: 48px;
+  border: 2px solid var(--border2);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo">Of</div>
+  <nav class="sidebar-nav">
+    <div class="nav-item" title="Dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+    </div>
+    <div class="nav-item" title="Transações">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+    </div>
+    <div class="nav-item" title="Cartões">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/></svg>
+    </div>
+    <div class="nav-item active" title="Importação">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    </div>
+    <div class="nav-item" title="Ciclos">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    </div>
+    <div class="nav-item" title="Planejamento">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+    </div>
+    <div class="nav-item" title="Score">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+    </div>
+    <div class="nav-item" title="Análise">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    </div>
+  </nav>
+  <div class="sidebar-bottom">
+    <button class="theme-btn" id="themeBtn" title="Alternar tema">
+      <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+    </button>
+  </div>
+</aside>
+
+<!-- Main -->
+<main class="main">
+  <div class="topbar">
+    <div class="breadcrumb">
+      <span>Sistema</span>
+      <span class="sep">›</span>
+      <span class="current">Importação</span>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost" onclick="simulateHistory()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Histórico
+      </button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- Steps -->
+    <div class="steps">
+      <div class="step active" id="step1">
+        <div class="step-dot" id="dot1">1</div>
+        <span>Upload</span>
+      </div>
+      <div class="step-line" id="line1"></div>
+      <div class="step" id="step2">
+        <div class="step-dot" id="dot2">2</div>
+        <span>Análise</span>
+      </div>
+      <div class="step-line" id="line2"></div>
+      <div class="step" id="step3">
+        <div class="step-dot" id="dot3">3</div>
+        <span>Revisão</span>
+      </div>
+      <div class="step-line" id="line3"></div>
+      <div class="step" id="step4">
+        <div class="step-dot" id="dot4">4</div>
+        <span>Concluído</span>
+      </div>
+    </div>
+
+    <!-- Header -->
+    <div class="upload-header">
+      <h1>Importar transações</h1>
+      <p>Envie seu extrato bancário e a IA classifica automaticamente cada transação.</p>
+      <div class="format-pills">
+        <span class="format-pill csv">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>
+          CSV
+        </span>
+        <span class="format-pill ofx">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>
+          OFX
+        </span>
+        <span class="format-pill xlsx">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>
+          XLSX
+        </span>
+      </div>
+    </div>
+
+    <!-- Drop zone (default state) -->
+    <div class="drop-zone" id="dropZone"
+         ondragover="onDragOver(event)"
+         ondragleave="onDragLeave(event)"
+         ondrop="onDrop(event)"
+         onclick="document.getElementById('fileInput').click()">
+      <div class="drop-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      </div>
+      <div class="drop-text">
+        <strong>Arraste seu arquivo aqui</strong>
+        <span>Suporta CSV, OFX e XLSX até 10MB</span>
+      </div>
+      <div class="drop-or"><span>ou</span></div>
+      <button class="btn btn-ghost" onclick="event.stopPropagation(); document.getElementById('fileInput').click()">
+        Selecionar arquivo
+      </button>
+      <input type="file" id="fileInput" accept=".csv,.ofx,.xlsx,.xls" style="display:none" onchange="onFileSelect(event)" />
+    </div>
+
+    <!-- Uploading state -->
+    <div class="upload-progress" id="uploadProgress">
+      <div class="progress-ring">
+        <svg width="64" height="64" viewBox="0 0 64 64">
+          <circle class="track" cx="32" cy="32" r="26"/>
+          <circle class="fill" cx="32" cy="32" r="26" id="progressCircle"/>
+        </svg>
+        <div class="progress-label" id="progressLabel">0%</div>
+      </div>
+      <div class="progress-info">
+        <strong id="progressTitle">Enviando arquivo…</strong>
+        <span id="progressSub">extrato-maio.csv · 1.2 MB</span>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progressBar"></div>
+      </div>
+    </div>
+
+    <!-- Recent imports -->
+    <div class="section-header">
+      <span class="section-title">Importações recentes</span>
+      <a class="see-all">Ver todas</a>
+    </div>
+
+    <div class="imports-list" id="importsList">
+      <div class="import-item">
+        <div class="import-icon csv">CSV</div>
+        <div class="import-info">
+          <strong>extrato-abril-itau.csv</strong>
+          <span>Banco Itaú · Conta corrente</span>
+        </div>
+        <div class="import-meta">
+          <strong>143 transações</strong>
+          <span>há 3 dias <span class="badge badge-success">Concluído</span></span>
+        </div>
+      </div>
+      <div class="import-item">
+        <div class="import-icon ofx">OFX</div>
+        <div class="import-info">
+          <strong>extrato-fev-nubank.ofx</strong>
+          <span>Nubank · Conta corrente</span>
+        </div>
+        <div class="import-meta">
+          <strong>89 transações</strong>
+          <span>há 1 semana <span class="badge badge-success">Concluído</span></span>
+        </div>
+      </div>
+      <div class="import-item">
+        <div class="import-icon xlsx">XLSX</div>
+        <div class="import-info">
+          <strong>cartao-credito-mar.xlsx</strong>
+          <span>Bradesco · Cartão de crédito</span>
+        </div>
+        <div class="import-meta">
+          <strong>67 transações</strong>
+          <span>há 2 semanas <span class="badge badge-warning">Revisão</span></span>
+        </div>
+      </div>
+      <div class="import-item">
+        <div class="import-icon csv">CSV</div>
+        <div class="import-info">
+          <strong>extrato-jan-inter.csv</strong>
+          <span>Banco Inter · Conta corrente</span>
+        </div>
+        <div class="import-meta">
+          <strong>112 transações</strong>
+          <span>há 1 mês <span class="badge badge-error">Erro</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty state (hidden by default) -->
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      </div>
+      <h3>Nenhuma importação ainda</h3>
+      <p>Envie seu primeiro extrato bancário para começar a organizar suas finanças.</p>
+      <button class="btn btn-primary">Fazer primeira importação</button>
+    </div>
+
+  </div>
+</main>
+
+<!-- Success toast -->
+<div class="success-toast" id="successToast">
+  <div class="success-toast-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+  </div>
+  <div class="success-toast-text">
+    <strong>Arquivo analisado com sucesso!</strong>
+    <span>143 transações detectadas, prontas para revisão</span>
+  </div>
+  <div class="success-toast-action">Revisar →</div>
+</div>
+
+<script>
+// Theme
+const btn = document.getElementById('themeBtn');
+const icon = document.getElementById('themeIcon');
+btn.addEventListener('click', () => {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  icon.innerHTML = isDark
+    ? '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>'
+    : '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
+});
+
+// Drag & drop
+function onDragOver(e) {
+  e.preventDefault();
+  document.getElementById('dropZone').classList.add('dragging');
+}
+function onDragLeave(e) {
+  document.getElementById('dropZone').classList.remove('dragging');
+}
+function onDrop(e) {
+  e.preventDefault();
+  document.getElementById('dropZone').classList.remove('dragging');
+  const file = e.dataTransfer.files[0];
+  if (file) startUpload(file);
+}
+function onFileSelect(e) {
+  const file = e.target.files[0];
+  if (file) startUpload(file);
+}
+
+function startUpload(file) {
+  document.getElementById('dropZone').style.display = 'none';
+  const prog = document.getElementById('uploadProgress');
+  prog.classList.add('visible');
+
+  const sub = document.getElementById('progressSub');
+  sub.textContent = `${file.name} · ${(file.size/1048576).toFixed(1)} MB`;
+
+  let pct = 0;
+  const interval = setInterval(() => {
+    pct = Math.min(pct + Math.random() * 15, 100);
+    setProgress(Math.round(pct));
+    if (pct >= 100) {
+      clearInterval(interval);
+      setTimeout(startAnalysis, 300);
+    }
+  }, 120);
+}
+
+function setProgress(pct) {
+  const circle = document.getElementById('progressCircle');
+  const label = document.getElementById('progressLabel');
+  const bar = document.getElementById('progressBar');
+  const circumference = 163;
+  circle.style.strokeDashoffset = circumference - (pct / 100) * circumference;
+  label.textContent = pct + '%';
+  bar.style.width = pct + '%';
+}
+
+function startAnalysis() {
+  // update steps
+  document.getElementById('step1').classList.add('done');
+  document.getElementById('step1').classList.remove('active');
+  document.getElementById('line1').classList.add('done-line');
+  document.getElementById('step2').classList.add('active');
+  document.getElementById('progressTitle').textContent = 'Analisando com IA…';
+  document.getElementById('progressSub').textContent = 'Identificando categorias e padrões';
+
+  let pct2 = 0;
+  setProgress(0);
+  const interval2 = setInterval(() => {
+    pct2 = Math.min(pct2 + Math.random() * 10, 100);
+    setProgress(Math.round(pct2));
+    if (pct2 >= 100) {
+      clearInterval(interval2);
+      setTimeout(showSuccess, 400);
+    }
+  }, 180);
+}
+
+function showSuccess() {
+  document.getElementById('step2').classList.add('done');
+  document.getElementById('step2').classList.remove('active');
+  document.getElementById('step3').classList.add('active');
+  document.getElementById('uploadProgress').classList.remove('visible');
+  document.getElementById('dropZone').style.display = '';
+
+  const toast = document.getElementById('successToast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 5000);
+}
+
+function simulateHistory() {
+  document.getElementById('importsList').style.display = 'none';
+  document.getElementById('emptyState').classList.add('visible');
+}
+</script>
+</body>
+</html>

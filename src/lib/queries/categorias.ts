@@ -6,6 +6,14 @@ export const LIMITE_FREE = 4
 // ─── Buscar categorias ────────────────────────────────────────────────────────
 
 export async function getCategorias(userId: string): Promise<Categoria[]> {
+  const { data: prefs } = await supabase
+    .from('user_category_preferences')
+    .select('categoria_id, hidden')
+    .eq('user_id', userId)
+    .eq('hidden', true)
+
+  const hiddenPadrao = new Set((prefs ?? []).map((p: any) => String(p.categoria_id)))
+
   const { data, error } = await supabase
     .from('categorias')
     .select('*')
@@ -14,11 +22,47 @@ export async function getCategorias(userId: string): Promise<Categoria[]> {
     .order('nome', { ascending: true })
 
   if (error) throw error
-  return (data ?? []).map((c) => ({
+  return (data ?? [])
+    .filter((c: any) => !(c.is_padrao === true && hiddenPadrao.has(String(c.id))))
+    .map((c: any) => ({
     ...c,
     ativo: c.ativo ?? true,
     ordem: c.ordem ?? 0,
   }))
+}
+
+export async function getCategoriasPadraoOcultas(userId: string): Promise<Categoria[]> {
+  const { data: prefs, error: prefsErr } = await supabase
+    .from('user_category_preferences')
+    .select('categoria_id')
+    .eq('user_id', userId)
+    .eq('hidden', true)
+
+  if (prefsErr) return []
+  const ids = (prefs ?? []).map((p: any) => String(p.categoria_id)).filter(Boolean)
+  if (ids.length === 0) return []
+
+  const { data, error } = await supabase
+    .from('categorias')
+    .select('*')
+    .in('id', ids)
+    .eq('is_padrao', true)
+    .order('nome', { ascending: true })
+
+  if (error) return []
+  return (data ?? []).map((c: any) => ({
+    ...c,
+    ativo: c.ativo ?? true,
+    ordem: c.ordem ?? 0,
+  }))
+}
+
+export async function setCategoriaPadraoOculta(userId: string, categoriaId: string, hidden: boolean): Promise<void> {
+  const { error } = await supabase
+    .from('user_category_preferences')
+    .upsert({ user_id: userId, categoria_id: categoriaId, hidden }, { onConflict: 'user_id,categoria_id' })
+
+  if (error) throw error
 }
 
 export async function getCategoriasAtivas(userId: string): Promise<Categoria[]> {

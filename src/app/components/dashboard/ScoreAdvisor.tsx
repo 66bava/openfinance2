@@ -1,6 +1,8 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Sparkles, RefreshCw } from "lucide-react"
 import { analisarScore, type ScoreContext } from "../../../lib/openai"
+import { useAuth } from "../../../lib/auth-context"
+import { consultarConselheiroIa } from "../../../lib/queries/ai-usage"
 
 function renderMarkdown(text: string) {
   return text.split(/\*\*(.*?)\*\*/g).map((part, i) =>
@@ -8,19 +10,56 @@ function renderMarkdown(text: string) {
   )
 }
 
+function stripDadosConsiderados(text: string) {
+  if (!text) return text
+  return text.replace(/(\*\*Dados considerados:\*\*[\s\S]*?)(?=\n\*\*|$)/gi, "").trim()
+}
+
 export function ScoreAdvisor(ctx: ScoreContext) {
+  const { user } = useAuth()
   const [analysis, setAnalysis] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [usage, setUsage] = useState<{ usado: number; limite: number; reset_at?: string | null } | null>(null)
+  const [usageLoading, setUsageLoading] = useState(false)
+
+  const remaining = usage
+    ? (usage.limite < 0 ? Infinity : Math.max(0, usage.limite - usage.usado))
+    : null
+
+  const isAtLimit = remaining === 0
+
+  useEffect(() => {
+    if (!user) return
+    setUsageLoading(true)
+    consultarConselheiroIa(user.id)
+      .then((r) => {
+        if (r?.success) setUsage({ usado: r.usado, limite: r.limite, reset_at: r.reset_at })
+      })
+      .catch(() => {})
+      .finally(() => setUsageLoading(false))
+  }, [user?.id])
 
   const analyze = async () => {
     setLoading(true)
     setError(null)
     try {
+      if (!user) throw new Error("Faça login para usar o Conselheiro IA.")
+
       const result = await analisarScore(ctx)
-      setAnalysis(result)
+      setAnalysis(stripDadosConsiderados(result))
+      try {
+        const r = await consultarConselheiroIa(user.id)
+        if (r?.success) setUsage({ usado: r.usado, limite: r.limite, reset_at: r.reset_at })
+      } catch { /* silent */ }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao conectar à IA. Tente novamente.")
+      try {
+        if (user) {
+          const r = await consultarConselheiroIa(user.id)
+          if (r?.success) setUsage({ usado: r.usado, limite: r.limite, reset_at: r.reset_at })
+        }
+      } catch { /* silent */ }
     } finally {
       setLoading(false)
     }
@@ -46,33 +85,48 @@ export function ScoreAdvisor(ctx: ScoreContext) {
         <p style={{ fontSize: 12, color: "var(--of-text-muted)", lineHeight: 1.4 }}>
           Entenda seu score e receba um plano de melhoria.
         </p>
+        <p style={{ fontSize: 11, color: isAtLimit ? "#F59E0B" : "var(--of-text-muted)", marginTop: 8 }}>
+          {usageLoading ? "Carregando limite semanal…" : (
+            usage
+              ? (usage.limite < 0
+                ? "Usos ilimitados no seu plano."
+                : isAtLimit
+                  ? `Limite atingido. ${usage.reset_at ? `Renova em ${new Date(usage.reset_at).toLocaleDateString("pt-BR", { weekday: "short", day: "2-digit", month: "short" })}.` : "Renova todo domingo."}`
+                  : `${remaining} uso(s) restante(s) esta semana.`)
+              : " "
+          )}
+        </p>
       </div>
 
       {!analysis && !loading && (
         <div style={{ padding: "14px 18px" }}>
           <button
             onClick={analyze}
+            disabled={isAtLimit}
             style={{
               width: "100%",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               gap: 8,
-              padding: "10px 0",
-              background: "linear-gradient(135deg, #7C3AED 0%, #4F46E5 100%)",
-              color: "#FFFFFF",
-              border: "none",
+              padding: "13px 0",
+              background: isAtLimit
+                ? "var(--of-page-bg)"
+                : "linear-gradient(135deg, #7C3AED 0%, #4F46E5 100%)",
+              color: isAtLimit ? "var(--of-text-muted)" : "#FFFFFF",
+              border: isAtLimit ? "1px solid var(--of-border)" : "none",
               borderRadius: 10,
               fontSize: 13,
               fontWeight: 700,
-              cursor: "pointer",
+              cursor: isAtLimit ? "not-allowed" : "pointer",
+              opacity: isAtLimit ? 0.6 : 1,
               transition: "opacity 0.15s",
             }}
-            onMouseOver={(e) => (e.currentTarget.style.opacity = "0.88")}
-            onMouseOut={(e) => (e.currentTarget.style.opacity = "1")}
+            onMouseOver={(e) => { if (!isAtLimit) e.currentTarget.style.opacity = "0.88" }}
+            onMouseOut={(e) => { if (!isAtLimit) e.currentTarget.style.opacity = "1" }}
           >
             <Sparkles size={14} />
-            Analisar meu score
+            {isAtLimit ? "Limite semanal atingido" : "Analisar meu score"}
           </button>
           {error && (
             <p style={{ fontSize: 12, color: "#EF4444", marginTop: 10, textAlign: "center", lineHeight: 1.4 }}>
@@ -110,12 +164,12 @@ export function ScoreAdvisor(ctx: ScoreContext) {
               display: "inline-flex",
               alignItems: "center",
               gap: 6,
-              marginTop: 12,
-              padding: "7px 12px",
+              marginTop: 14,
+              padding: "9px 16px",
               background: "none",
               border: "1px solid var(--of-border)",
-              borderRadius: 8,
-              fontSize: 11,
+              borderRadius: 10,
+              fontSize: 13,
               fontWeight: 600,
               color: "var(--of-text-muted)",
               cursor: "pointer",

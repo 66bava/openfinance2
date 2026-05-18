@@ -1,83 +1,165 @@
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
+import { Link } from "react-router"
 import { toast } from "sonner"
-import { Plus, X, Trash2, TrendingUp, Calendar, AlertCircle } from "lucide-react"
-import { useAuth } from "../../lib/auth-context"
-import { getCategoriasAtivas } from "../../lib/queries/categorias"
+import * as DialogPrimitive from "@radix-ui/react-dialog"
 import {
-  getParcelasFuturas,
-  getCompromissos,
-  criarCompromisso,
-  removerCompromisso,
-} from "../../lib/queries/futuro"
+  AlertCircle,
+  Calendar,
+  Car,
+  Home,
+  Building2,
+  Bike,
+  Plus,
+  Trash2,
+  X,
+  CreditCard,
+  Repeat,
+} from "lucide-react"
+import { useAuth } from "../../lib/auth-context"
 import { useLanguage } from "../../lib/language-context"
-import type { Transacao, Compromisso, Categoria } from "../../lib/types"
+import { getCategoriasAtivas } from "../../lib/queries/categorias"
+import { getAssinaturas, calcularTotalMensal } from "../../lib/queries/assinaturas"
+import { getParcelasFuturas, getCompromissos, criarCompromisso, removerCompromisso } from "../../lib/queries/futuro"
+import type { Assinatura, Categoria, Compromisso, MetodoPagamento, Transacao } from "../../lib/types"
+import { formatCurrency, formatDate } from "../../lib/format"
 
-const TIPO_COLORS: Record<string, string> = {
-  financiamento: "#2563EB",
-  despesa_fixa: "#D97706",
-  assinatura: "#7C3AED",
+type FinanciamentoTipo = "carro" | "casa" | "apartamento" | "moto" | "outro"
+
+const FIN_TIPO_META: Record<FinanciamentoTipo, { label: string; icon: React.ElementType; color: string }> = {
+  carro: { label: "Carro", icon: Car, color: "#2563EB" },
+  casa: { label: "Casa", icon: Home, color: "#16A34A" },
+  apartamento: { label: "Apartamento", icon: Building2, color: "#7C3AED" },
+  moto: { label: "Moto", icon: Bike, color: "#F59E0B" },
+  outro: { label: "Outro", icon: CreditCard, color: "#0A0A0A" },
 }
 
-const TIPO_BG: Record<string, string> = {
-  financiamento: "#EFF6FF",
-  despesa_fixa: "#FFFBEB",
-  assinatura: "#F5F3FF",
+const METODOS_PAGAMENTO: { value: MetodoPagamento; label: string }[] = [
+  { value: "pix", label: "Pix" },
+  { value: "credito", label: "Cartão de crédito" },
+  { value: "debito", label: "Cartão de débito" },
+  { value: "dinheiro", label: "Dinheiro" },
+  { value: "boleto", label: "Boleto" },
+  { value: "transferencia", label: "Transferência" },
+  { value: "debito_automatico", label: "Débito automático" },
+  { value: "outro", label: "Outro" },
+]
+
+function clampDay(day: number) {
+  return Math.max(1, Math.min(31, day))
 }
 
-function fmt(valor: number) {
-  return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
+function monthKey(d: Date) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`
 }
 
-function addMonths(dateStr: string, n: number) {
-  const d = new Date(dateStr + "T00:00:00")
+function addMonths(date: Date, n: number) {
+  const d = new Date(date)
   d.setMonth(d.getMonth() + n)
-  return d.toISOString().split("T")[0]
+  return d
 }
 
-interface NovoCompromisso {
+function monthsDiff(a: Date, b: Date) {
+  return (b.getFullYear() - a.getFullYear()) * 12 + (b.getMonth() - a.getMonth())
+}
+
+function parseBRL(raw: string): number {
+  const cleaned = raw.replace(/\./g, "").replace(",", ".").replace(/[^\d.]/g, "")
+  return Number.parseFloat(cleaned) || 0
+}
+
+function formatBRL(value: number) {
+  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
+}
+
+type NovoFinanciamento = {
+  financiamento_tipo: FinanciamentoTipo
   descricao: string
-  valor: string
-  categoria_id: string
-  tipo: "financiamento" | "despesa_fixa" | "assinatura"
+  valor_total_financiado: string
+  valor_entrada: string
+  valor_parcela: string
+  parcelas_total: string
+  parcelas_pagas: string
   dia_vencimento: number
   data_inicio: string
-  data_fim: string
+  metodo_pagamento: MetodoPagamento | ""
+  categoria_id: string
+  observacoes: string
+}
+
+const EMPTY_FIN: NovoFinanciamento = {
+  financiamento_tipo: "carro",
+  descricao: "",
+  valor_total_financiado: "",
+  valor_entrada: "",
+  valor_parcela: "",
+  parcelas_total: "36",
+  parcelas_pagas: "0",
+  dia_vencimento: 10,
+  data_inicio: new Date().toISOString().split("T")[0],
+  metodo_pagamento: "",
+  categoria_id: "",
+  observacoes: "",
+}
+
+function financiamentoIcon(tipo: FinanciamentoTipo) {
+  return FIN_TIPO_META[tipo]?.icon ?? CreditCard
+}
+
+function financiamentoColor(tipo: FinanciamentoTipo) {
+  return FIN_TIPO_META[tipo]?.color ?? "#0A0A0A"
+}
+
+function safeFinTipo(raw: string | null | undefined): FinanciamentoTipo {
+  const s = (raw || "").toString().trim().toLowerCase()
+  if (s === "carro" || s === "casa" || s === "apartamento" || s === "moto") return s
+  return "outro"
+}
+
+function mensalFin(c: Compromisso) {
+  const v = c.valor_parcela ?? c.valor
+  return Number(v) || 0
+}
+
+function parcelaLabel(pagas: number, total: number) {
+  if (!Number.isFinite(pagas) || !Number.isFinite(total)) return ""
+  return `${pagas}/${total}`
+}
+
+function percent(pagas: number, total: number) {
+  if (!total || total <= 0) return 0
+  return Math.max(0, Math.min(100, (pagas / total) * 100))
 }
 
 export default function Futuro() {
   const { user } = useAuth()
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
 
   const [parcelas, setParcelas] = useState<Transacao[]>([])
-  const [compromissos, setCompromissos] = useState<Compromisso[]>([])
+  const [financiamentos, setFinanciamentos] = useState<Compromisso[]>([])
+  const [assinaturas, setAssinaturas] = useState<Assinatura[]>([])
   const [cats, setCats] = useState<Categoria[]>([])
   const [loading, setLoading] = useState(true)
-  const [showModal, setShowModal] = useState(false)
-  const [saving, setSaving] = useState(false)
   const [migrationError, setMigrationError] = useState(false)
 
-  const [form, setForm] = useState<NovoCompromisso>({
-    descricao: "",
-    valor: "",
-    categoria_id: "",
-    tipo: "despesa_fixa",
-    dia_vencimento: 10,
-    data_inicio: new Date().toISOString().split("T")[0],
-    data_fim: "",
-  })
+  const [finModalOpen, setFinModalOpen] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [finForm, setFinForm] = useState<NovoFinanciamento>(EMPTY_FIN)
 
   async function carregar() {
     if (!user) return
     setLoading(true)
     try {
-      const [p, c, categorias] = await Promise.all([
+      const [p, fins, subs, categorias] = await Promise.all([
         getParcelasFuturas(user.id),
         getCompromissos(user.id),
+        getAssinaturas(user.id),
         getCategoriasAtivas(user.id),
       ])
       setParcelas(p)
-      setCompromissos(c)
+      setFinanciamentos(fins)
+      setAssinaturas(subs)
       setCats(categorias)
+      setMigrationError(false)
     } catch {
       setMigrationError(true)
     } finally {
@@ -85,420 +167,717 @@ export default function Futuro() {
     }
   }
 
-  useEffect(() => { carregar() }, [user])
+  useEffect(() => {
+    carregar()
+  }, [user])
 
-  // Build month groups for next 6 months
-  const hoje = new Date()
-  const meses: { key: string; label: string; mes: number; ano: number }[] = []
-  for (let i = 0; i < 6; i++) {
-    const d = new Date(hoje.getFullYear(), hoje.getMonth() + i + 1, 1)
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`
-    const label = d.toLocaleDateString("pt-BR", { month: "long", year: "numeric" })
-    meses.push({ key, label, mes: d.getMonth() + 1, ano: d.getFullYear() })
+  const totalSubsMensal = useMemo(() => calcularTotalMensal(assinaturas), [assinaturas])
+  const totalFinMensal = useMemo(() => financiamentos.reduce((s, c) => s + mensalFin(c), 0), [financiamentos])
+
+  // Próximos 6 meses (inclui próximo mês)
+  const meses = useMemo(() => {
+    const hoje = new Date()
+    const out: { key: string; label: string; mes: number; ano: number; date: Date }[] = []
+    for (let i = 0; i < 6; i++) {
+      const d = new Date(hoje.getFullYear(), hoje.getMonth() + i + 1, 1)
+      out.push({
+        key: monthKey(d),
+        label: d.toLocaleDateString("pt-BR", { month: "long", year: "numeric" }),
+        mes: d.getMonth() + 1,
+        ano: d.getFullYear(),
+        date: d,
+      })
+    }
+    return out
+  }, [])
+
+  const parcelasPorMes = useMemo(() => {
+    const map: Record<string, Transacao[]> = {}
+    for (const p of parcelas) {
+      const key = p.data.slice(0, 7)
+      if (!map[key]) map[key] = []
+      map[key].push(p)
+    }
+    return map
+  }, [parcelas])
+
+  function finNoMes(c: Compromisso, mesDate: Date) {
+    const start = new Date((c.data_inicio || "").slice(0, 10) + "T00:00:00")
+    if (Number.isNaN(start.getTime())) return false
+    const m0 = new Date(start.getFullYear(), start.getMonth(), 1)
+    const m = new Date(mesDate.getFullYear(), mesDate.getMonth(), 1)
+    const diff = monthsDiff(m0, m)
+    if (diff < 0) return false
+
+    const total = Number(c.parcelas_total ?? null)
+    const pagas = Number(c.parcelas_pagas ?? 0)
+    const installment = diff + 1
+
+    if (Number.isFinite(total) && total > 0 && installment > total) return false
+    if (Number.isFinite(pagas) && pagas >= 0 && installment <= pagas) return false
+
+    return true
   }
 
-  // Group parcelas by month
-  const parcelasPorMes: Record<string, Transacao[]> = {}
-  for (const p of parcelas) {
-    const key = p.data.slice(0, 7)
-    if (!parcelasPorMes[key]) parcelasPorMes[key] = []
-    parcelasPorMes[key].push(p)
+  function totalMes(m: { key: string; date: Date }) {
+    const pTotal = (parcelasPorMes[m.key] || []).reduce((s, p) => s + p.valor, 0)
+    const fTotal = financiamentos.filter((c) => finNoMes(c, m.date)).reduce((s, c) => s + mensalFin(c), 0)
+    const sTotal = totalSubsMensal // aproximação mensal (considera recorrência)
+    return pTotal + fTotal + sTotal
   }
 
-  // For each month, compute compromissos that apply
-  function compromissosMes(mes: number, ano: number, dataFim?: string | null): Compromisso[] {
-    const inicioMes = new Date(ano, mes - 1, 1)
-    const fimMes = new Date(ano, mes, 0)
-    return compromissos.filter((c) => {
-      const inicio = new Date(c.data_inicio + "T00:00:00")
-      if (inicio > fimMes) return false
-      if (c.data_fim) {
-        const fim = new Date(c.data_fim + "T00:00:00")
-        if (fim < inicioMes) return false
-      }
-      return true
-    })
-  }
+  const totalGeral = useMemo(() => meses.reduce((s, m) => s + totalMes(m), 0), [meses, parcelasPorMes, financiamentos, totalSubsMensal])
 
-  function totalMes(key: string, mes: number, ano: number) {
-    const pTotal = (parcelasPorMes[key] || []).reduce((s, p) => s + p.valor, 0)
-    const cTotal = compromissosMes(mes, ano).reduce((s, c) => s + c.valor, 0)
-    return pTotal + cTotal
-  }
+  async function handleSalvarFinanciamento() {
+    if (!user) return
+    if (!finForm.descricao.trim()) {
+      toast.error("Informe o nome do financiamento.")
+      return
+    }
 
-  const totalGeral = meses.reduce((s, m) => s + totalMes(m.key, m.mes, m.ano), 0)
+    const valorTotal = parseBRL(finForm.valor_total_financiado)
+    const entrada = parseBRL(finForm.valor_entrada)
+    const valorParcela = parseBRL(finForm.valor_parcela)
+    const parcelasTotal = Number.parseInt(finForm.parcelas_total || "0", 10) || 0
+    const parcelasPagas = Number.parseInt(finForm.parcelas_pagas || "0", 10) || 0
 
-  async function handleSalvarCompromisso() {
-    if (!user || !form.descricao.trim() || !form.valor) return
-    const valor = parseFloat(form.valor.replace(",", "."))
-    if (isNaN(valor) || valor <= 0) { toast.error("Valor inválido."); return }
+    if (valorTotal <= 0) { toast.error("Informe o valor total financiado."); return }
+    if (entrada < 0) { toast.error("Entrada inválida."); return }
+    if (valorParcela <= 0) { toast.error("Informe o valor da parcela mensal."); return }
+    if (parcelasTotal <= 0) { toast.error("Informe a quantidade total de parcelas."); return }
+    if (parcelasPagas < 0 || parcelasPagas > parcelasTotal) { toast.error("Parcelas pagas inválidas."); return }
+    if (!finForm.data_inicio) { toast.error("Informe a data de início."); return }
 
     setSaving(true)
     try {
-      await criarCompromisso(user.id, {
-        descricao: form.descricao.trim(),
-        valor,
-        categoria_id: form.categoria_id || null,
-        tipo: form.tipo,
-        dia_vencimento: form.dia_vencimento,
-        data_inicio: form.data_inicio,
-        data_fim: form.data_fim || null,
+      const saved = await criarCompromisso(user.id, {
+        tipo: "financiamento",
+        descricao: finForm.descricao.trim(),
+        valor: valorParcela, // compatibilidade: valor mensal
+        valor_parcela: valorParcela,
+        valor_total_financiado: valorTotal,
+        valor_entrada: entrada || null,
+        parcelas_total: parcelasTotal,
+        parcelas_pagas: parcelasPagas,
+        financiamento_tipo: finForm.financiamento_tipo,
+        dia_vencimento: clampDay(finForm.dia_vencimento),
+        data_inicio: finForm.data_inicio,
+        data_fim: null,
+        categoria_id: finForm.categoria_id || null,
+        metodo_pagamento: finForm.metodo_pagamento || null,
+        observacoes: finForm.observacoes || null,
         ativo: true,
-      })
-      toast.success("Compromisso adicionado!")
-      setShowModal(false)
-      setForm({
-        descricao: "", valor: "", categoria_id: "", tipo: "despesa_fixa",
-        dia_vencimento: 10, data_inicio: new Date().toISOString().split("T")[0], data_fim: "",
-      })
-      carregar()
+      } as any)
+
+      toast.success("Financiamento adicionado!")
+      setFinanciamentos((prev) => [...prev, saved].sort((a, b) => (a.dia_vencimento ?? 0) - (b.dia_vencimento ?? 0)))
+      setFinModalOpen(false)
+      setFinForm(EMPTY_FIN)
     } catch {
-      toast.error("Erro ao salvar. Verifique se a migration foi aplicada.")
+      toast.error("Erro ao salvar. Tente novamente.")
     } finally {
       setSaving(false)
     }
   }
 
-  async function handleRemover(id: string) {
-    if (!confirm("Remover este compromisso?")) return
+  async function handleRemoverFin(id: string) {
+    if (!user) return
     try {
-      await removerCompromisso(id, user!.id)
-      toast.success("Compromisso removido.")
-      carregar()
+      await removerCompromisso(id, user.id)
+      setFinanciamentos((prev) => prev.filter((c) => c.id !== id))
+      toast.success("Removido.")
     } catch {
       toast.error("Erro ao remover.")
     }
   }
 
+  const subsProximas = useMemo(() => {
+    const list = [...assinaturas]
+      .filter((a) => a.ativo)
+      .sort((a, b) => {
+        const da = a.proximo_pagamento ? new Date(a.proximo_pagamento + "T00:00:00").getTime() : 0
+        const db = b.proximo_pagamento ? new Date(b.proximo_pagamento + "T00:00:00").getTime() : 0
+        return da - db
+      })
+    return list.slice(0, 5)
+  }, [assinaturas])
+
   if (loading) {
     return (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 300 }}>
-        <div style={{ width: 28, height: 28, border: "3px solid var(--of-border)", borderTopColor: "var(--of-text)", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />
+      <div className="p-4 lg:p-6 max-w-[1200px] mx-auto flex items-center justify-center min-h-[400px]">
+        <div className="w-6 h-6 border-2 border-black border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  if (migrationError) {
+    return (
+      <div className="p-4 lg:p-6 max-w-[900px] mx-auto">
+        <div style={{
+          background: "var(--of-surface)",
+          borderRadius: 16,
+          border: "1px solid var(--of-border)",
+          padding: "18px 18px",
+        }}>
+          <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+            <AlertCircle size={18} color="#EF4444" style={{ marginTop: 2 }} />
+            <div>
+              <p style={{ fontSize: 14, fontWeight: 700, color: "var(--of-text)" }}>Migração necessária</p>
+              <p style={{ fontSize: 13, color: "var(--of-text-muted)", marginTop: 4, lineHeight: 1.5 }}>
+                {t("futuroMigrationMsg")}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     )
   }
 
   return (
-    <div style={{ padding: "20px 16px 80px", maxWidth: 720, margin: "0 auto" }}>
-
-      {/* Summary bar */}
-      <div style={{
-        background: "var(--of-surface)", border: "1px solid var(--of-border)",
-        borderRadius: 14, padding: "18px 20px", marginBottom: 24,
-        display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16,
-        boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 10, background: "#FEF3C7", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <TrendingUp size={20} style={{ color: "#D97706" }} />
-          </div>
-          <div>
-            <p style={{ fontSize: 12, color: "var(--of-text-muted)", marginBottom: 2 }}>{t("futuroH1")}</p>
-            <p style={{ fontSize: 22, fontWeight: 700, color: "var(--of-text)" }}>{fmt(totalGeral)}</p>
-          </div>
+    <div className="p-4 lg:p-6 max-w-[1200px] mx-auto">
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 12, flexWrap: "wrap" as const, marginBottom: 18 }}>
+        <div>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--of-text)", letterSpacing: "-0.02em" }}>{t("futuroH1")}</h1>
+          <p style={{ fontSize: 13, color: "var(--of-text-muted)", marginTop: 4, lineHeight: 1.5 }}>
+            Planeje as próximas cobranças (assinaturas, financiamentos e parcelas) antes do mês virar.
+          </p>
         </div>
-        <p style={{ fontSize: 11, color: "var(--of-text-muted)", textAlign: "right" }}>
-          próx. 6 meses
-        </p>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" as const }}>
+          <Link
+            to="/app/assinaturas"
+            style={{
+              display: "inline-flex", alignItems: "center", gap: 8,
+              padding: "10px 12px", borderRadius: 10,
+              border: "1px solid var(--of-border)", background: "var(--of-surface)",
+              color: "var(--of-text)", textDecoration: "none",
+              fontSize: 13, fontWeight: 700,
+            }}
+          >
+            <Repeat size={14} /> Gerenciar assinaturas
+          </Link>
+          <button
+            onClick={() => setFinModalOpen(true)}
+            style={{
+              display: "inline-flex", alignItems: "center", gap: 8,
+              padding: "10px 12px", borderRadius: 10,
+              border: "none", background: "var(--of-btn-bg)",
+              color: "var(--of-btn-text)",
+              fontSize: 13, fontWeight: 800, cursor: "pointer",
+            }}
+          >
+            <Plus size={14} /> Novo financiamento
+          </button>
+        </div>
       </div>
 
-      {migrationError && (
-        <div style={{
-          display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", marginBottom: 20,
-          background: "#FEF3C7", border: "1px solid #FDE68A", borderRadius: 10,
-        }}>
-          <AlertCircle size={16} style={{ color: "#D97706", flexShrink: 0 }} />
-          <p style={{ fontSize: 13, color: "#92400E" }}>{t("futuroMigrationMsg")}</p>
+      {/* Resumo */}
+      <div style={{ display: "grid", gap: 12, marginBottom: 18 }} className="grid grid-cols-1 md:grid-cols-3">
+        <div style={{ background: "var(--of-surface)", border: "1px solid var(--of-border)", borderRadius: 14, padding: "16px 16px" }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: "var(--of-text-muted)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+            Assinaturas (mês)
+          </p>
+          <p style={{ fontSize: 20, fontWeight: 900, color: "var(--of-text)", marginTop: 4 }}>
+            {formatCurrency(totalSubsMensal, lang)}
+          </p>
+          <p style={{ fontSize: 12, color: "var(--of-text-muted)", marginTop: 4 }}>
+            {assinaturas.length} ativas
+          </p>
         </div>
-      )}
+        <div style={{ background: "var(--of-surface)", border: "1px solid var(--of-border)", borderRadius: 14, padding: "16px 16px" }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: "var(--of-text-muted)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+            Financiamentos (mês)
+          </p>
+          <p style={{ fontSize: 20, fontWeight: 900, color: "var(--of-text)", marginTop: 4 }}>
+            {formatCurrency(totalFinMensal, lang)}
+          </p>
+          <p style={{ fontSize: 12, color: "var(--of-text-muted)", marginTop: 4 }}>
+            {financiamentos.length} ativos
+          </p>
+        </div>
+        <div style={{ background: "var(--of-surface)", border: "1px solid var(--of-border)", borderRadius: 14, padding: "16px 16px" }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: "var(--of-text-muted)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+            Próximos 6 meses (estimado)
+          </p>
+          <p style={{ fontSize: 20, fontWeight: 900, color: "var(--of-text)", marginTop: 4 }}>
+            {formatCurrency(totalGeral, lang)}
+          </p>
+          <p style={{ fontSize: 12, color: "var(--of-text-muted)", marginTop: 4 }}>
+            Inclui parcelas + assinaturas + financiamentos
+          </p>
+        </div>
+      </div>
 
-      {/* Month timeline */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 20, marginBottom: 32 }}>
-        {meses.map(({ key, label, mes, ano }) => {
-          const monthParcelas = parcelasPorMes[key] || []
-          const monthComps = compromissosMes(mes, ano)
-          const total = totalMes(key, mes, ano)
-          if (monthParcelas.length === 0 && monthComps.length === 0) return null
-
-          return (
-            <div key={key} style={{ background: "var(--of-surface)", border: "1px solid var(--of-border)", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
-              {/* Month header */}
-              <div style={{
-                padding: "12px 16px", display: "flex", justifyContent: "space-between", alignItems: "center",
-                borderBottom: "1px solid var(--of-border-light)", background: "var(--of-page-bg)",
-              }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <Calendar size={14} style={{ color: "var(--of-text-muted)" }} />
-                  <span style={{ fontSize: 13, fontWeight: 600, color: "var(--of-text)", textTransform: "capitalize" }}>{label}</span>
-                </div>
-                <span style={{ fontSize: 14, fontWeight: 700, color: "#D97706" }}>{fmt(total)}</span>
+      {/* Cards: Assinaturas + Financiamentos */}
+      <div style={{ display: "grid", gap: 16, marginBottom: 18 }} className="grid grid-cols-1 lg:grid-cols-2">
+        {/* Assinaturas */}
+        <div style={{ background: "var(--of-surface)", border: "1px solid var(--of-border)", borderRadius: 16, overflow: "hidden" }}>
+          <div style={{ padding: "14px 16px", borderBottom: "1px solid var(--of-border)" }}>
+            <p style={{ fontSize: 13, fontWeight: 800, color: "var(--of-text)" }}>Assinaturas (próximas cobranças)</p>
+            <p style={{ fontSize: 12, color: "var(--of-text-muted)", marginTop: 2 }}>
+              Recorrências como Netflix, Spotify, academia, ferramentas e apps.
+            </p>
+          </div>
+          <div style={{ padding: "12px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
+            {subsProximas.length === 0 ? (
+              <div style={{ padding: "18px 0", textAlign: "center" }}>
+                <p style={{ fontSize: 13, color: "var(--of-text-muted)" }}>Nenhuma assinatura cadastrada.</p>
+                <Link to="/app/assinaturas" style={{ display: "inline-block", marginTop: 10, fontSize: 13, fontWeight: 700, color: "#16A34A", textDecoration: "none" }}>
+                  Adicionar assinatura →
+                </Link>
               </div>
-
-              {/* Parcelas */}
-              {monthParcelas.map((p) => (
-                <div key={p.id} style={{
-                  display: "flex", alignItems: "center", justifyContent: "space-between",
-                  padding: "11px 16px", borderBottom: "1px solid var(--of-border-light)",
-                }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <span style={{ fontSize: 16 }}>{p.categorias?.icone || "💳"}</span>
-                    <div>
-                      <p style={{ fontSize: 13, fontWeight: 500, color: "var(--of-text)" }}>{p.descricao}</p>
-                      {p.total_parcelas && (
-                        <p style={{ fontSize: 11, color: "var(--of-text-muted)" }}>
-                          {t("futuroParcela")} {p.parcela_atual} {t("futuroDeLabel")} {p.total_parcelas}
-                        </p>
+            ) : (
+              subsProximas.map((a) => (
+                <div key={a.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                  <div style={{ minWidth: 0, display: "flex", alignItems: "center", gap: 10 }}>
+                    <div style={{
+                      width: 30, height: 30, borderRadius: 10,
+                      background: (a.cor || "#16A34A") + "22",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      flexShrink: 0,
+                    }}>
+                      <span style={{ fontSize: 14 }}>{a.icone || "💳"}</span>
+                    </div>
+                    <div style={{ minWidth: 0 }}>
+                      <p style={{ fontSize: 13, fontWeight: 700, color: "var(--of-text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {a.nome}
+                      </p>
+                      {a.proximo_pagamento ? (
+                        <p style={{ fontSize: 11, color: "var(--of-text-muted)" }}>{formatDate(a.proximo_pagamento, lang)}</p>
+                      ) : (
+                        <p style={{ fontSize: 11, color: "var(--of-text-muted)" }}>Próximo pagamento não informado</p>
                       )}
                     </div>
                   </div>
-                  <span style={{ fontSize: 14, fontWeight: 600, color: "var(--of-text)" }}>{fmt(p.valor)}</span>
+                  <p style={{ fontSize: 13, fontWeight: 800, color: "var(--of-text)" }}>{formatCurrency(a.valor, lang)}</p>
                 </div>
-              ))}
-
-              {/* Compromissos */}
-              {monthComps.map((c) => (
-                <div key={c.id} style={{
-                  display: "flex", alignItems: "center", justifyContent: "space-between",
-                  padding: "11px 16px", borderBottom: "1px solid var(--of-border-light)",
-                }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <span style={{ fontSize: 16 }}>{c.categorias?.icone || "📆"}</span>
-                    <div>
-                      <p style={{ fontSize: 13, fontWeight: 500, color: "var(--of-text)" }}>{c.descricao}</p>
-                      <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 2 }}>
-                        <span style={{
-                          fontSize: 10, fontWeight: 700, padding: "1px 6px", borderRadius: 6,
-                          background: TIPO_BG[c.tipo] || "#F5F5F5",
-                          color: TIPO_COLORS[c.tipo] || "#555",
-                        }}>
-                          {c.tipo === "financiamento" ? t("futuroTipoFin") : c.tipo === "despesa_fixa" ? t("futuroTipoFixa") : t("futuroTipoAssin")}
-                        </span>
-                        <span style={{ fontSize: 11, color: "var(--of-text-muted)" }}>
-                          {t("futuroDiaVenc")} {c.dia_vencimento}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <span style={{ fontSize: 14, fontWeight: 600, color: "var(--of-text)" }}>{fmt(c.valor)} <span style={{ fontSize: 10, color: "var(--of-text-muted)" }}>{t("futuroTotalMes")}</span></span>
-                </div>
-              ))}
-            </div>
-          )
-        })}
-
-        {parcelas.length === 0 && compromissos.length === 0 && !migrationError && (
-          <div style={{ textAlign: "center", padding: "48px 24px", color: "var(--of-text-muted)" }}>
-            <TrendingUp size={36} style={{ margin: "0 auto 12px", opacity: 0.3 }} />
-            <p style={{ fontSize: 14 }}>{t("futuroSemDados")}</p>
+              ))
+            )}
           </div>
-        )}
-      </div>
-
-      {/* Compromissos section */}
-      <div style={{ marginBottom: 16 }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-          <h2 style={{ fontSize: 14, fontWeight: 700, color: "var(--of-text)" }}>{t("futuroCompromissosH")}</h2>
-          <button
-            onClick={() => setShowModal(true)}
-            style={{
-              display: "flex", alignItems: "center", gap: 6, padding: "7px 14px",
-              background: "#0A0A0A", color: "#FFFFFF", border: "none", borderRadius: 8,
-              cursor: "pointer", fontSize: 13, fontWeight: 600,
-            }}
-          >
-            <Plus size={14} />
-            {t("futuroNovoComp")}
-          </button>
         </div>
 
-        {compromissos.length > 0 && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {compromissos.map((c) => (
-              <div key={c.id} style={{
-                display: "flex", alignItems: "center", justifyContent: "space-between",
-                padding: "12px 16px", background: "var(--of-surface)",
-                border: "1px solid var(--of-border)", borderRadius: 12,
-                boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
-              }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <span style={{ fontSize: 18 }}>{c.categorias?.icone || "📆"}</span>
-                  <div>
-                    <p style={{ fontSize: 13, fontWeight: 600, color: "var(--of-text)" }}>{c.descricao}</p>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 3 }}>
-                      <span style={{
-                        fontSize: 10, fontWeight: 700, padding: "1px 6px", borderRadius: 6,
-                        background: TIPO_BG[c.tipo] || "#F5F5F5",
-                        color: TIPO_COLORS[c.tipo] || "#555",
-                      }}>
-                        {c.tipo === "financiamento" ? t("futuroTipoFin") : c.tipo === "despesa_fixa" ? t("futuroTipoFixa") : t("futuroTipoAssin")}
-                      </span>
-                      <span style={{ fontSize: 11, color: "var(--of-text-muted)" }}>
-                        {t("futuroDiaVenc")} {c.dia_vencimento}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <div style={{ textAlign: "right" }}>
-                    <p style={{ fontSize: 15, fontWeight: 700, color: "var(--of-text)" }}>{fmt(c.valor)}</p>
-                    <p style={{ fontSize: 10, color: "var(--of-text-muted)" }}>{t("futuroTotalMes")}</p>
-                  </div>
-                  <button
-                    onClick={() => handleRemover(c.id)}
-                    style={{ background: "none", border: "none", cursor: "pointer", padding: 6, color: "var(--of-text-muted)", borderRadius: 6 }}
-                    onMouseEnter={(e) => { e.currentTarget.style.color = "#DC2626" }}
-                    onMouseLeave={(e) => { e.currentTarget.style.color = "var(--of-text-muted)" }}
-                  >
-                    <Trash2 size={15} />
-                  </button>
-                </div>
-              </div>
-            ))}
+        {/* Financiamentos */}
+        <div style={{ background: "var(--of-surface)", border: "1px solid var(--of-border)", borderRadius: 16, overflow: "hidden" }}>
+          <div style={{ padding: "14px 16px", borderBottom: "1px solid var(--of-border)" }}>
+            <p style={{ fontSize: 13, fontWeight: 800, color: "var(--of-text)" }}>Financiamentos</p>
+            <p style={{ fontSize: 12, color: "var(--of-text-muted)", marginTop: 2 }}>
+              Acompanhe parcelas pagas, parcelas restantes e o peso no seu mês.
+            </p>
           </div>
-        )}
+          <div style={{ padding: "12px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
+            {financiamentos.length === 0 ? (
+              <div style={{ padding: "18px 0", textAlign: "center" }}>
+                <p style={{ fontSize: 13, color: "var(--of-text-muted)" }}>Nenhum financiamento cadastrado.</p>
+                <button
+                  onClick={() => setFinModalOpen(true)}
+                  style={{
+                    marginTop: 10,
+                    border: "1px dashed var(--of-border)",
+                    background: "var(--of-surface)",
+                    color: "var(--of-text)",
+                    borderRadius: 12,
+                    padding: "10px 12px",
+                    fontSize: 13,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                  }}
+                >
+                  + Adicionar financiamento
+                </button>
+              </div>
+            ) : (
+              financiamentos.map((c) => {
+                const tipo = safeFinTipo(c.financiamento_tipo as any)
+                const Icon = financiamentoIcon(tipo)
+                const color = financiamentoColor(tipo)
+                const total = Number(c.parcelas_total ?? 0) || 0
+                const pagas = Number(c.parcelas_pagas ?? 0) || 0
+                const pct = percent(pagas, total)
+                const mensal = mensalFin(c)
+
+                return (
+                  <div key={c.id} style={{ border: "1px solid var(--of-border)", borderRadius: 14, padding: "12px 12px" }}>
+                    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 10 }}>
+                      <div style={{ display: "flex", gap: 10, minWidth: 0 }}>
+                        <div style={{
+                          width: 34, height: 34, borderRadius: 12,
+                          background: color + "1A",
+                          border: "1px solid " + color + "33",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          flexShrink: 0,
+                        }}>
+                          <Icon size={16} style={{ color }} />
+                        </div>
+                        <div style={{ minWidth: 0 }}>
+                          <p style={{ fontSize: 13, fontWeight: 800, color: "var(--of-text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            {c.descricao}
+                          </p>
+                          <p style={{ fontSize: 11, color: "var(--of-text-muted)", marginTop: 2 }}>
+                            Vence dia {c.dia_vencimento} · Início {formatDate(c.data_inicio, lang)}
+                          </p>
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <p style={{ fontSize: 13, fontWeight: 900, color: "var(--of-text)" }}>{formatCurrency(mensal, lang)}/mês</p>
+                        <button
+                          onClick={() => handleRemoverFin(c.id)}
+                          title={t("futuroRemover")}
+                          style={{
+                            width: 34, height: 34, borderRadius: 10,
+                            border: "1px solid var(--of-border)",
+                            background: "var(--of-surface)",
+                            color: "#DC2626",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </div>
+
+                    {total > 0 && (
+                      <div style={{ marginTop: 12 }}>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+                          <p style={{ fontSize: 11, fontWeight: 700, color: "var(--of-text-muted)", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                            Progresso
+                          </p>
+                          <p style={{ fontSize: 11, fontWeight: 800, color: "var(--of-text-secondary)" }}>
+                            {parcelaLabel(pagas, total)} ({pct.toFixed(0)}%)
+                          </p>
+                        </div>
+                        <div style={{ height: 8, borderRadius: 999, background: "var(--of-border)", overflow: "hidden" }}>
+                          <div style={{ width: `${pct}%`, height: "100%", borderRadius: 999, background: color, transition: "width 0.2s" }} />
+                        </div>
+                      </div>
+                    )}
+
+                    {(c.metodo_pagamento || c.valor_total_financiado) && (
+                      <div style={{ marginTop: 10, display: "flex", flexWrap: "wrap" as const, gap: 8 }}>
+                        {c.valor_total_financiado != null && (
+                          <span style={{ fontSize: 11, fontWeight: 700, padding: "4px 10px", borderRadius: 999, border: "1px solid var(--of-border)", background: "var(--of-page-bg)", color: "var(--of-text-secondary)" }}>
+                            Total: {formatCurrency(Number(c.valor_total_financiado) || 0, lang)}
+                          </span>
+                        )}
+                        {c.metodo_pagamento && (
+                          <span style={{ fontSize: 11, fontWeight: 700, padding: "4px 10px", borderRadius: 999, border: "1px solid var(--of-border)", background: "var(--of-page-bg)", color: "var(--of-text-secondary)" }}>
+                            Pagamento: {METODOS_PAGAMENTO.find((m) => m.value === c.metodo_pagamento)?.label ?? c.metodo_pagamento}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )
+              })
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* Modal novo compromisso */}
-      {showModal && (
-        <div style={{
-          position: "fixed", inset: 0, zIndex: 200,
-          background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)",
-          display: "flex", alignItems: "center", justifyContent: "center", padding: 16,
-        }}>
-          <div style={{
-            background: "var(--of-surface)", borderRadius: 16, width: "100%", maxWidth: 460,
-            boxShadow: "0 24px 80px rgba(0,0,0,0.25)", overflow: "hidden",
-          }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", borderBottom: "1px solid var(--of-border-light)" }}>
-              <h3 style={{ fontSize: 15, fontWeight: 700, color: "var(--of-text)" }}>{t("futuroNovoComp")}</h3>
-              <button onClick={() => setShowModal(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--of-text-muted)" }}><X size={18} /></button>
+      {/* Próximos meses */}
+      <div style={{ background: "var(--of-surface)", borderRadius: 16, border: "1px solid var(--of-border)", overflow: "hidden" }}>
+        <div style={{ padding: "14px 16px", borderBottom: "1px solid var(--of-border)" }}>
+          <p style={{ fontSize: 13, fontWeight: 800, color: "var(--of-text)" }}>Projeção dos próximos meses</p>
+          <p style={{ fontSize: 12, color: "var(--of-text-muted)", marginTop: 2 }}>
+            Uma visão rápida do que entra no seu planejamento antes do mês começar.
+          </p>
+        </div>
+        <div style={{ padding: "12px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
+          {meses.map((m) => {
+            const pTotal = (parcelasPorMes[m.key] || []).reduce((s, p) => s + p.valor, 0)
+            const fTotal = financiamentos.filter((c) => finNoMes(c, m.date)).reduce((s, c) => s + mensalFin(c), 0)
+            const sTotal = totalSubsMensal
+            const total = pTotal + fTotal + sTotal
+
+            return (
+              <div key={m.key} style={{
+                border: "1px solid var(--of-border)", borderRadius: 14,
+                padding: "12px 12px",
+                display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
+              }}>
+                <div style={{ minWidth: 0 }}>
+                  <p style={{ fontSize: 13, fontWeight: 800, color: "var(--of-text)", textTransform: "capitalize" }}>{m.label}</p>
+                  <div style={{ marginTop: 6, display: "flex", flexWrap: "wrap" as const, gap: 8 }}>
+                    <span style={{ fontSize: 11, color: "var(--of-text-muted)" }}>
+                      Parcelas: <strong style={{ color: "var(--of-text)" }}>{formatCurrency(pTotal, lang)}</strong>
+                    </span>
+                    <span style={{ fontSize: 11, color: "var(--of-text-muted)" }}>
+                      Financiamentos: <strong style={{ color: "var(--of-text)" }}>{formatCurrency(fTotal, lang)}</strong>
+                    </span>
+                    <span style={{ fontSize: 11, color: "var(--of-text-muted)" }}>
+                      Assinaturas: <strong style={{ color: "var(--of-text)" }}>{formatCurrency(sTotal, lang)}</strong>
+                    </span>
+                  </div>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: "var(--of-text-muted)", letterSpacing: "0.06em", textTransform: "uppercase" }}>Total</p>
+                  <p style={{ fontSize: 15, fontWeight: 900, color: "var(--of-text)" }}>{formatCurrency(total, lang)}</p>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Modal: Novo financiamento */}
+      <DialogPrimitive.Root open={finModalOpen} onOpenChange={(v) => { if (!v) setFinForm(EMPTY_FIN); setFinModalOpen(v) }}>
+        <DialogPrimitive.Portal>
+          <DialogPrimitive.Overlay
+            style={{
+              position: "fixed", inset: 0, zIndex: 100,
+              backgroundColor: "rgba(0,0,0,0.5)",
+              backdropFilter: "blur(2px)",
+            }}
+          />
+          <DialogPrimitive.Content
+            style={{
+              position: "fixed",
+              top: "50%", left: "50%",
+              transform: "translate(-50%, -50%)",
+              zIndex: 101,
+              width: "100%",
+              maxWidth: 640,
+              maxHeight: "90vh",
+              overflowY: "auto",
+              backgroundColor: "var(--of-surface)",
+              borderRadius: 16,
+              border: "1px solid var(--of-border)",
+              boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
+              padding: "22px 22px 18px",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 10, marginBottom: 16 }}>
+              <div>
+                <h2 style={{ fontSize: 18, fontWeight: 900, color: "var(--of-text)", letterSpacing: "-0.02em" }}>
+                  Novo financiamento
+                </h2>
+                <p style={{ fontSize: 13, color: "var(--of-text-muted)", marginTop: 4, lineHeight: 1.45 }}>
+                  Cadastre um financiamento real (parcelas, progresso e impacto mensal).
+                </p>
+              </div>
+              <DialogPrimitive.Close
+                style={{
+                  background: "none", border: "none", cursor: "pointer",
+                  width: 36, height: 36, borderRadius: 10,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  color: "var(--of-text-secondary)",
+                }}
+              >
+                <X size={18} />
+              </DialogPrimitive.Close>
             </div>
 
-            <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: 14 }}>
-              {/* Tipo */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", display: "block", marginBottom: 6 }}>Tipo</label>
-                <div style={{ display: "flex", gap: 6 }}>
-                  {(["despesa_fixa", "financiamento", "assinatura"] as const).map((tipo) => (
-                    <button
-                      key={tipo}
-                      onClick={() => setForm((f) => ({ ...f, tipo }))}
-                      style={{
-                        flex: 1, padding: "8px 4px", borderRadius: 8, border: "none", cursor: "pointer",
-                        fontSize: 11, fontWeight: 600, transition: "all 0.15s",
-                        background: form.tipo === tipo ? TIPO_BG[tipo] : "var(--of-page-bg)",
-                        color: form.tipo === tipo ? TIPO_COLORS[tipo] : "var(--of-text-muted)",
-                        outline: form.tipo === tipo ? `2px solid ${TIPO_COLORS[tipo]}` : "none",
-                      }}
-                    >
-                      {tipo === "financiamento" ? t("futuroTipoFin") : tipo === "despesa_fixa" ? t("futuroTipoFixa") : t("futuroTipoAssin")}
-                    </button>
+                <label style={{ fontSize: 11, fontWeight: 700, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>
+                  Tipo
+                </label>
+                <select
+                  value={finForm.financiamento_tipo}
+                  onChange={(e) => setFinForm((p) => ({ ...p, financiamento_tipo: e.target.value as FinanciamentoTipo }))}
+                  style={{ width: "100%", padding: "10px 12px", border: "1px solid var(--of-border)", borderRadius: 10, background: "var(--of-surface)", color: "var(--of-text)", fontSize: 14, outline: "none" }}
+                >
+                  {Object.entries(FIN_TIPO_META).map(([k, v]) => (
+                    <option key={k} value={k}>{v.label}</option>
                   ))}
-                </div>
+                </select>
               </div>
 
-              {/* Descrição */}
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", display: "block", marginBottom: 6 }}>Descrição</label>
+                <label style={{ fontSize: 11, fontWeight: 700, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>
+                  Nome
+                </label>
                 <input
-                  type="text"
-                  value={form.descricao}
-                  onChange={(e) => setForm((f) => ({ ...f, descricao: e.target.value }))}
-                  placeholder="Ex: Financiamento do carro, Netflix..."
-                  style={{ width: "100%", padding: "10px 12px", border: "1px solid var(--of-border)", borderRadius: 8, fontSize: 14, outline: "none", background: "var(--of-page-bg)", color: "var(--of-text)", boxSizing: "border-box" as const }}
+                  value={finForm.descricao}
+                  onChange={(e) => setFinForm((p) => ({ ...p, descricao: e.target.value }))}
+                  placeholder="Ex: Corolla 2022, Casa, Apartamento..."
+                  style={{ width: "100%", padding: "10px 12px", border: "1px solid var(--of-border)", borderRadius: 10, background: "transparent", color: "var(--of-text)", fontSize: 14, outline: "none" }}
                 />
               </div>
+            </div>
 
-              {/* Valor + Dia */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                <div>
-                  <label style={{ fontSize: 11, fontWeight: 600, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", display: "block", marginBottom: 6 }}>Valor mensal (R$)</label>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginTop: 12 }}>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>
+                  Valor total financiado
+                </label>
+                <input
+                  inputMode="decimal"
+                  value={finForm.valor_total_financiado}
+                  onChange={(e) => setFinForm((p) => ({ ...p, valor_total_financiado: e.target.value }))}
+                  placeholder="0,00"
+                  style={{ width: "100%", padding: "10px 12px", border: "1px solid var(--of-border)", borderRadius: 10, background: "transparent", color: "var(--of-text)", fontSize: 14, outline: "none" }}
+                />
+              </div>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>
+                  Entrada (opcional)
+                </label>
+                <input
+                  inputMode="decimal"
+                  value={finForm.valor_entrada}
+                  onChange={(e) => setFinForm((p) => ({ ...p, valor_entrada: e.target.value }))}
+                  placeholder="0,00"
+                  style={{ width: "100%", padding: "10px 12px", border: "1px solid var(--of-border)", borderRadius: 10, background: "transparent", color: "var(--of-text)", fontSize: 14, outline: "none" }}
+                />
+              </div>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>
+                  Parcela mensal
+                </label>
+                <input
+                  inputMode="decimal"
+                  value={finForm.valor_parcela}
+                  onChange={(e) => setFinForm((p) => ({ ...p, valor_parcela: e.target.value }))}
+                  placeholder="0,00"
+                  style={{ width: "100%", padding: "10px 12px", border: "1px solid var(--of-border)", borderRadius: 10, background: "transparent", color: "var(--of-text)", fontSize: 14, outline: "none" }}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginTop: 12 }}>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>
+                  Total de parcelas
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  value={finForm.parcelas_total}
+                  onChange={(e) => setFinForm((p) => ({ ...p, parcelas_total: e.target.value }))}
+                  style={{ width: "100%", padding: "10px 12px", border: "1px solid var(--of-border)", borderRadius: 10, background: "transparent", color: "var(--of-text)", fontSize: 14, outline: "none" }}
+                />
+              </div>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>
+                  Parcelas pagas
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  value={finForm.parcelas_pagas}
+                  onChange={(e) => setFinForm((p) => ({ ...p, parcelas_pagas: e.target.value }))}
+                  style={{ width: "100%", padding: "10px 12px", border: "1px solid var(--of-border)", borderRadius: 10, background: "transparent", color: "var(--of-text)", fontSize: 14, outline: "none" }}
+                />
+              </div>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>
+                  Dia de vencimento
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  max={31}
+                  value={finForm.dia_vencimento}
+                  onChange={(e) => setFinForm((p) => ({ ...p, dia_vencimento: clampDay(Number.parseInt(e.target.value || "1", 10) || 1) }))}
+                  style={{ width: "100%", padding: "10px 12px", border: "1px solid var(--of-border)", borderRadius: 10, background: "transparent", color: "var(--of-text)", fontSize: 14, outline: "none" }}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 12 }}>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>
+                  Data de início
+                </label>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, border: "1px solid var(--of-border)", borderRadius: 10, padding: "10px 12px" }}>
+                  <Calendar size={16} style={{ color: "var(--of-text-muted)" }} />
                   <input
-                    type="text"
-                    inputMode="decimal"
-                    value={form.valor}
-                    onChange={(e) => setForm((f) => ({ ...f, valor: e.target.value }))}
-                    placeholder="0,00"
-                    style={{ width: "100%", padding: "10px 12px", border: "1px solid var(--of-border)", borderRadius: 8, fontSize: 14, outline: "none", background: "var(--of-page-bg)", color: "var(--of-text)", boxSizing: "border-box" as const }}
-                  />
-                </div>
-                <div>
-                  <label style={{ fontSize: 11, fontWeight: 600, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", display: "block", marginBottom: 6 }}>{t("futuroDiaVenc")}</label>
-                  <input
-                    type="number"
-                    min={1}
-                    max={31}
-                    value={form.dia_vencimento}
-                    onChange={(e) => setForm((f) => ({ ...f, dia_vencimento: Math.max(1, Math.min(31, parseInt(e.target.value) || 1)) }))}
-                    style={{ width: "100%", padding: "10px 12px", border: "1px solid var(--of-border)", borderRadius: 8, fontSize: 14, outline: "none", background: "var(--of-page-bg)", color: "var(--of-text)", boxSizing: "border-box" as const }}
+                    type="date"
+                    value={finForm.data_inicio}
+                    onChange={(e) => setFinForm((p) => ({ ...p, data_inicio: e.target.value }))}
+                    style={{ flex: 1, border: "none", outline: "none", background: "transparent", color: "var(--of-text)", fontSize: 14 }}
                   />
                 </div>
               </div>
 
-              {/* Categoria */}
               <div>
-                <label style={{ fontSize: 11, fontWeight: 600, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", display: "block", marginBottom: 6 }}>Categoria (opcional)</label>
+                <label style={{ fontSize: 11, fontWeight: 700, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>
+                  Forma de pagamento
+                </label>
                 <select
-                  value={form.categoria_id}
-                  onChange={(e) => setForm((f) => ({ ...f, categoria_id: e.target.value }))}
-                  style={{ width: "100%", padding: "10px 12px", border: "1px solid var(--of-border)", borderRadius: 8, fontSize: 14, outline: "none", background: "var(--of-page-bg)", color: "var(--of-text)", boxSizing: "border-box" as const }}
+                  value={finForm.metodo_pagamento}
+                  onChange={(e) => setFinForm((p) => ({ ...p, metodo_pagamento: e.target.value as any }))}
+                  style={{ width: "100%", padding: "10px 12px", border: "1px solid var(--of-border)", borderRadius: 10, background: "var(--of-surface)", color: "var(--of-text)", fontSize: 14, outline: "none" }}
                 >
-                  <option value="">Selecione...</option>
+                  <option value="">Selecione…</option>
+                  {METODOS_PAGAMENTO.map((m) => (
+                    <option key={m.value} value={m.value}>{m.label}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 12 }}>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>
+                  Categoria (opcional)
+                </label>
+                <select
+                  value={finForm.categoria_id}
+                  onChange={(e) => setFinForm((p) => ({ ...p, categoria_id: e.target.value }))}
+                  style={{ width: "100%", padding: "10px 12px", border: "1px solid var(--of-border)", borderRadius: 10, background: "var(--of-surface)", color: "var(--of-text)", fontSize: 14, outline: "none" }}
+                >
+                  <option value="">Selecione…</option>
                   {cats.filter((c) => c.tipo === "despesa").map((c) => (
                     <option key={c.id} value={c.id}>{c.icone} {c.nome}</option>
                   ))}
                 </select>
               </div>
-
-              {/* Datas */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                <div>
-                  <label style={{ fontSize: 11, fontWeight: 600, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", display: "block", marginBottom: 6 }}>{t("futuroDataInicio")}</label>
-                  <input
-                    type="date"
-                    value={form.data_inicio}
-                    onChange={(e) => setForm((f) => ({ ...f, data_inicio: e.target.value }))}
-                    style={{ width: "100%", padding: "10px 12px", border: "1px solid var(--of-border)", borderRadius: 8, fontSize: 14, outline: "none", background: "var(--of-page-bg)", color: "var(--of-text)", boxSizing: "border-box" as const }}
-                  />
-                </div>
-                <div>
-                  <label style={{ fontSize: 11, fontWeight: 600, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", display: "block", marginBottom: 6 }}>{t("futuroDataFim")}</label>
-                  <input
-                    type="date"
-                    value={form.data_fim}
-                    onChange={(e) => setForm((f) => ({ ...f, data_fim: e.target.value }))}
-                    style={{ width: "100%", padding: "10px 12px", border: "1px solid var(--of-border)", borderRadius: 8, fontSize: 14, outline: "none", background: "var(--of-page-bg)", color: "var(--of-text)", boxSizing: "border-box" as const }}
-                  />
-                </div>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: "var(--of-text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: 6 }}>
+                  Observações (opcional)
+                </label>
+                <input
+                  value={finForm.observacoes}
+                  onChange={(e) => setFinForm((p) => ({ ...p, observacoes: e.target.value }))}
+                  placeholder="Ex: taxa, banco, observações..."
+                  style={{ width: "100%", padding: "10px 12px", border: "1px solid var(--of-border)", borderRadius: 10, background: "transparent", color: "var(--of-text)", fontSize: 14, outline: "none" }}
+                />
               </div>
             </div>
 
-            <div style={{ display: "flex", gap: 8, padding: "0 20px 20px" }}>
+            <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
               <button
-                onClick={() => setShowModal(false)}
+                onClick={() => setFinModalOpen(false)}
                 style={{
-                  flex: 1, padding: "11px", border: "1px solid var(--of-border)", borderRadius: 8,
-                  background: "none", cursor: "pointer", fontSize: 13, fontWeight: 600, color: "var(--of-text)",
+                  flex: 1,
+                  padding: "12px 0",
+                  borderRadius: 12,
+                  border: "1px solid var(--of-border)",
+                  background: "var(--of-surface)",
+                  color: "var(--of-text)",
+                  fontSize: 14,
+                  fontWeight: 700,
+                  cursor: "pointer",
                 }}
               >
-                {t("futuroCancelar")}
+                Cancelar
               </button>
               <button
-                onClick={handleSalvarCompromisso}
+                onClick={handleSalvarFinanciamento}
                 disabled={saving}
                 style={{
-                  flex: 2, padding: "11px", border: "none", borderRadius: 8,
-                  background: "#0A0A0A", color: "#FFFFFF",
-                  cursor: saving ? "not-allowed" : "pointer", fontSize: 13, fontWeight: 700,
-                  opacity: saving ? 0.7 : 1,
+                  flex: 2,
+                  padding: "12px 0",
+                  borderRadius: 12,
+                  border: "none",
+                  background: saving ? "var(--of-border)" : "var(--of-btn-bg)",
+                  color: saving ? "var(--of-text-muted)" : "var(--of-btn-text)",
+                  fontSize: 14,
+                  fontWeight: 900,
+                  cursor: saving ? "not-allowed" : "pointer",
                 }}
               >
-                {saving ? "Salvando..." : t("futuroSalvar")}
+                {saving ? "Salvando..." : "Salvar financiamento"}
               </button>
             </div>
-          </div>
-        </div>
-      )}
+          </DialogPrimitive.Content>
+        </DialogPrimitive.Portal>
+      </DialogPrimitive.Root>
     </div>
   )
 }
+

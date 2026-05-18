@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Openfy — Planejamento</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:      #0A0A0A;
+  --bg2:     #111111;
+  --bg3:     #1A1A1A;
+  --bg4:     #222222;
+  --border:  rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text:    #F0F0EC;
+  --text2:   #9CA3AF;
+  --text3:   #52525B;
+  --accent:  #16A34A;
+  --accent2: #15803D;
+  --accentFg:#4ADE80;
+  --accentGlow: rgba(22,163,74,0.15);
+  --red:     #EF4444;
+  --redGlow: rgba(239,68,68,0.12);
+  --yellow:  #EAB308;
+  --yellowGlow: rgba(234,179,8,0.12);
+  --blue:    #60A5FA;
+  --blueGlow: rgba(96,165,250,0.12);
+  --purple:  #A78BFA;
+  --purpleGlow: rgba(167,139,250,0.12);
+  --orange:  #FB923C;
+  --orangeGlow: rgba(251,146,60,0.12);
+  --radius:  12px;
+  --sidebar: 64px;
+  --font-title: 'DM Sans', sans-serif;
+  --font-body:  'Inter', sans-serif;
+}
+
+[data-theme="light"] {
+  --bg:      #F5F5F0;
+  --bg2:     #FFFFFF;
+  --bg3:     #ECEEE9;
+  --bg4:     #E2E4DF;
+  --border:  rgba(0,0,0,0.07);
+  --border2: rgba(0,0,0,0.12);
+  --text:    #0A0A0A;
+  --text2:   #52525B;
+  --text3:   #A1A1AA;
+  --accentGlow: rgba(22,163,74,0.08);
+  --redGlow: rgba(239,68,68,0.06);
+  --yellowGlow: rgba(234,179,8,0.07);
+  --blueGlow: rgba(96,165,250,0.07);
+  --purpleGlow: rgba(167,139,250,0.07);
+  --orangeGlow: rgba(251,146,60,0.07);
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  overflow: hidden;
+}
+
+/* Sidebar */
+.sidebar {
+  width: var(--sidebar); height: 100vh;
+  background: var(--bg2); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; align-items: center;
+  padding: 20px 0; gap: 6px; flex-shrink: 0;
+}
+.sidebar-logo {
+  width: 36px; height: 36px; background: var(--accent); border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-title); font-weight: 700; font-size: 14px; color: #fff;
+  margin-bottom: 12px;
+}
+.nav-item {
+  width: 44px; height: 44px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: background 0.15s, color 0.15s; color: var(--text3);
+}
+.nav-item:hover { background: var(--bg3); color: var(--text2); }
+.nav-item.active { background: var(--accentGlow); color: var(--accent); }
+.nav-item svg { width: 18px; height: 18px; }
+.theme-btn {
+  width: 44px; height: 44px; border-radius: 10px;
+  background: var(--bg3); border: 1px solid var(--border);
+  color: var(--text2); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: auto; margin-bottom: 4px;
+}
+.theme-btn:hover { color: var(--text); }
+
+/* Main */
+.main { flex: 1; height: 100vh; overflow-y: auto; display: flex; flex-direction: column; }
+
+.topbar {
+  height: 56px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 32px; gap: 10px;
+  flex-shrink: 0; background: var(--bg);
+  position: sticky; top: 0; z-index: 10;
+}
+.breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text2); }
+.breadcrumb .sep { color: var(--text3); }
+.breadcrumb .current { color: var(--text); font-weight: 500; }
+.topbar-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 8px;
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  transition: all 0.15s; border: none; font-family: var(--font-body);
+}
+.btn-ghost { background: transparent; color: var(--text2); border: 1px solid var(--border); }
+.btn-ghost:hover { background: var(--bg3); color: var(--text); border-color: var(--border2); }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent2); }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+
+/* Content layout */
+.content {
+  padding: 32px 40px 80px;
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+  align-items: start;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Section */
+.section { display: flex; flex-direction: column; gap: 12px; }
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 4px;
+}
+.section-title {
+  font-family: var(--font-title); font-size: 15px; font-weight: 600;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-count {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px; border-radius: 6px;
+  background: var(--bg3); font-size: 11px; font-weight: 600; color: var(--text2);
+}
+.see-all { font-size: 13px; color: var(--accent); cursor: pointer; font-weight: 500; }
+
+/* Badge */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 20px;
+  font-size: 11px; font-weight: 600;
+}
+.badge-sub { background: var(--purpleGlow); color: var(--purple); border: 1px solid rgba(167,139,250,0.2); }
+.badge-invest { background: var(--blueGlow); color: var(--blue); border: 1px solid rgba(96,165,250,0.2); }
+.badge-fixed { background: var(--orangeGlow); color: var(--orange); border: 1px solid rgba(251,146,60,0.2); }
+.badge-financing { background: var(--yellowGlow); color: var(--yellow); border: 1px solid rgba(234,179,8,0.2); }
+.badge-ai { background: var(--accentGlow); color: var(--accentFg); border: 1px solid rgba(74,222,128,0.2); }
+.badge-alert { background: var(--redGlow); color: var(--red); border: 1px solid rgba(239,68,68,0.2); }
+
+/* ── AI SUGGESTIONS ── */
+.ai-banner {
+  background: linear-gradient(135deg, rgba(22,163,74,0.08) 0%, rgba(96,165,250,0.06) 100%);
+  border: 1px solid rgba(22,163,74,0.2);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 8px;
+  grid-column: 1 / -1;
+  position: relative;
+  overflow: hidden;
+}
+.ai-banner::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--blue), var(--accent));
+  background-size: 200% 100%;
+  animation: shimmer 3s ease infinite;
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.ai-banner-header {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+}
+.ai-banner-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--accentGlow); border: 1px solid rgba(74,222,128,0.2);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--accentFg); flex-shrink: 0;
+}
+.ai-banner-icon svg { width: 16px; height: 16px; }
+.ai-banner-title { font-family: var(--font-title); font-size: 14px; font-weight: 600; }
+.ai-banner-sub { font-size: 12px; color: var(--text2); margin-top: 1px; }
+
+.suggestions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.suggestion-card {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex; flex-direction: column; gap: 10px;
+  position: relative;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.suggestion-card:hover { border-color: rgba(22,163,74,0.3); }
+
+.suggestion-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 100%;
+  border-radius: 12px;
+  background: radial-gradient(ellipse 80% 40% at 50% 0%, var(--accentGlow), transparent);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.suggestion-card:hover::before { opacity: 1; }
+
+.suggestion-header {
+  display: flex; align-items: flex-start; gap: 8px;
+}
+.suggestion-icon {
+  width: 36px; height: 36px; border-radius: 9px;
+  background: var(--bg3); border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.suggestion-info { flex: 1; }
+.suggestion-name { font-size: 13px; font-weight: 600; }
+.suggestion-detail { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+.suggestion-body {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.suggestion-amount { font-family: var(--font-title); font-size: 16px; font-weight: 700; }
+
+.suggestion-actions { display: flex; gap: 6px; }
+.sug-btn {
+  padding: 5px 10px; border-radius: 6px;
+  font-size: 11px; font-weight: 600;
+  cursor: pointer; border: 1px solid var(--border2);
+  background: var(--bg3); color: var(--text2);
+  transition: all 0.12s;
+  font-family: var(--font-body);
+}
+.sug-btn.primary { background: var(--accentGlow); border-color: rgba(22,163,74,0.3); color: var(--accentFg); }
+.sug-btn.primary:hover { background: rgba(22,163,74,0.25); }
+.sug-btn:hover { background: var(--bg4); color: var(--text); }
+
+.suggestion-conf {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 11px; color: var(--text3);
+}
+.conf-bar {
+  width: 48px; height: 3px;
+  background: var(--bg4); border-radius: 99px; overflow: hidden;
+}
+.conf-bar-fill {
+  height: 100%; border-radius: 99px;
+  background: var(--accent);
+}
+
+/* ── ITEM LIST (subscriptions, fixed, financing) ── */
+.item-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px;
+  cursor: pointer; transition: all 0.15s;
+  position: relative;
+}
+.item-card:hover { background: var(--bg3); border-color: var(--border2); }
+
+.item-emoji {
+  width: 38px; height: 38px;
+  border-radius: 10px; background: var(--bg3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+  border: 1px solid var(--border2);
+}
+
+.item-info { flex: 1; min-width: 0; }
+.item-name { font-size: 13px; font-weight: 600; }
+.item-meta { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+.item-amount { text-align: right; flex-shrink: 0; }
+.item-amount .val { font-family: var(--font-title); font-size: 14px; font-weight: 600; }
+.item-amount .val.neg { color: var(--red); }
+.item-amount .val.pos { color: var(--accentFg); }
+.item-amount .when { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+.item-status-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  flex-shrink: 0;
+  margin-left: 4px;
+}
+.item-status-dot.active { background: var(--accent); box-shadow: 0 0 0 2px var(--accentGlow); }
+.item-status-dot.paused { background: var(--yellow); }
+.item-status-dot.late   { background: var(--red); box-shadow: 0 0 0 2px var(--redGlow); }
+
+/* Alert cards */
+.alert-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: flex; align-items: flex-start; gap: 12px;
+  cursor: pointer; transition: all 0.15s;
+}
+.alert-card:hover { background: var(--bg3); border-color: var(--border2); }
+.alert-card.warn { border-color: rgba(234,179,8,0.2); background: var(--yellowGlow); }
+.alert-card.warn:hover { border-color: rgba(234,179,8,0.3); }
+.alert-card.danger { border-color: rgba(239,68,68,0.2); background: var(--redGlow); }
+.alert-card.danger:hover { border-color: rgba(239,68,68,0.3); }
+
+.alert-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; font-size: 16px;
+}
+
+.alert-content { flex: 1; }
+.alert-title { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+.alert-desc { font-size: 12px; color: var(--text2); line-height: 1.4; }
+
+.alert-action {
+  font-size: 12px; font-weight: 600; color: var(--accent);
+  cursor: pointer; flex-shrink: 0; align-self: center;
+  white-space: nowrap;
+}
+
+/* ── PAYMENT METHODS ── */
+.payment-section {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 16px; padding: 20px;
+}
+
+.pm-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px;
+}
+.pm-title { font-family: var(--font-title); font-size: 14px; font-weight: 600; }
+.pm-period { font-size: 12px; color: var(--text2); }
+
+.pm-bars { display: flex; flex-direction: column; gap: 12px; }
+
+.pm-item { display: flex; align-items: center; gap: 12px; }
+
+.pm-label {
+  display: flex; align-items: center; gap: 8px;
+  width: 100px; flex-shrink: 0;
+}
+.pm-emoji { font-size: 16px; width: 20px; text-align: center; }
+.pm-name { font-size: 12px; font-weight: 500; color: var(--text2); }
+
+.pm-bar-track {
+  flex: 1; height: 6px;
+  background: var(--bg3); border-radius: 99px; overflow: hidden;
+}
+.pm-bar-fill {
+  height: 100%; border-radius: 99px;
+  transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+
+.pm-pct { font-size: 12px; font-weight: 600; width: 36px; text-align: right; flex-shrink: 0; }
+
+.pm-colors {
+  --c1: #16A34A;
+  --c2: #60A5FA;
+  --c3: #A78BFA;
+  --c4: #FB923C;
+  --c5: #F472B6;
+  --c6: #6B7280;
+}
+
+/* Donut chart via SVG */
+.donut-wrap { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; }
+.donut-svg { flex-shrink: 0; }
+.donut-legend { display: flex; flex-direction: column; gap: 8px; }
+.legend-item { display: flex; align-items: center; gap: 8px; }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.legend-label { font-size: 12px; color: var(--text2); }
+.legend-pct { font-size: 12px; font-weight: 600; color: var(--text); margin-left: auto; }
+
+/* Summary total */
+.pm-total {
+  margin-top: 16px; padding-top: 14px;
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.pm-total-label { font-size: 12px; color: var(--text2); }
+.pm-total-val { font-family: var(--font-title); font-size: 16px; font-weight: 700; color: var(--red); }
+
+/* Right column */
+.right-col { display: flex; flex-direction: column; gap: 20px; }
+
+/* Divider */
+.block-gap { height: 20px; }
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 99px; }
+
+/* Modal */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: none; align-items: center; justify-content: center;
+  z-index: 50; backdrop-filter: blur(6px);
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--bg2); border: 1px solid var(--border2);
+  border-radius: 18px; width: 440px; overflow: hidden;
+  animation: modal-in 0.22s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+}
+@keyframes modal-in {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal-header { padding: 24px 24px 16px; border-bottom: 1px solid var(--border); }
+.modal-title { font-family: var(--font-title); font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+.modal-sub { font-size: 13px; color: var(--text2); }
+.modal-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; }
+.modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: 12px; font-weight: 500; color: var(--text2); }
+.field input, .field select {
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 9px 12px;
+  font-size: 14px; font-family: var(--font-body); color: var(--text);
+  outline: none; transition: border-color 0.15s;
+}
+.field input:focus, .field select:focus { border-color: var(--accent); }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.type-chooser { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.type-opt {
+  padding: 10px 8px;
+  border: 1.5px solid var(--border2);
+  border-radius: 8px; text-align: center;
+  cursor: pointer; font-size: 12px; font-weight: 600;
+  color: var(--text2); background: var(--bg3);
+  transition: all 0.12s;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+.type-opt.selected { border-color: var(--accent); background: var(--accentGlow); color: var(--accentFg); }
+.type-opt:hover { border-color: var(--border2); background: var(--bg4); color: var(--text); }
+.type-opt .emoji { font-size: 20px; }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo">Of</div>
+  <div class="nav-item" title="Dashboard">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+  </div>
+  <div class="nav-item" title="Transações">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+  </div>
+  <div class="nav-item" title="Cartões">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/></svg>
+  </div>
+  <div class="nav-item" title="Importação">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+  </div>
+  <div class="nav-item" title="Ciclos">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+  </div>
+  <div class="nav-item active" title="Planejamento">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+  </div>
+  <div class="nav-item" title="Análise">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+  </div>
+  <button class="theme-btn" id="themeBtn">
+    <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+  </button>
+</aside>
+
+<!-- Main -->
+<main class="main">
+  <div class="topbar">
+    <div class="breadcrumb">
+      <span>Finanças</span>
+      <span class="sep">›</span>
+      <span class="current">Planejamento</span>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Adicionar item
+      </button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- Left column -->
+    <div style="display:flex;flex-direction:column;gap:24px;">
+
+      <!-- AI Suggestions Banner -->
+      <div class="ai-banner">
+        <div class="ai-banner-header">
+          <div class="ai-banner-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <div>
+            <div class="ai-banner-title">Sugestões da IA — 5 itens detectados</div>
+            <div class="ai-banner-sub">Baseado nas suas importações de abril e maio 2025</div>
+          </div>
+          <button class="btn btn-ghost btn-sm" style="margin-left:auto">Dispensar tudo</button>
+        </div>
+
+        <div class="suggestions-grid">
+
+          <!-- Suggestion 1: Netflix -->
+          <div class="suggestion-card" onclick="openModal('sub')">
+            <div class="suggestion-header">
+              <div class="suggestion-icon">🎬</div>
+              <div class="suggestion-info">
+                <div class="suggestion-name">Netflix</div>
+                <div class="suggestion-detail">Todo dia 15 · há 6 meses</div>
+              </div>
+            </div>
+            <div class="suggestion-body">
+              <div>
+                <div class="suggestion-amount" style="color:var(--red)">R$ 55,90/mês</div>
+                <div style="margin-top:4px"><span class="badge badge-sub">Possível assinatura</span></div>
+              </div>
+            </div>
+            <div class="suggestion-conf">
+              <div class="conf-bar"><div class="conf-bar-fill" style="width:96%"></div></div>
+              96% confiança
+            </div>
+            <div class="suggestion-actions">
+              <button class="sug-btn primary" onclick="event.stopPropagation();openModal('sub')">+ Assinatura</button>
+              <button class="sug-btn" onclick="event.stopPropagation()">Ignorar</button>
+            </div>
+          </div>
+
+          <!-- Suggestion 2: Gympass -->
+          <div class="suggestion-card" onclick="openModal('sub')">
+            <div class="suggestion-header">
+              <div class="suggestion-icon">💪</div>
+              <div class="suggestion-info">
+                <div class="suggestion-name">Gympass</div>
+                <div class="suggestion-detail">Todo dia 8 · há 4 meses</div>
+              </div>
+            </div>
+            <div class="suggestion-body">
+              <div>
+                <div class="suggestion-amount" style="color:var(--red)">R$ 99,90/mês</div>
+                <div style="margin-top:4px"><span class="badge badge-sub">Possível assinatura</span></div>
+              </div>
+            </div>
+            <div class="suggestion-conf">
+              <div class="conf-bar"><div class="conf-bar-fill" style="width:82%"></div></div>
+              82% confiança
+            </div>
+            <div class="suggestion-actions">
+              <button class="sug-btn primary" onclick="event.stopPropagation();openModal('sub')">+ Assinatura</button>
+              <button class="sug-btn" onclick="event.stopPropagation()">Ignorar</button>
+            </div>
+          </div>
+
+          <!-- Suggestion 3: Conta de água -->
+          <div class="suggestion-card" onclick="openModal('fixed')">
+            <div class="suggestion-header">
+              <div class="suggestion-icon">💧</div>
+              <div class="suggestion-info">
+                <div class="suggestion-name">Sabesp — Água</div>
+                <div class="suggestion-detail">Vence dia 10 · mensal</div>
+              </div>
+            </div>
+            <div class="suggestion-body">
+              <div>
+                <div class="suggestion-amount" style="color:var(--red)">~R$ 82/mês</div>
+                <div style="margin-top:4px"><span class="badge badge-fixed">Conta fixa</span></div>
+              </div>
+            </div>
+            <div class="suggestion-conf">
+              <div class="conf-bar"><div class="conf-bar-fill" style="width:91%"></div></div>
+              91% confiança
+            </div>
+            <div class="suggestion-actions">
+              <button class="sug-btn primary" onclick="event.stopPropagation();openModal('fixed')">+ Conta fixa</button>
+              <button class="sug-btn" onclick="event.stopPropagation()">Ignorar</button>
+            </div>
+          </div>
+
+          <!-- Suggestion 4: XP Investimentos -->
+          <div class="suggestion-card" onclick="openModal('invest')">
+            <div class="suggestion-header">
+              <div class="suggestion-icon">📈</div>
+              <div class="suggestion-info">
+                <div class="suggestion-name">XP Investimentos</div>
+                <div class="suggestion-detail">Aplicação mensal recorrente</div>
+              </div>
+            </div>
+            <div class="suggestion-body">
+              <div>
+                <div class="suggestion-amount" style="color:var(--blue)">R$ 1.500/mês</div>
+                <div style="margin-top:4px"><span class="badge badge-invest">Investimento</span></div>
+              </div>
+            </div>
+            <div class="suggestion-conf">
+              <div class="conf-bar"><div class="conf-bar-fill" style="width:88%;background:var(--blue)"></div></div>
+              88% confiança
+            </div>
+            <div class="suggestion-actions">
+              <button class="sug-btn" style="background:var(--blueGlow);border-color:rgba(96,165,250,0.3);color:var(--blue)" onclick="event.stopPropagation();openModal('invest')">+ Investimento</button>
+              <button class="sug-btn" onclick="event.stopPropagation()">Ignorar</button>
+            </div>
+          </div>
+
+          <!-- Suggestion 5: Financiamento -->
+          <div class="suggestion-card" onclick="openModal('financing')">
+            <div class="suggestion-header">
+              <div class="suggestion-icon">🏠</div>
+              <div class="suggestion-info">
+                <div class="suggestion-name">Caixa — Habitação</div>
+                <div class="suggestion-detail">Todo dia 5 · parcela fixa</div>
+              </div>
+            </div>
+            <div class="suggestion-body">
+              <div>
+                <div class="suggestion-amount" style="color:var(--yellow)">R$ 1.240/mês</div>
+                <div style="margin-top:4px"><span class="badge badge-financing">Financiamento</span></div>
+              </div>
+            </div>
+            <div class="suggestion-conf">
+              <div class="conf-bar"><div class="conf-bar-fill" style="width:79%;background:var(--yellow)"></div></div>
+              79% confiança
+            </div>
+            <div class="suggestion-actions">
+              <button class="sug-btn" style="background:var(--yellowGlow);border-color:rgba(234,179,8,0.3);color:var(--yellow)" onclick="event.stopPropagation();openModal('financing')">+ Financiamento</button>
+              <button class="sug-btn" onclick="event.stopPropagation()">Ignorar</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Subscriptions -->
+      <div class="section">
+        <div class="section-header">
+          <span class="section-title">
+            <span style="font-size:16px">🔄</span> Assinaturas
+            <span class="section-count">4</span>
+          </span>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span style="font-size:13px;color:var(--red);font-weight:600">R$ 285,70/mês</span>
+            <a class="see-all">+ Adicionar</a>
+          </div>
+        </div>
+
+        <div class="item-card">
+          <div class="item-emoji">🎬</div>
+          <div class="item-info">
+            <div class="item-name">Netflix Premium</div>
+            <div class="item-meta">Cobra todo dia 15 · Cartão Nubank</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="item-amount">
+              <div class="val neg">−R$ 55,90</div>
+              <div class="when">próx. 15 mai</div>
+            </div>
+            <div class="item-status-dot active"></div>
+          </div>
+        </div>
+
+        <div class="item-card">
+          <div class="item-emoji">💪</div>
+          <div class="item-info">
+            <div class="item-name">Gympass</div>
+            <div class="item-meta">Cobra todo dia 8 · Cartão Itaú</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="item-amount">
+              <div class="val neg">−R$ 99,90</div>
+              <div class="when">próx. 08 jun</div>
+            </div>
+            <div class="item-status-dot active"></div>
+          </div>
+        </div>
+
+        <div class="item-card">
+          <div class="item-emoji">🎵</div>
+          <div class="item-info">
+            <div class="item-name">Spotify Premium</div>
+            <div class="item-meta">Cobra todo dia 1 · Cartão Nubank</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="item-amount">
+              <div class="val neg">−R$ 21,90</div>
+              <div class="when">próx. 01 jun</div>
+            </div>
+            <div class="item-status-dot active"></div>
+          </div>
+        </div>
+
+        <div class="item-card">
+          <div class="item-emoji">🏋️</div>
+          <div class="item-info">
+            <div class="item-name">Academia Smart Fit</div>
+            <div class="item-meta">Cobra todo dia 20 · Débito automático</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="item-amount">
+              <div class="val neg">−R$ 109,90</div>
+              <div class="when">próx. 20 mai</div>
+            </div>
+            <div class="item-status-dot paused"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fixed bills -->
+      <div class="section">
+        <div class="section-header">
+          <span class="section-title">
+            <span style="font-size:16px">📋</span> Contas fixas
+            <span class="section-count">3</span>
+          </span>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span style="font-size:13px;color:var(--red);font-weight:600">R$ 492,00/mês</span>
+            <a class="see-all">+ Adicionar</a>
+          </div>
+        </div>
+
+        <div class="item-card">
+          <div class="item-emoji">💧</div>
+          <div class="item-info">
+            <div class="item-name">Sabesp — Água e Esgoto</div>
+            <div class="item-meta">Vence dia 10 · Boleto</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="item-amount">
+              <div class="val neg">−R$ 82,00</div>
+              <div class="when">vence 10 jun</div>
+            </div>
+            <div class="item-status-dot active"></div>
+          </div>
+        </div>
+
+        <div class="item-card">
+          <div class="item-emoji">⚡</div>
+          <div class="item-info">
+            <div class="item-name">Enel — Energia Elétrica</div>
+            <div class="item-meta">Vence dia 15 · Boleto</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="item-amount">
+              <div class="val neg">−R$ 210,00</div>
+              <div class="when">vence 15 jun</div>
+            </div>
+            <div class="item-status-dot active"></div>
+          </div>
+        </div>
+
+        <div class="item-card">
+          <div class="item-emoji">📡</div>
+          <div class="item-info">
+            <div class="item-name">Claro — Internet e TV</div>
+            <div class="item-meta">Vence dia 5 · Débito automático</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="item-amount">
+              <div class="val neg">−R$ 200,00</div>
+              <div class="when">vence 05 jun</div>
+            </div>
+            <div class="item-status-dot late"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Financing -->
+      <div class="section">
+        <div class="section-header">
+          <span class="section-title">
+            <span style="font-size:16px">🏦</span> Financiamentos
+            <span class="section-count">2</span>
+          </span>
+          <a class="see-all">+ Adicionar</a>
+        </div>
+
+        <div class="item-card">
+          <div class="item-emoji">🏠</div>
+          <div class="item-info">
+            <div class="item-name">Caixa — Financiamento Habitação</div>
+            <div class="item-meta">Parcela 47/360 · Vence dia 5 · Débito</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="item-amount">
+              <div class="val neg">−R$ 1.240,00</div>
+              <div class="when">vence 05 jun</div>
+            </div>
+            <div class="item-status-dot active"></div>
+          </div>
+        </div>
+
+        <div class="item-card">
+          <div class="item-emoji">🚗</div>
+          <div class="item-info">
+            <div class="item-name">Itaú — Financiamento Veículo</div>
+            <div class="item-meta">Parcela 18/48 · Vence dia 20 · Boleto</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="item-amount">
+              <div class="val neg">−R$ 890,00</div>
+              <div class="when">vence 20 mai</div>
+            </div>
+            <div class="item-status-dot active"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right column -->
+    <div class="right-col">
+
+      <!-- Alerts -->
+      <div class="section">
+        <div class="section-header">
+          <span class="section-title">
+            <span style="font-size:16px">⚡</span> Alertas
+          </span>
+        </div>
+
+        <div class="alert-card danger">
+          <div class="alert-icon" style="background:var(--redGlow)">🚨</div>
+          <div class="alert-content">
+            <div class="alert-title">Conta Claro venceu há 12 dias</div>
+            <div class="alert-desc">R$ 200,00 em aberto. Risco de cancelamento do serviço.</div>
+          </div>
+          <span class="alert-action">Pagar →</span>
+        </div>
+
+        <div class="alert-card warn">
+          <div class="alert-icon" style="background:var(--yellowGlow)">⚠️</div>
+          <div class="alert-content">
+            <div class="alert-title">Parcela do veículo vence em 3 dias</div>
+            <div class="alert-desc">Itaú — R$ 890,00 · Vence 20/05</div>
+          </div>
+          <span class="alert-action" style="color:var(--yellow)">Ver →</span>
+        </div>
+
+        <div class="alert-card" style="border-color:rgba(167,139,250,0.2);background:var(--purpleGlow)">
+          <div class="alert-icon" style="background:var(--purpleGlow)">💡</div>
+          <div class="alert-content">
+            <div class="alert-title">Assinaturas custam R$ 285/mês</div>
+            <div class="alert-desc">13% da sua renda vai para serviços de streaming e academia.</div>
+          </div>
+          <span class="alert-action" style="color:var(--purple)">Revisar →</span>
+        </div>
+      </div>
+
+      <!-- Payment methods -->
+      <div class="payment-section">
+        <div class="pm-header">
+          <span class="pm-title">Formas de pagamento</span>
+          <span class="pm-period">Maio 2025</span>
+        </div>
+
+        <div class="pm-bars">
+          <div class="pm-item">
+            <div class="pm-label">
+              <span class="pm-emoji">⚡</span>
+              <span class="pm-name">Pix</span>
+            </div>
+            <div class="pm-bar-track">
+              <div class="pm-bar-fill" style="width:38%;background:#16A34A"></div>
+            </div>
+            <span class="pm-pct" style="color:#16A34A">38%</span>
+          </div>
+
+          <div class="pm-item">
+            <div class="pm-label">
+              <span class="pm-emoji">💳</span>
+              <span class="pm-name">Cartão créd.</span>
+            </div>
+            <div class="pm-bar-track">
+              <div class="pm-bar-fill" style="width:27%;background:var(--blue)"></div>
+            </div>
+            <span class="pm-pct" style="color:var(--blue)">27%</span>
+          </div>
+
+          <div class="pm-item">
+            <div class="pm-label">
+              <span class="pm-emoji">💳</span>
+              <span class="pm-name">Cartão déb.</span>
+            </div>
+            <div class="pm-bar-track">
+              <div class="pm-bar-fill" style="width:16%;background:var(--purple)"></div>
+            </div>
+            <span class="pm-pct" style="color:var(--purple)">16%</span>
+          </div>
+
+          <div class="pm-item">
+            <div class="pm-label">
+              <span class="pm-emoji">📄</span>
+              <span class="pm-name">Boleto</span>
+            </div>
+            <div class="pm-bar-track">
+              <div class="pm-bar-fill" style="width:12%;background:var(--orange)"></div>
+            </div>
+            <span class="pm-pct" style="color:var(--orange)">12%</span>
+          </div>
+
+          <div class="pm-item">
+            <div class="pm-label">
+              <span class="pm-emoji">↔️</span>
+              <span class="pm-name">Transferência</span>
+            </div>
+            <div class="pm-bar-track">
+              <div class="pm-bar-fill" style="width:5%;background:var(--yellow)"></div>
+            </div>
+            <span class="pm-pct" style="color:var(--yellow)">5%</span>
+          </div>
+
+          <div class="pm-item">
+            <div class="pm-label">
+              <span class="pm-emoji">💵</span>
+              <span class="pm-name">Dinheiro</span>
+            </div>
+            <div class="pm-bar-track">
+              <div class="pm-bar-fill" style="width:2%;background:var(--text3)"></div>
+            </div>
+            <span class="pm-pct" style="color:var(--text3)">2%</span>
+          </div>
+        </div>
+
+        <div class="pm-total">
+          <span class="pm-total-label">Total gasto no período</span>
+          <span class="pm-total-val">−R$ 8.742,00</span>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+<!-- Add Item Modal -->
+<div class="modal-overlay" id="addModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Adicionar assinatura</div>
+      <div class="modal-sub">Detectado pela IA com base nas suas importações</div>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Tipo de compromisso</label>
+        <div class="type-chooser">
+          <div class="type-opt selected" id="type-sub" onclick="selectType('sub')">
+            <span class="emoji">🔄</span>
+            Assinatura
+          </div>
+          <div class="type-opt" id="type-fixed" onclick="selectType('fixed')">
+            <span class="emoji">📋</span>
+            Conta fixa
+          </div>
+          <div class="type-opt" id="type-financing" onclick="selectType('financing')">
+            <span class="emoji">🏦</span>
+            Financiamento
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Nome</label>
+        <input type="text" id="modalName" value="Netflix" />
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Valor</label>
+          <input type="text" value="R$ 55,90" />
+        </div>
+        <div class="field">
+          <label>Dia de vencimento</label>
+          <input type="number" min="1" max="31" value="15" />
+        </div>
+      </div>
+      <div class="field">
+        <label>Forma de pagamento</label>
+        <select>
+          <option>Cartão de crédito</option>
+          <option>Cartão de débito</option>
+          <option>Pix</option>
+          <option>Boleto</option>
+          <option>Débito automático</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="closeModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="20 6 9 17 4 12"/></svg>
+        Salvar
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+const themeBtn = document.getElementById('themeBtn');
+const themeIcon = document.getElementById('themeIcon');
+themeBtn.addEventListener('click', () => {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  themeIcon.innerHTML = isDark
+    ? '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>'
+    : '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
+});
+
+const typeLabels = {
+  sub: 'Adicionar assinatura',
+  fixed: 'Adicionar conta fixa',
+  financing: 'Adicionar financiamento',
+  invest: 'Registrar investimento'
+};
+
+function openModal(type) {
+  const t = type || 'sub';
+  document.getElementById('modalTitle').textContent = typeLabels[t] || typeLabels.sub;
+  if (t === 'invest') {
+    selectType('sub');
+  } else {
+    selectType(t);
+  }
+  document.getElementById('addModal').classList.add('open');
+}
+function closeModal() { document.getElementById('addModal').classList.remove('open'); }
+
+function selectType(t) {
+  ['sub','fixed','financing'].forEach(k => {
+    document.getElementById('type-' + k)?.classList.remove('selected');
+  });
+  document.getElementById('type-' + t)?.classList.add('selected');
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+</body>
+</html>

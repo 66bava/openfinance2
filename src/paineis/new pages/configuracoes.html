@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Openfy — Configurações</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green: #16A34A;
+    --green-dim: rgba(22,163,74,0.10);
+    --green-glow: rgba(22,163,74,0.22);
+    --bg: #0A0A0A;
+    --surface: #111111;
+    --surface2: #181818;
+    --border: rgba(255,255,255,0.07);
+    --border-hover: rgba(255,255,255,0.13);
+    --text: #F5F5F0;
+    --muted: rgba(245,245,240,0.42);
+    --error: #EF4444;
+    --error-dim: rgba(239,68,68,0.10);
+    --sidebar-w: 220px;
+    --radius-card: 16px;
+    --radius-input: 12px;
+    --radius-pill: 999px;
+  }
+
+  [data-theme="light"] {
+    --bg: #F0F0EB;
+    --surface: #FAFAFA;
+    --surface2: #F0F0EB;
+    --border: rgba(0,0,0,0.07);
+    --border-hover: rgba(0,0,0,0.14);
+    --text: #0A0A0A;
+    --muted: rgba(10,10,10,0.42);
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  /* ---- SIDEBAR ---- */
+  .sidebar {
+    width: var(--sidebar-w);
+    min-height: 100vh;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 32px 0;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .logo {
+    padding: 0 24px 28px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+  .logo-mark {
+    width: 28px; height: 28px;
+    background: var(--green);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: #fff;
+    font-weight: 800;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .logo-name {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+
+  .nav-group { margin-bottom: 4px; }
+  .nav-group-label {
+    padding: 4px 24px 6px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 10px 24px;
+    cursor: pointer;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--muted);
+    transition: all 0.18s;
+    position: relative;
+    border-radius: 0;
+    margin: 1px 8px;
+    border-radius: 10px;
+  }
+  .nav-item:hover { color: var(--text); background: var(--surface2); }
+  .nav-item.active { color: var(--text); background: var(--surface2); }
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 50%;
+    transform: translateY(-50%);
+    width: 3px; height: 20px;
+    background: var(--green);
+    border-radius: 0 4px 4px 0;
+  }
+  .nav-icon { font-size: 15px; opacity: 0.8; width: 18px; text-align: center; }
+  .nav-item.active .nav-icon { opacity: 1; }
+  .nav-item.danger { color: rgba(239,68,68,0.7); }
+  .nav-item.danger:hover { color: var(--error); background: var(--error-dim); }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 16px 16px 0;
+    border-top: 1px solid var(--border);
+  }
+  .theme-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    font-family: 'Inter', sans-serif;
+    transition: all 0.2s;
+  }
+  .theme-toggle:hover { color: var(--text); border-color: var(--border-hover); }
+
+  /* Toggle switch */
+  .toggle-switch {
+    width: 36px; height: 20px;
+    background: var(--border);
+    border-radius: var(--radius-pill);
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s;
+    flex-shrink: 0;
+    border: none;
+    outline: none;
+  }
+  .toggle-switch::after {
+    content: '';
+    position: absolute;
+    width: 14px; height: 14px;
+    background: #fff;
+    border-radius: 50%;
+    top: 3px; left: 3px;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+  .toggle-switch.on { background: var(--green); }
+  .toggle-switch.on::after { transform: translateX(16px); }
+
+  /* ---- MAIN CONTENT ---- */
+  .main {
+    flex: 1;
+    padding: 40px 48px;
+    max-width: 760px;
+    overflow-y: auto;
+  }
+
+  .page-header { margin-bottom: 40px; }
+  .page-title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--text);
+  }
+  .page-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* Section */
+  .section { margin-bottom: 40px; }
+  .section-title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    gap: 20px;
+    transition: background 0.15s;
+  }
+  .row:last-child { border-bottom: none; }
+  .row:hover { background: var(--surface2); }
+  .row.clickable { cursor: pointer; }
+
+  .row-left { flex: 1; min-width: 0; }
+  .row-label {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .row-sub { font-size: 12px; color: var(--muted); line-height: 1.4; }
+  .row-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .row-value { font-size: 13px; color: var(--muted); }
+  .row-arrow { color: var(--muted); font-size: 14px; }
+
+  /* Avatar */
+  .avatar-block {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .avatar {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #16A34A 0%, #0D7A36 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .avatar-info .name {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .avatar-info .email { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .plan-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--green-dim);
+    border: 1px solid var(--green-glow);
+    color: var(--green);
+    padding: 3px 10px;
+    border-radius: var(--radius-pill);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 6px;
+  }
+
+  /* Inputs in rows */
+  .inline-input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 12px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    outline: none;
+    width: 180px;
+    transition: border-color 0.2s;
+  }
+  .inline-input:focus { border-color: var(--green); }
+
+  /* Select inline */
+  .inline-select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 12px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+    -webkit-appearance: none;
+  }
+  .inline-select:focus { border-color: var(--green); }
+  .inline-select option { background: var(--surface2); }
+
+  /* Tag */
+  .tag {
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    font-size: 11px;
+    font-weight: 600;
+    border: 1px solid;
+    letter-spacing: 0.02em;
+  }
+  .tag-green { background: var(--green-dim); border-color: var(--green-glow); color: var(--green); }
+  .tag-muted { background: transparent; border-color: var(--border); color: var(--muted); }
+
+  /* Button small */
+  .btn-sm {
+    padding: 7px 16px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: all 0.18s;
+    border: 1px solid;
+  }
+  .btn-sm-ghost { background: transparent; border-color: var(--border); color: var(--muted); }
+  .btn-sm-ghost:hover { border-color: var(--border-hover); color: var(--text); }
+  .btn-sm-primary { background: var(--green); border-color: var(--green); color: #fff; }
+  .btn-sm-primary:hover { background: #15803d; }
+  .btn-sm-danger { background: transparent; border-color: rgba(239,68,68,0.3); color: var(--error); }
+  .btn-sm-danger:hover { background: var(--error-dim); border-color: var(--error); }
+
+  /* LGPD block */
+  .lgpd-consent {
+    background: var(--green-dim);
+    border: 1px solid var(--green-glow);
+    border-radius: var(--radius-card);
+    padding: 16px 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .lgpd-icon { font-size: 18px; flex-shrink: 0; margin-top: 2px; }
+  .lgpd-title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .lgpd-sub { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .lgpd-link { color: var(--green); text-decoration: none; font-weight: 600; }
+  .lgpd-link:hover { text-decoration: underline; }
+
+  /* Delete zone */
+  .danger-zone {
+    background: var(--error-dim);
+    border: 1px solid rgba(239,68,68,0.2);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+  }
+  .danger-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(239,68,68,0.12);
+    gap: 20px;
+  }
+  .danger-row:last-child { border-bottom: none; }
+  .danger-label { font-size: 13.5px; font-weight: 500; color: var(--error); }
+  .danger-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* Theme theme color chooser */
+  .theme-colors { display: flex; gap: 8px; }
+  .color-dot {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.18s;
+  }
+  .color-dot.active { border-color: var(--text); transform: scale(1.15); }
+
+  /* Panel transitions */
+  .content-section { display: none; }
+  .content-section.active { display: block; animation: fadeIn 0.2s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Mobile nav */
+  @media (max-width: 768px) {
+    body { flex-direction: column; }
+    .sidebar {
+      width: 100%;
+      min-height: auto;
+      height: auto;
+      position: relative;
+      padding: 16px 0 0;
+      flex-direction: column;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-group { display: flex; overflow-x: auto; padding: 0 12px 12px; gap: 4px; }
+    .nav-group-label { display: none; }
+    .nav-item {
+      white-space: nowrap;
+      padding: 8px 14px;
+      margin: 0;
+      flex-shrink: 0;
+      border-radius: var(--radius-pill);
+    }
+    .nav-item.active::before { display: none; }
+    .nav-item.active { background: var(--green-dim); color: var(--green); }
+    .logo { border-bottom: none; padding-bottom: 12px; }
+    .sidebar-footer { display: none; }
+    .main { padding: 24px 20px; max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-mark">O</div>
+    <div class="logo-name">Openfy</div>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-label">Conta</div>
+    <div class="nav-item active" onclick="go('perfil', this)">
+      <span class="nav-icon">◎</span> Perfil
+    </div>
+    <div class="nav-item" onclick="go('preferencias', this)">
+      <span class="nav-icon">⊞</span> Preferências
+    </div>
+    <div class="nav-item" onclick="go('notificacoes', this)">
+      <span class="nav-icon">◉</span> Notificações
+    </div>
+    <div class="nav-item" onclick="go('tema', this)">
+      <span class="nav-icon">◑</span> Aparência
+    </div>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-label">Segurança</div>
+    <div class="nav-item" onclick="go('seguranca', this)">
+      <span class="nav-icon">⊙</span> Segurança
+    </div>
+    <div class="nav-item" onclick="go('privacidade', this)">
+      <span class="nav-icon">◈</span> Privacidade
+    </div>
+    <div class="nav-item" onclick="go('lgpd', this)">
+      <span class="nav-icon">▣</span> LGPD
+    </div>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-label">Financeiro</div>
+    <div class="nav-item" onclick="go('dados', this)">
+      <span class="nav-icon">⬡</span> Dados financeiros
+    </div>
+    <div class="nav-item" onclick="go('exportar', this)">
+      <span class="nav-icon">↑</span> Exportar dados
+    </div>
+    <div class="nav-item" onclick="go('banco', this)">
+      <span class="nav-icon">◫</span> Banco conectado
+    </div>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-label">Perigo</div>
+    <div class="nav-item danger" onclick="go('excluir', this)">
+      <span class="nav-icon">✕</span> Excluir conta
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <button class="theme-toggle" onclick="toggleTheme()">
+      <span>Aparência</span>
+      <span id="theme-label">Escuro</span>
+    </button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- PERFIL -->
+  <div class="content-section active" id="s-perfil">
+    <div class="page-header">
+      <div class="page-title">Perfil</div>
+      <div class="page-sub">Suas informações pessoais</div>
+    </div>
+
+    <div class="section">
+      <div class="card">
+        <div class="avatar-block">
+          <div class="avatar">P</div>
+          <div class="avatar-info">
+            <div class="name">Pedro Hartmann</div>
+            <div class="email">pedro@openfy.app</div>
+            <div class="plan-badge">✦ Pro</div>
+          </div>
+          <div style="margin-left:auto">
+            <button class="btn-sm btn-sm-ghost" onclick="showToast('Em breve')">Alterar foto</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-left">
+            <div class="row-label">Nome completo</div>
+          </div>
+          <input class="inline-input" type="text" value="Pedro Hartmann" />
+        </div>
+        <div class="row">
+          <div class="row-left">
+            <div class="row-label">E-mail</div>
+          </div>
+          <input class="inline-input" type="text" value="pedro@openfy.app" />
+        </div>
+        <div class="row">
+          <div class="row-left">
+            <div class="row-label">Telefone</div>
+            <div class="row-sub">Para recuperação de conta</div>
+          </div>
+          <input class="inline-input" type="text" placeholder="+55 51 9..." />
+        </div>
+        <div class="row">
+          <div class="row-left">
+            <div class="row-label">Plano atual</div>
+            <div class="row-sub">Renovação em 13/06/2025</div>
+          </div>
+          <div class="row-right">
+            <span class="tag tag-green">Pro · R$19,90</span>
+            <button class="btn-sm btn-sm-ghost">Gerenciar</button>
+          </div>
+        </div>
+        <div class="row" style="justify-content:flex-end">
+          <button class="btn-sm btn-sm-primary" onclick="showToast('Perfil salvo!')">Salvar alterações</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PREFERÊNCIAS -->
+  <div class="content-section" id="s-preferencias">
+    <div class="page-header">
+      <div class="page-title">Preferências</div>
+      <div class="page-sub">Personalize sua experiência</div>
+    </div>
+    <div class="section">
+      <div class="card">
+        <div class="row">
+          <div class="row-left">
+            <div class="row-label">Moeda padrão</div>
+          </div>
+          <select class="inline-select">
+            <option>BRL — Real</option>
+            <option>USD — Dólar</option>
+            <option>EUR — Euro</option>
+          </select>
+        </div>
+        <div class="row">
+          <div class="row-left">
+            <div class="row-label">Início do mês financeiro</div>
+            <div class="row-sub">Quando seu ciclo começa</div>
+          </div>
+          <select class="inline-select">
+            <option>Dia 1</option>
+            <option>Dia 5</option>
+            <option>Dia 10</option>
+            <option>Dia 15</option>
+          </select>
+        </div>
+        <div class="row">
+          <div class="row-left">
+            <div class="row-label">Relatório IA automático</div>
+            <div class="row-sub">Gerado todo início de mês</div>
+          </div>
+          <button class="toggle-switch on" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="row">
+          <div class="row-left">
+            <div class="row-label">Modo Missão ativo</div>
+            <div class="row-sub">Metas gamificadas no dashboard</div>
+          </div>
+          <button class="toggle-switch on" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="row">
+          <div class="row-left">
+            <div class="row-label">Idioma</div>
+          </div>
+          <select class="inline-select">
+            <option>Português (BR)</option>
+            <option>English</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTIFICAÇÕES -->
+  <div class="content-section" id="s-notificacoes">
+    <div class="page-header">
+      <div class="page-title">Notificações</div>
+      <div class="page-sub">Quando e como você quer ser avisado</div>
+    </div>
+    <div class="section">
+      <div class="section-title">Push e e-mail</div>
+      <div class="card">
+        <div class="row">
+          <div class="row-left">
+            <div class="row-label">Transação registrada</div>
+            <div class="row-sub">Confirmação imediata</div>
+          </div>
+          <button class="toggle-switch on" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="row">
+          <div class="row-left">
+            <div class="row-label">Meta alcançada</div>
+            <div class="row-sub">Modo Missão</div>
+          </div>
+          <button class="toggle-switch on" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="row">
+          <div class="row-left">
+            <div class="row-label">Alerta de orçamento</div>
+            <div class="row-sub">Ao atingir 80% do limite</div>
+          </div>
+          <button class="toggle-switch on" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="row">
+          <div class="row-left">
+            <div class="row-label">Relatório mensal pronto</div>
+            <div class="row-sub">Via e-mail</div>
+          </div>
+          <button class="toggle-switch on" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="row">
+          <div class="row-left">
+            <div class="row-label">Novidades do produto</div>
+            <div class="row-sub">Updates e lançamentos</div>
+          </div>
+          <button class="toggle-switch" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="row">
+          <div class="row-left">
+            <div class="row-label">Dicas financeiras</div>
+            <div class="row-sub">Semanalmente</div>
+          </div>
+          <button class="toggle-switch" onclick="this.classList.toggle('on')"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- APARÊNCIA -->
+  <div class="content-section" id="s-tema">
+    <div class="page-header">
+      <div class="page-title">Aparência</div>
+      <div class="page-sub">Tema e visual do app</div>
+    </div>
+    <div class="section">
+      <div class="card">
+        <div class="row">
+          <div class="row-left">
+            <div class="row-label">Tema</div>
+          </div>
+          <div class="row-right">
+            <span class="row-value" id="theme-display">Escuro</span>
+            <button class="btn-sm btn-sm-ghost" onclick="toggleTheme()">Alternar</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-left">
+            <div class="row-label">Cor de destaque</div>
+            <div class="row-sub">Cor principal da interface</div>
+          </div>
+          <div class="theme-colors">
+            <div class="color-dot active" style="background:#16A34A" onclick="selectColor(this)"></div>
+            <div class="color-dot" style="background:#2563EB" onclick="selectColor(this)"></div>
+            <div class="color-dot" style="background:#7C3AED" onclick="selectColor(this)"></div>
+            <div class="color-dot" style="background:#EA580C" onclick="selectColor(this)"></div>
+            <div class="color-dot" style="background:#DB2777" onclick="selectColor(this)"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-left">
+            <div class="row-label">Densidade da interface</div>
+          </div>
+          <select class="inline-select">
+            <option>Confortável</option>
+            <option>Compacto</option>
+            <option>Espaçoso</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEGURANÇA -->
+  <div class="content-section" id="s-seguranca">
+    <div class="page-header">
+      <div class="page-title">Segurança</div>
+      <div class="page-sub">Proteja sua conta</div>
+    </div>
+    <div class="section">
+      <div class="card">
+        <div class="row clickable" onclick="showToast('Enviamos um e-mail para você')">
+          <div class="row-left">
+            <div class="row-label">Alterar senha</div>
+            <div class="row-sub">Enviaremos link para o e-mail cadastrado</div>
+          </div>
+          <div class="row-right">
+            <span class="row-arrow">→</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-left">
+            <div class="row-label">Autenticação em dois fatores</div>
+            <div class="row-sub">Camada extra de proteção</div>
+          </div>
+          <div class="row-right">
+            <span class="tag tag-muted">Inativo</span>
+            <button class="btn-sm btn-sm-ghost">Ativar</button>
+          </div>
+        </div>
+        <div class="row clickable" onclick="showToast('Em breve')">
+          <div class="row-left">
+            <div class="row-label">Sessões ativas</div>
+            <div class="row-sub">2 dispositivos conectados</div>
+          </div>
+          <div class="row-right">
+            <span class="row-arrow">→</span>
+          </div>
+        </div>
+        <div class="row clickable" onclick="showToast('Em breve')">
+          <div class="row-left">
+            <div class="row-label">Log de acessos</div>
+            <div class="row-sub">Últimos 30 dias</div>
+          </div>
+          <div class="row-right">
+            <span class="row-arrow">→</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRIVACIDADE -->
+  <div class="content-section" id="s-privacidade">
+    <div class="page-header">
+      <div class="page-title">Privacidade</div>
+      <div class="page-sub">Controle como seus dados são usados</div>
+    </div>
+    <div class="section">
+      <div class="card">
+        <div class="row">
+          <div class="row-left">
+            <div class="row-label">Analytics de uso</div>
+            <div class="row-sub">Ajuda a melhorar o produto</div>
+          </div>
+          <button class="toggle-switch on" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="row">
+          <div class="row-left">
+            <div class="row-label">Dados para melhoria da IA</div>
+            <div class="row-sub">Relatórios usados anonimamente</div>
+          </div>
+          <button class="toggle-switch" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="row">
+          <div class="row-left">
+            <div class="row-label">Cookies de personalização</div>
+          </div>
+          <button class="toggle-switch on" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="row clickable" onclick="showToast('Em breve')">
+          <div class="row-left">
+            <div class="row-label">Política de Privacidade</div>
+          </div>
+          <span class="row-arrow">→</span>
+        </div>
+        <div class="row clickable" onclick="showToast('Em breve')">
+          <div class="row-left">
+            <div class="row-label">Termos de Uso</div>
+          </div>
+          <span class="row-arrow">→</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LGPD -->
+  <div class="content-section" id="s-lgpd">
+    <div class="page-header">
+      <div class="page-title">LGPD</div>
+      <div class="page-sub">Seus direitos e consentimentos</div>
+    </div>
+    <div class="section">
+      <div class="lgpd-consent" style="margin-bottom:16px">
+        <div class="lgpd-icon">▣</div>
+        <div>
+          <div class="lgpd-title">Consentimento ativo</div>
+          <div class="lgpd-sub">Você aceitou os termos em 01/05/2025. Veja a <a class="lgpd-link" href="#">Política de Privacidade</a> completa.</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="row clickable" onclick="showToast('Exportando dados...')">
+          <div class="row-left">
+            <div class="row-label">Baixar meus dados</div>
+            <div class="row-sub">JSON completo · Art. 18 LGPD</div>
+          </div>
+          <button class="btn-sm btn-sm-ghost">Exportar</button>
+        </div>
+        <div class="row clickable" onclick="showToast('Em breve')">
+          <div class="row-left">
+            <div class="row-label">Revogar consentimento</div>
+            <div class="row-sub">Encerra uso dos seus dados</div>
+          </div>
+          <span class="row-arrow">→</span>
+        </div>
+        <div class="row clickable" onclick="showToast('Em breve')">
+          <div class="row-left">
+            <div class="row-label">Relatório de tratamento</div>
+            <div class="row-sub">Como seus dados são usados</div>
+          </div>
+          <span class="row-arrow">→</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DADOS FINANCEIROS -->
+  <div class="content-section" id="s-dados">
+    <div class="page-header">
+      <div class="page-title">Dados financeiros</div>
+      <div class="page-sub">Configure entradas e categorias</div>
+    </div>
+    <div class="section">
+      <div class="section-title">Renda e metas</div>
+      <div class="card">
+        <div class="row">
+          <div class="row-left">
+            <div class="row-label">Renda mensal estimada</div>
+          </div>
+          <input class="inline-input" type="text" value="R$ 3.500" />
+        </div>
+        <div class="row">
+          <div class="row-left">
+            <div class="row-label">Meta de economia</div>
+            <div class="row-sub">% da renda</div>
+          </div>
+          <input class="inline-input" type="text" value="20%" />
+        </div>
+        <div class="row">
+          <div class="row-left">
+            <div class="row-label">Categorias personalizadas</div>
+            <div class="row-sub">8 ativas</div>
+          </div>
+          <button class="btn-sm btn-sm-ghost">Gerenciar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPORTAR -->
+  <div class="content-section" id="s-exportar">
+    <div class="page-header">
+      <div class="page-title">Exportar dados</div>
+      <div class="page-sub">Baixe suas informações</div>
+    </div>
+    <div class="section">
+      <div class="card">
+        <div class="row">
+          <div class="row-left">
+            <div class="row-label">Transações · Excel</div>
+            <div class="row-sub">Histórico completo em .xlsx</div>
+          </div>
+          <button class="btn-sm btn-sm-ghost" onclick="showToast('Exportando...')">↓ Baixar</button>
+        </div>
+        <div class="row">
+          <div class="row-left">
+            <div class="row-label">Relatórios · PDF</div>
+            <div class="row-sub">Todos os relatórios gerados</div>
+          </div>
+          <button class="btn-sm btn-sm-ghost" onclick="showToast('Exportando...')">↓ Baixar</button>
+        </div>
+        <div class="row">
+          <div class="row-left">
+            <div class="row-label">Perfil completo · JSON</div>
+            <div class="row-sub">Dados brutos conforme LGPD</div>
+          </div>
+          <button class="btn-sm btn-sm-ghost" onclick="showToast('Exportando...')">↓ Baixar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BANCO CONECTADO -->
+  <div class="content-section" id="s-banco">
+    <div class="page-header">
+      <div class="page-title">Banco conectado</div>
+      <div class="page-sub">Open Finance · em breve</div>
+    </div>
+    <div class="section">
+      <div class="card">
+        <div class="row">
+          <div class="row-left">
+            <div class="row-label">Nubank</div>
+            <div class="row-sub">Conectado em 01/05/2025</div>
+          </div>
+          <div class="row-right">
+            <span class="tag tag-green">Ativo</span>
+            <button class="btn-sm btn-sm-danger" onclick="showToast('Desconectado')">Desconectar</button>
+          </div>
+        </div>
+        <div class="row clickable" onclick="showToast('Em breve')">
+          <div class="row-left">
+            <div class="row-label">Adicionar outro banco</div>
+          </div>
+          <span class="row-arrow">+</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXCLUIR CONTA -->
+  <div class="content-section" id="s-excluir">
+    <div class="page-header">
+      <div class="page-title">Excluir conta</div>
+      <div class="page-sub">Esta ação é permanente e irreversível</div>
+    </div>
+    <div class="section">
+      <div class="danger-zone">
+        <div class="danger-row">
+          <div>
+            <div class="danger-label">Apagar todos os dados</div>
+            <div class="danger-sub">Transações, metas, relatórios e perfil</div>
+          </div>
+          <button class="btn-sm btn-sm-danger" onclick="showToast('Insira sua senha para confirmar')">Excluir tudo</button>
+        </div>
+        <div class="danger-row">
+          <div>
+            <div class="danger-label">Cancelar assinatura</div>
+            <div class="danger-sub">Acesso Pro encerra ao fim do ciclo</div>
+          </div>
+          <button class="btn-sm btn-sm-danger" onclick="showToast('Assinatura cancelada')">Cancelar plano</button>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-top:14px;line-height:1.6">
+        Antes de excluir, recomendamos <span style="color:var(--text);font-weight:500;cursor:pointer" onclick="go('exportar', null)">exportar seus dados</span>. Após a exclusão, não é possível recuperar nenhuma informação.
+      </p>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  function go(section, navEl) {
+    // Hide all
+    document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    // Show target
+    const target = document.getElementById('s-' + section);
+    if (target) target.classList.add('active');
+    if (navEl) navEl.classList.add('active');
+    else {
+      // Find by section
+      const items = document.querySelectorAll('.nav-item');
+      items.forEach(i => { if (i.textContent.trim().toLowerCase().includes(section)) i.classList.add('active'); });
+    }
+  }
+
+  function toggleTheme() {
+    const html = document.documentElement;
+    const display = document.getElementById('theme-display');
+    const label = document.getElementById('theme-label');
+    if (html.dataset.theme === 'dark') {
+      html.dataset.theme = 'light';
+      if (display) display.textContent = 'Claro';
+      if (label) label.textContent = 'Claro';
+    } else {
+      html.dataset.theme = 'dark';
+      if (display) display.textContent = 'Escuro';
+      if (label) label.textContent = 'Escuro';
+    }
+  }
+
+  function selectColor(dot) {
+    document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+    dot.classList.add('active');
+    const color = dot.style.background;
+    document.documentElement.style.setProperty('--green', color);
+    // Reset dimmed versions roughly
+    document.documentElement.style.setProperty('--green-dim', color + '1a');
+  }
+
+  function showToast(msg) {
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#16A34A;color:#fff;padding:11px 22px;border-radius:999px;font-family:DM Sans,sans-serif;font-weight:600;font-size:13px;z-index:999;white-space:nowrap;box-shadow:0 8px 24px rgba(22,163,74,0.4);animation:slideUp 0.25s ease';
+    t.textContent = '✓ ' + msg;
+    document.body.appendChild(t);
+    setTimeout(() => { t.style.opacity='0'; t.style.transition='opacity 0.3s'; setTimeout(()=>t.remove(),300); }, 2500);
+  }
+
+  const style = document.createElement('style');
+  style.textContent = '@keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}';
+  document.head.appendChild(style);
+</script>
+</body>
+</html>

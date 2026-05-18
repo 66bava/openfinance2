@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Openfy — Layout Base</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green:#16A34A; --green-b:#22C55E; --green-dim:rgba(22,163,74,.12);
+  --bg:#080808; --bg-s:#0A0A0A; --bg-c:#111111; --bg-c2:#161616; --bg-i:#1A1A1A;
+  --bd:rgba(255,255,255,.06); --bd-l:rgba(255,255,255,.10);
+  --t1:#EEEDE6; --t2:#8A8A7E; --t3:#444440;
+  --red:#EF4444; --amber:#F59E0B; --blue:#3B82F6;
+  --sw:240px; --sw-c:68px; --hh:60px; --r:12px; --rs:8px;
+  --tr:.22s cubic-bezier(.4,0,.2,1);
+  --fd:'DM Sans',sans-serif; --fb:'Inter',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--t1);font-family:var(--fb);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{width:var(--sw);min-width:var(--sw);height:100vh;background:var(--bg-s);border-right:1px solid var(--bd);display:flex;flex-direction:column;transition:width var(--tr),min-width var(--tr);position:relative;z-index:100;overflow:hidden}
+.sidebar.collapsed{width:var(--sw-c);min-width:var(--sw-c)}
+
+.sidebar-logo{height:var(--hh);display:flex;align-items:center;padding:0 18px;border-bottom:1px solid var(--bd);gap:10px;flex-shrink:0;overflow:hidden}
+.logo-mark{width:28px;height:28px;background:var(--green);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-mark svg{width:16px;height:16px;fill:#fff}
+.logo-text{font-family:var(--fd);font-weight:700;font-size:17px;color:var(--t1);white-space:nowrap;letter-spacing:-.3px;transition:opacity var(--tr)}
+.sidebar.collapsed .logo-text{opacity:0;width:0}
+
+.sidebar-nav{flex:1;padding:12px 8px;overflow-y:auto;overflow-x:hidden}
+.sidebar-nav::-webkit-scrollbar{display:none}
+.nav-group{margin-bottom:24px}
+.nav-group-label{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);padding:0 10px;margin-bottom:4px;white-space:nowrap;transition:opacity var(--tr)}
+.sidebar.collapsed .nav-group-label{opacity:0}
+
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--rs);cursor:pointer;transition:background var(--tr),color var(--tr);color:var(--t2);white-space:nowrap;position:relative;text-decoration:none}
+.nav-item:hover{background:var(--bg-c);color:var(--t1)}
+.nav-item.active{background:var(--green-dim);color:var(--green-b)}
+.nav-icon{width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:var(--rs)}
+.nav-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav-label{font-size:13.5px;font-weight:500;font-family:var(--fd);transition:opacity var(--tr)}
+.sidebar.collapsed .nav-label{opacity:0;width:0;overflow:hidden}
+.nav-badge{margin-left:auto;background:var(--green);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;transition:opacity var(--tr)}
+.sidebar.collapsed .nav-badge{opacity:0}
+
+.sidebar.collapsed .nav-item[data-tip]:hover::after{content:attr(data-tip);position:absolute;left:calc(var(--sw-c) - 8px);top:50%;transform:translateY(-50%);background:var(--bg-c2);border:1px solid var(--bd-l);color:var(--t1);font-size:12px;font-weight:500;padding:6px 12px;border-radius:var(--rs);white-space:nowrap;z-index:999;pointer-events:none}
+
+.sidebar-footer{padding:8px 8px 16px;border-top:1px solid var(--bd);display:flex;flex-direction:column;gap:2px;overflow:hidden}
+.user-card{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--rs);cursor:pointer;transition:background var(--tr)}
+.user-card:hover{background:var(--bg-c)}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--green),#15803D);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.user-info{overflow:hidden;transition:opacity var(--tr),width var(--tr)}
+.sidebar.collapsed .user-info{opacity:0;width:0}
+.user-name{font-size:13px;font-weight:600;color:var(--t1);white-space:nowrap}
+.user-plan{font-size:11px;color:var(--t2)}
+
+.collapse-btn{position:absolute;top:50%;right:-12px;transform:translateY(-50%);width:24px;height:24px;background:var(--bg-c);border:1px solid var(--bd-l);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:200;transition:background var(--tr)}
+.collapse-btn:hover{background:var(--bg-i)}
+.collapse-btn svg{width:12px;height:12px;stroke:var(--t2);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform var(--tr)}
+.sidebar.collapsed .collapse-btn svg{transform:rotate(180deg)}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+
+/* HEADER */
+.header{height:var(--hh);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 24px;gap:12px;background:var(--bg-s);flex-shrink:0}
+.header-title{font-family:var(--fd);font-size:16px;font-weight:600;color:var(--t1);margin-right:8px}
+.search-wrap{flex:1;max-width:360px;position:relative}
+.search-wrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:15px;height:15px;stroke:var(--t3);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.search-wrap input{width:100%;background:var(--bg-c);border:1px solid var(--bd);border-radius:var(--rs);padding:7px 12px 7px 36px;color:var(--t1);font-family:var(--fb);font-size:13px;outline:none;transition:border-color var(--tr)}
+.search-wrap input:focus{border-color:var(--bd-l)}
+.search-wrap input::placeholder{color:var(--t3)}
+.search-kbd{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:var(--bg-i);border:1px solid var(--bd-l);border-radius:4px;padding:1px 5px;font-size:10px;color:var(--t3)}
+.header-spacer{flex:1}
+.header-actions{display:flex;align-items:center;gap:4px}
+.icon-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:var(--rs);cursor:pointer;transition:background var(--tr);color:var(--t2);position:relative}
+.icon-btn:hover{background:var(--bg-c);color:var(--t1)}
+.icon-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.notif-dot{position:absolute;top:7px;right:7px;width:7px;height:7px;background:var(--green-b);border-radius:50%;border:2px solid var(--bg-s)}
+.sync-btn{display:flex;align-items:center;gap:6px;padding:0 12px;height:32px;border-radius:var(--rs);background:var(--bg-c);border:1px solid var(--bd);color:var(--t2);font-size:12px;font-weight:500;cursor:pointer;transition:all var(--tr);white-space:nowrap}
+.sync-btn:hover{border-color:var(--bd-l);color:var(--t1)}
+.sync-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sync-btn.syncing svg{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.divider{width:1px;height:20px;background:var(--bd);margin:0 4px}
+.header-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--green),#15803D);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;cursor:pointer;flex-shrink:0}
+
+/* PAGE */
+.page-content{flex:1;overflow-y:auto;padding:28px;background:var(--bg)}
+.page-content::-webkit-scrollbar{width:4px}
+.page-content::-webkit-scrollbar-thumb{background:var(--bd-l);border-radius:4px}
+
+/* DEMO */
+.demo-center{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:24px;text-align:center}
+.demo-title{font-family:var(--fd);font-size:28px;font-weight:700;color:var(--t1)}
+.demo-sub{color:var(--t2);font-size:15px;max-width:420px;line-height:1.7}
+.demo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;width:100%;max-width:560px;margin-top:16px}
+.demo-card{background:var(--bg-c);border:1px solid var(--bd);border-radius:var(--r);padding:20px 12px;cursor:pointer;transition:all var(--tr);display:flex;flex-direction:column;align-items:center;gap:10px}
+.demo-card:hover{border-color:var(--green);background:var(--green-dim);transform:translateY(-2px)}
+.demo-card svg{width:22px;height:22px;stroke:var(--green-b);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.demo-card span{font-size:12px;font-weight:500;color:var(--t2)}
+.beta-badge{display:inline-flex;align-items:center;gap:4px;background:var(--green-dim);border:1px solid rgba(34,197,94,.2);color:var(--green-b);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 10px;border-radius:20px}
+
+/* MOBILE */
+@media(max-width:768px){
+  .sidebar{display:none}
+  .header-title{display:none}
+  .search-wrap{max-width:none}
+  .sync-btn span{display:none}
+  .mobile-nav{display:flex!important}
+  .page-content{padding-bottom:80px}
+}
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:64px;background:var(--bg-s);border-top:1px solid var(--bd);z-index:1000;padding:0 8px}
+.mobile-nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:var(--t3);transition:color var(--tr)}
+.mobile-nav-item.active{color:var(--green-b)}
+.mobile-nav-item svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.mobile-nav-item span{font-size:10px;font-weight:500}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <button class="collapse-btn" onclick="toggleSidebar()">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <div class="sidebar-logo">
+      <div class="logo-mark"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+      <span class="logo-text">Openfy</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-group">
+        <div class="nav-group-label">Principal</div>
+        <a class="nav-item active" data-tip="Dashboard" href="#"><div class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div><span class="nav-label">Dashboard</span></a>
+        <a class="nav-item" data-tip="Registro Rápido" href="#"><div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div><span class="nav-label">Registro Rápido</span><span class="nav-badge">IA</span></a>
+        <a class="nav-item" data-tip="Score" href="#"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div><span class="nav-label">Score</span></a>
+        <a class="nav-item" data-tip="Insights IA" href="#"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></div><span class="nav-label">Insights IA</span></a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Finanças</div>
+        <a class="nav-item" data-tip="Planejamento" href="#"><div class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><span class="nav-label">Planejamento</span></a>
+        <a class="nav-item" data-tip="Investimentos" href="#"><div class="nav-icon"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div><span class="nav-label">Investimentos</span></a>
+        <a class="nav-item" data-tip="Pagamentos" href="#"><div class="nav-icon"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><span class="nav-label">Pagamentos</span></a>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <a class="nav-item" data-tip="Configurações" href="#"><div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div><span class="nav-label">Configurações</span></a>
+      <div class="user-card"><div class="user-avatar">PH</div><div class="user-info"><div class="user-name">Pedro H.</div><div class="user-plan">Plano Pro · Beta</div></div></div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="header">
+      <span class="header-title">Dashboard</span>
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Buscar transações, categorias…">
+        <span class="search-kbd">⌘K</span>
+      </div>
+      <div class="header-spacer"></div>
+      <div class="header-actions">
+        <div class="sync-btn" onclick="triggerSync()" id="syncBtn">
+          <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+          <span>Sincronizar</span>
+        </div>
+        <div class="divider"></div>
+        <div class="icon-btn"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg><span class="notif-dot"></span></div>
+        <div class="icon-btn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg></div>
+        <div class="divider"></div>
+        <div class="header-avatar">PH</div>
+      </div>
+    </header>
+    <div class="page-content">
+      <div class="demo-center">
+        <div>
+          <div style="display:flex;align-items:center;justify-content:center;margin-bottom:20px">
+            <div class="logo-mark" style="width:52px;height:52px;border-radius:14px"><svg viewBox="0 0 24 24" style="width:28px;height:28px;fill:#fff"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+          </div>
+          <div class="demo-title">Openfy — Layout Base</div>
+          <div style="margin:12px auto 0;display:flex;justify-content:center"><span class="beta-badge">Beta</span></div>
+          <p class="demo-sub" style="margin-top:16px">Sidebar colapsável com tooltips, header com busca, sync e perfil. Navegação mobile adaptada na barra inferior.</p>
+        </div>
+        <div class="demo-grid">
+          <div class="demo-card"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Dashboard</span></div>
+          <div class="demo-card"><svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span>Score</span></div>
+          <div class="demo-card"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg><span>Investimentos</span></div>
+          <div class="demo-card"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Planejamento</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav class="mobile-nav">
+  <div class="mobile-nav-item active"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Início</span></div>
+  <div class="mobile-nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>Registrar</span></div>
+  <div class="mobile-nav-item"><svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span>Score</span></div>
+  <div class="mobile-nav-item"><svg viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg><span>Insights</span></div>
+  <div class="mobile-nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span>Config</span></div>
+</nav>
+
+<script>
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('collapsed')}
+function triggerSync(){const b=document.getElementById('syncBtn');b.classList.add('syncing');setTimeout(()=>b.classList.remove('syncing'),2000)}
+</script>
+</body>
+</html>

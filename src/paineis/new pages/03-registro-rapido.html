@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Openfy — Registro Rápido</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#16A34A;--green-b:#22C55E;--green-dim:rgba(22,163,74,.12);
+  --bg:#080808;--bg-s:#0A0A0A;--bg-c:#111111;--bg-c2:#161616;--bg-i:#1A1A1A;
+  --bd:rgba(255,255,255,.06);--bd-l:rgba(255,255,255,.10);
+  --t1:#EEEDE6;--t2:#8A8A7E;--t3:#444440;
+  --red:#EF4444;--red-dim:rgba(239,68,68,.12);
+  --amber:#F59E0B;--amber-dim:rgba(245,158,11,.12);
+  --blue:#3B82F6;--blue-dim:rgba(59,130,246,.12);
+  --r:12px;--rs:8px;--tr:.22s cubic-bezier(.4,0,.2,1);
+  --fd:'DM Sans',sans-serif;--fb:'Inter',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t1);font-family:var(--fb);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+.page{max-width:1100px;margin:0 auto;padding:28px}
+
+/* PAGE HEADER */
+.page-header{margin-bottom:28px}
+.page-title{font-family:var(--fd);font-size:24px;font-weight:700;letter-spacing:-.4px;color:var(--t1);margin-bottom:4px}
+.page-sub{font-size:14px;color:var(--t2)}
+.ia-badge{display:inline-flex;align-items:center;gap:5px;background:var(--green-dim);border:1px solid rgba(34,197,94,.2);color:var(--green-b);font-size:10px;font-weight:700;letter-spacing:.06em;padding:2px 9px;border-radius:20px;margin-left:10px;vertical-align:middle}
+.ia-badge svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* MAIN LAYOUT */
+.layout{display:grid;grid-template-columns:1fr 300px;gap:20px}
+
+/* TABS */
+.tabs{display:flex;gap:4px;background:var(--bg-c);border:1px solid var(--bd);border-radius:var(--r);padding:4px;margin-bottom:20px}
+.tab{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 16px;border-radius:var(--rs);cursor:pointer;font-size:13px;font-weight:600;font-family:var(--fd);color:var(--t2);transition:all var(--tr)}
+.tab:hover{color:var(--t1)}
+.tab.active{background:var(--bg-s);color:var(--t1);box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.tab svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* TAB PANELS */
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* ─── TEXTO ─── */
+.text-input-wrap{position:relative;margin-bottom:16px}
+.text-input{width:100%;background:var(--bg-c);border:1px solid var(--bd-l);border-radius:var(--r);padding:16px 52px 16px 16px;color:var(--t1);font-family:var(--fd);font-size:16px;font-weight:500;outline:none;resize:none;min-height:80px;transition:border-color var(--tr);line-height:1.5}
+.text-input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(22,163,74,.08)}
+.text-input::placeholder{color:var(--t3);font-size:15px}
+.text-send-btn{position:absolute;bottom:12px;right:12px;width:36px;height:36px;background:var(--green);border-radius:var(--rs);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background var(--tr)}
+.text-send-btn:hover{background:#15803D}
+.text-send-btn svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+
+/* AI DETECTION */
+.ai-detect-box{background:linear-gradient(135deg,rgba(22,163,74,.06),rgba(22,163,74,.02));border:1px solid rgba(34,197,94,.15);border-radius:var(--r);padding:16px;margin-bottom:20px}
+.ai-detect-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.ai-detect-title{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--green-b);text-transform:uppercase;letter-spacing:.05em}
+.ai-detect-title svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ai-detect-confidence{font-size:11px;font-weight:700;color:var(--green-b);background:var(--green-dim);padding:2px 8px;border-radius:20px}
+.detect-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.detect-field{background:var(--bg-c);border:1px solid var(--bd);border-radius:var(--rs);padding:10px 12px;position:relative}
+.detect-field.full{grid-column:1/-1}
+.detect-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);margin-bottom:5px}
+.detect-value{font-family:var(--fd);font-size:15px;font-weight:700;color:var(--t1)}
+.detect-pct{position:absolute;top:8px;right:8px;font-size:10px;font-weight:700;color:var(--green-b);background:var(--green-dim);padding:1px 6px;border-radius:10px}
+
+.ai-actions{display:flex;gap:8px;margin-top:14px}
+
+/* ─── FOTO ─── */
+.drop-zone{border:2px dashed var(--bd-l);border-radius:var(--r);padding:48px 24px;text-align:center;cursor:pointer;transition:all var(--tr);margin-bottom:16px;position:relative}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--green);background:var(--green-dim)}
+.drop-icon{width:52px;height:52px;margin:0 auto 16px;background:var(--bg-c2);border-radius:14px;display:flex;align-items:center;justify-content:center}
+.drop-icon svg{width:24px;height:24px;stroke:var(--t2);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.drop-title{font-family:var(--fd);font-size:15px;font-weight:600;color:var(--t1);margin-bottom:6px}
+.drop-sub{font-size:12px;color:var(--t3);line-height:1.6}
+.drop-badge{display:inline-block;margin-top:12px;background:var(--green-dim);border:1px solid rgba(34,197,94,.2);color:var(--green-b);font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px}
+.file-types{display:flex;gap:8px;justify-content:center;margin-top:12px}
+.file-type{background:var(--bg-c2);border:1px solid var(--bd);border-radius:6px;padding:3px 10px;font-size:11px;color:var(--t3);font-weight:500}
+
+/* ─── MANUAL ─── */
+.type-toggle{display:flex;gap:0;background:var(--bg-c);border:1px solid var(--bd);border-radius:var(--rs);overflow:hidden;margin-bottom:20px;width:fit-content}
+.type-btn{padding:8px 24px;font-size:13px;font-weight:600;cursor:pointer;transition:all var(--tr);color:var(--t2);font-family:var(--fd)}
+.type-btn.active.desp{background:var(--red-dim);color:var(--red)}
+.type-btn.active.rec{background:var(--green-dim);color:var(--green-b)}
+
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group.full{grid-column:1/-1}
+.form-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--t3)}
+.form-input{background:var(--bg-c);border:1px solid var(--bd);border-radius:var(--rs);padding:10px 12px;color:var(--t1);font-family:var(--fb);font-size:14px;outline:none;transition:border-color var(--tr);width:100%}
+.form-input:focus{border-color:var(--bd-l)}
+.form-input::placeholder{color:var(--t3)}
+select.form-input option{background:var(--bg-c2)}
+
+.cat-grid{display:flex;flex-wrap:wrap;gap:7px}
+.cat-chip{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;transition:all var(--tr);background:var(--bg-c);border:1px solid var(--bd);color:var(--t2)}
+.cat-chip:hover,.cat-chip.active{background:var(--green-dim);border-color:rgba(34,197,94,.25);color:var(--green-b)}
+
+/* SUBMIT */
+.submit-row{display:flex;gap:8px;margin-top:4px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:0 20px;height:42px;border-radius:var(--rs);font-size:14px;font-weight:600;cursor:pointer;transition:all var(--tr);font-family:var(--fd);border:none}
+.btn-primary{background:var(--green);color:#fff;flex:1}
+.btn-primary:hover{background:#15803D}
+.btn-ghost{background:transparent;color:var(--t2);border:1px solid var(--bd)}
+.btn-ghost:hover{border-color:var(--bd-l);color:var(--t1)}
+.btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* SIDEBAR */
+.sidebar-right{display:flex;flex-direction:column;gap:16px}
+.card{background:var(--bg-c);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
+.card-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--bd)}
+.card-title{font-family:var(--fd);font-size:13px;font-weight:600;color:var(--t1);display:flex;align-items:center;gap:7px}
+.card-title svg{width:14px;height:14px;stroke:var(--t2);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.card-body{padding:16px 18px}
+.recent-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd)}
+.recent-item:last-child{border:none;padding-bottom:0}
+.recent-item:first-child{padding-top:0}
+.recent-icon{font-size:16px}
+.recent-info{flex:1}
+.recent-name{font-size:12px;font-weight:500;color:var(--t1)}
+.recent-meta{font-size:10px;color:var(--t3);margin-top:1px}
+.recent-val{font-family:var(--fd);font-size:13px;font-weight:700;color:var(--red)}
+
+.recorrente-item{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bd)}
+.recorrente-item:last-child{border:none;padding-bottom:0}
+.recorrente-item:first-child{padding-top:0}
+.rec-name{font-size:12px;font-weight:500;color:var(--t1)}
+.rec-date{font-size:10px;color:var(--t3);margin-top:1px}
+.rec-val{font-family:var(--fd);font-size:12px;font-weight:600;color:var(--amber)}
+.rec-check{width:18px;height:18px;border:1px solid var(--bd-l);border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-left:8px}
+.rec-check:hover{border-color:var(--green);background:var(--green-dim)}
+.rec-check svg{width:10px;height:10px;stroke:var(--green-b);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+
+.tip-box{background:var(--green-dim);border:1px solid rgba(34,197,94,.15);border-radius:var(--r);padding:14px 16px}
+.tip-icon{font-size:20px;margin-bottom:8px}
+.tip-text{font-size:12px;color:var(--t2);line-height:1.6}
+.tip-text strong{color:var(--green-b)}
+
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr}
+  .detect-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:600px){
+  .page{padding:16px}
+  .tabs{flex-direction:column}
+  .form-grid{grid-template-columns:1fr}
+  .detect-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="page-header">
+    <div class="page-title">Registro Rápido <span class="ia-badge"><svg viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>IA Ativa</span></div>
+    <div class="page-sub">Registre em segundos — a IA detecta valor, data, categoria e forma de pagamento.</div>
+  </div>
+
+  <div class="layout">
+    <div>
+      <!-- TABS -->
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('texto',this)">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          Texto Livre
+        </div>
+        <div class="tab" onclick="switchTab('foto',this)">
+          <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          Foto / Comprovante
+        </div>
+        <div class="tab" onclick="switchTab('manual',this)">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Manual
+        </div>
+      </div>
+
+      <!-- TAB: TEXTO -->
+      <div class="tab-panel active" id="tab-texto">
+        <div class="text-input-wrap">
+          <textarea class="text-input" placeholder="Ex: Paguei R$ 89,90 no iFood hoje com cartão de crédito…" oninput="simulateDetect(this)"></textarea>
+          <div class="text-send-btn"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
+        </div>
+
+        <div class="ai-detect-box" id="detectBox" style="display:none">
+          <div class="ai-detect-header">
+            <div class="ai-detect-title">
+              <svg viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+              IA Detectou
+            </div>
+            <span class="ai-detect-confidence">94% confiança</span>
+          </div>
+          <div class="detect-grid">
+            <div class="detect-field">
+              <div class="detect-label">Valor</div>
+              <div class="detect-value">R$ 89,90</div>
+              <span class="detect-pct">99%</span>
+            </div>
+            <div class="detect-field">
+              <div class="detect-label">Tipo</div>
+              <div class="detect-value" style="color:var(--red)">Despesa</div>
+              <span class="detect-pct">98%</span>
+            </div>
+            <div class="detect-field">
+              <div class="detect-label">Data</div>
+              <div class="detect-value">Hoje</div>
+              <span class="detect-pct">97%</span>
+            </div>
+            <div class="detect-field">
+              <div class="detect-label">Categoria</div>
+              <div class="detect-value">🍕 Alimentação</div>
+              <span class="detect-pct">91%</span>
+            </div>
+            <div class="detect-field">
+              <div class="detect-label">Pagamento</div>
+              <div class="detect-value">💳 Crédito</div>
+              <span class="detect-pct">88%</span>
+            </div>
+            <div class="detect-field">
+              <div class="detect-label">Estabelecimento</div>
+              <div class="detect-value">iFood</div>
+              <span class="detect-pct">96%</span>
+            </div>
+          </div>
+          <div class="ai-actions">
+            <button class="btn btn-primary" style="flex:1"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Confirmar Registro</button>
+            <button class="btn btn-ghost"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Editar</button>
+          </div>
+        </div>
+
+        <div style="padding:14px 0;border-top:1px solid var(--bd)">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);margin-bottom:10px">Exemplos de frases</div>
+          <div style="display:flex;flex-wrap:wrap;gap:7px">
+            <div style="padding:5px 12px;background:var(--bg-c);border:1px solid var(--bd);border-radius:20px;font-size:12px;color:var(--t2);cursor:pointer;transition:all var(--tr)" onclick="fillExample(this)">Gastei R$ 45 no Uber hoje</div>
+            <div style="padding:5px 12px;background:var(--bg-c);border:1px solid var(--bd);border-radius:20px;font-size:12px;color:var(--t2);cursor:pointer;transition:all var(--tr)" onclick="fillExample(this)">Recebi R$ 7200 de salário</div>
+            <div style="padding:5px 12px;background:var(--bg-c);border:1px solid var(--bd);border-radius:20px;font-size:12px;color:var(--t2);cursor:pointer;transition:all var(--tr)" onclick="fillExample(this)">Paguei Netflix R$ 39,90 crédito</div>
+            <div style="padding:5px 12px;background:var(--bg-c);border:1px solid var(--bd);border-radius:20px;font-size:12px;color:var(--t2);cursor:pointer;transition:all var(--tr)" onclick="fillExample(this)">Mercado R$ 220 no Pix ontem</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: FOTO -->
+      <div class="tab-panel" id="tab-foto">
+        <div class="drop-zone" ondrop="handleDrop(event)" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" onclick="document.getElementById('fileInput').click()">
+          <input type="file" id="fileInput" accept="image/*,.pdf" style="display:none">
+          <div class="drop-icon"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+          <div class="drop-title">Solte a foto aqui ou clique para selecionar</div>
+          <div class="drop-sub">Nota fiscal, comprovante de Pix, recibo, extrato — a IA lê e preenche tudo automaticamente</div>
+          <div class="drop-badge">✨ OCR com IA</div>
+          <div class="file-types">
+            <div class="file-type">JPG</div>
+            <div class="file-type">PNG</div>
+            <div class="file-type">PDF</div>
+            <div class="file-type">HEIC</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+          <div style="background:var(--bg-c);border:1px solid var(--bd);border-radius:var(--r);padding:16px;text-align:center;cursor:pointer;transition:all var(--tr)" onmouseenter="this.style.borderColor='var(--green)'" onmouseleave="this.style.borderColor='var(--bd)'">
+            <div style="font-size:28px;margin-bottom:8px">📷</div>
+            <div style="font-size:12px;font-weight:600;color:var(--t1);margin-bottom:4px">Câmera</div>
+            <div style="font-size:11px;color:var(--t3)">Fotografar recibo</div>
+          </div>
+          <div style="background:var(--bg-c);border:1px solid var(--bd);border-radius:var(--r);padding:16px;text-align:center;cursor:pointer;transition:all var(--tr)" onmouseenter="this.style.borderColor='var(--green)'" onmouseleave="this.style.borderColor='var(--bd)'">
+            <div style="font-size:28px;margin-bottom:8px">📁</div>
+            <div style="font-size:12px;font-weight:600;color:var(--t1);margin-bottom:4px">Galeria</div>
+            <div style="font-size:11px;color:var(--t3)">Selecionar imagem</div>
+          </div>
+          <div style="background:var(--bg-c);border:1px solid var(--bd);border-radius:var(--r);padding:16px;text-align:center;cursor:pointer;transition:all var(--tr)" onmouseenter="this.style.borderColor='var(--green)'" onmouseleave="this.style.borderColor='var(--bd)'">
+            <div style="font-size:28px;margin-bottom:8px">📤</div>
+            <div style="font-size:12px;font-weight:600;color:var(--t1);margin-bottom:4px">PDF</div>
+            <div style="font-size:11px;color:var(--t3)">Importar extrato</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: MANUAL -->
+      <div class="tab-panel" id="tab-manual">
+        <div class="type-toggle">
+          <div class="type-btn active desp" id="btnDesp" onclick="setType('desp')">💸 Despesa</div>
+          <div class="type-btn rec" id="btnRec" onclick="setType('rec')">💰 Receita</div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Valor</label>
+            <input class="form-input" type="text" placeholder="R$ 0,00">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Data</label>
+            <input class="form-input" type="date" value="2025-05-13">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Descrição</label>
+            <input class="form-input" type="text" placeholder="Ex: iFood, Mercado…">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Forma de Pagamento</label>
+            <select class="form-input">
+              <option>💳 Cartão de Crédito</option>
+              <option>🟢 Pix</option>
+              <option>💵 Dinheiro</option>
+              <option>🔀 TED / DOC</option>
+              <option>🏧 Débito</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">Estabelecimento</label>
+            <input class="form-input" type="text" placeholder="Ex: Supermercado Extra, iFood…">
+          </div>
+        </div>
+
+        <div style="margin-bottom:20px">
+          <div class="form-label" style="margin-bottom:10px">Categoria</div>
+          <div class="cat-grid">
+            <div class="cat-chip active">🍕 Alimentação</div>
+            <div class="cat-chip">🚗 Transporte</div>
+            <div class="cat-chip">🏠 Moradia</div>
+            <div class="cat-chip">💊 Saúde</div>
+            <div class="cat-chip">🎬 Lazer</div>
+            <div class="cat-chip">📱 Assinaturas</div>
+            <div class="cat-chip">👗 Vestuário</div>
+            <div class="cat-chip">📚 Educação</div>
+            <div class="cat-chip">⚡ Contas</div>
+            <div class="cat-chip">+ Outra</div>
+          </div>
+        </div>
+
+        <div class="submit-row">
+          <button class="btn btn-primary"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Registrar</button>
+          <button class="btn btn-ghost">Limpar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIDEBAR RIGHT -->
+    <div class="sidebar-right">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Recentes</div>
+        </div>
+        <div class="card-body">
+          <div class="recent-item">
+            <div class="recent-icon">🍕</div>
+            <div class="recent-info"><div class="recent-name">iFood</div><div class="recent-meta">Hoje · Crédito</div></div>
+            <div class="recent-val">−R$ 89,90</div>
+          </div>
+          <div class="recent-item">
+            <div class="recent-icon">⛽</div>
+            <div class="recent-info"><div class="recent-name">Posto BR</div><div class="recent-meta">Ontem · Pix</div></div>
+            <div class="recent-val">−R$ 145,00</div>
+          </div>
+          <div class="recent-item">
+            <div class="recent-icon">🛒</div>
+            <div class="recent-info"><div class="recent-name">Mercado Extra</div><div class="recent-meta">11/05 · Pix</div></div>
+            <div class="recent-val">−R$ 312,50</div>
+          </div>
+          <div class="recent-item">
+            <div class="recent-icon">🎬</div>
+            <div class="recent-info"><div class="recent-name">Netflix</div><div class="recent-meta">11/05 · Crédito</div></div>
+            <div class="recent-val">−R$ 39,90</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 001 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Recorrentes Pendentes</div>
+        </div>
+        <div class="card-body">
+          <div class="recorrente-item">
+            <div>
+              <div class="rec-name">Spotify</div>
+              <div class="rec-date">Vence 15/05</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="rec-val">R$ 21,90</span>
+              <div class="rec-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            </div>
+          </div>
+          <div class="recorrente-item">
+            <div>
+              <div class="rec-name">Academia</div>
+              <div class="rec-date">Vence 15/05</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="rec-val">R$ 89,90</span>
+              <div class="rec-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            </div>
+          </div>
+          <div class="recorrente-item">
+            <div>
+              <div class="rec-name">Internet</div>
+              <div class="rec-date">Vence 20/05</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="rec-val">R$ 119,90</span>
+              <div class="rec-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tip-box">
+        <div class="tip-icon">💡</div>
+        <div class="tip-text"><strong>Dica IA:</strong> Você registra mais gastos à noite, entre 20h e 23h. Tente registrar logo após cada compra para maior precisão.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function switchTab(id,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
+}
+
+let detectTimer;
+function simulateDetect(el){
+  clearTimeout(detectTimer);
+  const box=document.getElementById('detectBox');
+  if(el.value.length>10){
+    detectTimer=setTimeout(()=>{box.style.display='block';box.style.animation='fadeIn .3s ease'},600);
+  } else {
+    box.style.display='none';
+  }
+}
+
+function fillExample(el){
+  const ta=document.querySelector('.text-input');
+  ta.value=el.textContent;
+  simulateDetect(ta);
+}
+
+function setType(t){
+  document.getElementById('btnDesp').className='type-btn'+(t==='desp'?' active desp':'');
+  document.getElementById('btnRec').className='type-btn'+(t==='rec'?' active rec':'');
+}
+
+function handleDrop(e){
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag');
+}
+
+document.querySelectorAll('.cat-chip').forEach(c=>{
+  c.addEventListener('click',()=>{
+    document.querySelectorAll('.cat-chip').forEach(x=>x.classList.remove('active'));
+    c.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

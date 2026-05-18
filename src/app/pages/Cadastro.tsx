@@ -3,6 +3,7 @@ import { Navigate, Link } from "react-router"
 import { supabase } from "../../lib/supabase"
 import { useAuth } from "../../lib/auth-context"
 import { emailSchema, senhaSchema, nomeSchema } from "../../lib/validations"
+import { CURRENT_TERMS_VERSION } from "../../lib/terms"
 import { Eye, EyeOff, Check, ArrowRight, TrendingUp, Shield, Zap, Lock } from "lucide-react"
 
 const BENEFITS = [
@@ -155,22 +156,25 @@ export default function Cadastro() {
         plano: "free",
         renda_mensal: 0,
         meta_economia: 0,
-        consentimento_politica: consentimentoPolitica,
-        consentimento_marketing: consentimentoMarketing,
-        data_consentimento: new Date().toISOString(),
-        versao_politica: "1.0",
-      }, { onConflict: "id" })
+          consentimento_politica: consentimentoPolitica,
+          consentimento_marketing: consentimentoMarketing,
+          data_consentimento: new Date().toISOString(),
+          versao_politica: CURRENT_TERMS_VERSION,
+          versao_termos_aceita: CURRENT_TERMS_VERSION,
+          data_aceite_termos: new Date().toISOString(),
+        }, { onConflict: "id" })
 
       await supabase.from("audit_logs").insert({
         user_id: data.user.id,
         acao: "cadastro",
         detalhes: {
-          email,
-          consentimento_politica: consentimentoPolitica,
-          consentimento_marketing: consentimentoMarketing,
-          versao_politica: "1.0",
-        },
-      })
+            email,
+            consentimento_politica: consentimentoPolitica,
+            consentimento_marketing: consentimentoMarketing,
+            versao_politica: CURRENT_TERMS_VERSION,
+            versao_termos_aceita: CURRENT_TERMS_VERSION,
+          },
+        })
 
       if (betaFechado) {
         await supabase.rpc("mark_beta_email_used", { p_email: email.toLowerCase().trim() })

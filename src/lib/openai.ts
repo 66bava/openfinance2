@@ -34,10 +34,166 @@ async function aiRequest(input: AiRequestInput, maxTokensFallback = 400): Promis
   })
 
   const payload = await res.json().catch(() => ({} as any))
-  if (!res.ok) throw new Error(payload?.error?.message ?? `Erro ${res.status} na API`)
+  if (!res.ok) {
+    const base = payload?.error?.message ?? `Erro ${res.status} na API`
+    const detail = payload?.error?.detail ? ` (${payload.error.detail})` : ""
+    throw new Error(`${base}${detail}`)
+  }
 
   const content = payload?.content
   return typeof content === "string" && content.trim() ? content : "Não foi possível gerar a análise."
+}
+
+function isAiKeyError(err: unknown): boolean {
+  const msg = err instanceof Error ? err.message : String(err ?? "")
+  const s = msg.toLowerCase()
+  return (
+    s.includes("invalid api key") ||
+    s.includes("api key not valid") ||
+    (s.includes("chave") && (s.includes("inválida") || s.includes("expirada"))) ||
+    s.includes("server is missing groq_api_key") ||
+    s.includes("server is missing") && s.includes("api key")
+  )
+}
+
+function fmtBRL(v: number): string {
+  const n = Number(v) || 0
+  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(n)
+}
+
+function pct(v: number): string {
+  const n = Number(v)
+  if (!Number.isFinite(n)) return "0%"
+  return `${Math.round(n)}%`
+}
+
+function offlineScore(ctx: ScoreContext): string {
+  const renda = round2(ctx.totalRenda)
+  const gastos = round2(ctx.totalGastos)
+  const saldo = round2(renda - gastos)
+  const econ = round2(ctx.percentualEconomia)
+  const topCat = ctx.categorias?.[0]?.name ? `${ctx.categorias[0].name} (${pct(ctx.categorias[0].percent)})` : "sem categorias suficientes"
+
+  const why =
+    renda === 0 && gastos === 0
+      ? "Dados insuficientes: ainda não há transações suficientes no ciclo para explicar o score."
+      : saldo < 0
+        ? `Você gastou mais do que recebeu (saldo ${fmtBRL(saldo)}). Isso derruba o equilíbrio gastos/renda.`
+        : `Sua economia está em ${pct(econ)} com saldo ${fmtBRL(saldo)}; isso é o principal driver do score.`
+
+  const actions: string[] = []
+  if (renda === 0 && gastos === 0) {
+    actions.push("Registre suas transações do ciclo (meta: 10+ transações) para o score refletir seu comportamento.")
+    actions.push("Categorize as despesas principais (5 categorias) e marque método de pagamento para melhorar a leitura do padrão.")
+    actions.push("Defina uma meta simples de economia (ex: guardar 5% da renda) e acompanhe por 30 dias.")
+  } else {
+    actions.push(`Defina um teto semanal para sua maior categoria (${topCat}) e reduza 5% nesta semana.`)
+    actions.push(`Trave recorrências: revise assinaturas/compromissos e corte 1 item para liberar pelo menos ${fmtBRL(Math.max(10, renda * 0.01))}/mês.`)
+    actions.push(`Automatize 1 hábito: programe um aporte recorrente (mesmo pequeno) e mantenha por 30 dias.`)
+  }
+
+  return [
+    "**Resumo:**",
+    `- Score atual: ${ctx.score} (${ctx.scoreLabel})`,
+    `- Renda: ${fmtBRL(renda)} · Gastos: ${fmtBRL(gastos)} · Saldo: ${fmtBRL(saldo)}`,
+    `- Economia: ${pct(econ)} · Maior categoria: ${topCat}`,
+    "",
+    "**Por que seu score está assim:**",
+    why,
+    "",
+    "**3 ações para melhorar:**",
+    `1. ${actions[0]}`,
+    `2. ${actions[1]}`,
+    `3. ${actions[2]}`,
+  ].join("\n")
+}
+
+function offlineCategoria(ctx: CategoriaContext): string {
+  const valor = round2(ctx.valor)
+  const pctTotal = round2(ctx.percentualDoTotal)
+  const total = round2(ctx.totalGastos)
+
+  const avaliacao =
+    total === 0 ? "Dados insuficientes para avaliar a categoria." :
+      pctTotal >= 30 ? "Categoria muito concentrada no seu orçamento." :
+        pctTotal >= 15 ? "Categoria relevante e com espaço para otimização." :
+          "Categoria sob controle no geral."
+
+  const porQue =
+    total === 0
+      ? "Sem despesas suficientes no período informado."
+      : `Essa categoria soma ${fmtBRL(valor)} no período (${pct(pctTotal)} de ${fmtBRL(total)}), com ${ctx.numTransacoes} transações.`
+
+  const a1 = `Defina um teto para ${ctx.categoria} (meta: -5% no próximo ciclo) e acompanhe semanalmente.`
+  const a2 = `Escolha 1 descritor recorrente e reduza frequência/valor (meta: cortar ${fmtBRL(Math.max(10, valor * 0.05))} no mês).`
+
+  return [
+    "**Avaliação:**",
+    avaliacao,
+    "",
+    "**Por que isso acontece:**",
+    porQue,
+    "",
+    "**2 ações concretas para reduzir:**",
+    `1. ${a1}`,
+    `2. ${a2}`,
+  ].join("\n")
+}
+
+function offlineRelatorio(context: any): string {
+  const totais = context?.totais ?? {}
+  const renda = round2(totais.totalRenda)
+  const gastos = round2(totais.totalGastos)
+  const saldo = round2(totais.saldoDisponivel)
+  const econ = round2(totais.percentualEconomia)
+  const gastoDia = round2(totais.gastoMedioDia)
+  const topCats = Array.isArray(context?.topExpenseCategories) ? context.topExpenseCategories.slice(0, 4) : []
+
+  const causas: string[] = []
+  if (renda === 0 && gastos === 0) causas.push("Dados insuficientes: poucas transações no período.")
+  if (saldo < 0) causas.push(`Saldo negativo (${fmtBRL(saldo)}): gastos acima da renda.`)
+  if (topCats[0]?.name) causas.push(`Concentração em ${topCats[0].name} (${fmtBRL(topCats[0].total)}; ${pct(topCats[0].percent)} dos gastos).`)
+  if (context?.assinaturas?.totalMensal != null) causas.push(`Recorrências: ${fmtBRL(round2(context.assinaturas.totalMensal))}/mês em assinaturas.`)
+
+  const metas: string[] = []
+  if (renda > 0) metas.push(`Economia: subir de ${pct(econ)} para ${pct(Math.min(50, econ + 5))} em 30 dias.`)
+  if (topCats[0]?.name) metas.push(`Maior categoria (${topCats[0].name}): reduzir 5% no próximo ciclo.`)
+  metas.push("Registro: manter 100% das despesas categorizadas no próximo ciclo.")
+
+  const perguntas: string[] = []
+  if (!Array.isArray(context?.topMerchants) || context.topMerchants.length === 0) perguntas.push("Você registra a descrição/estabelecimento em todas as despesas?")
+  if (!context?.investimentos) perguntas.push("Você tem investimentos fora do app (renda fixa/variável) que ainda não cadastrou?")
+
+  return [
+    "**Resumo do período:**",
+    `- Renda: ${fmtBRL(renda)} · Gastos: ${fmtBRL(gastos)} · Saldo: ${fmtBRL(saldo)}`,
+    `- Economia: ${pct(econ)} · Gasto médio/dia: ${fmtBRL(gastoDia)}`,
+    `- Transações: ${context?.contagens?.transacoes ?? 0} (receitas: ${context?.contagens?.receitas ?? 0}, despesas: ${context?.contagens?.despesas ?? 0})`,
+    "",
+    "**Por que está assim (causas prováveis):**",
+    ...(causas.length ? causas.map((c) => `- ${c}`) : ["- Dados insuficientes para apontar causas com segurança."]),
+    "",
+    "**Plano de ação (7 dias):**",
+    "- Categorize/ajuste as 20 transações mais recentes para melhorar a precisão.",
+    "- Defina teto semanal para a maior categoria e acompanhe diariamente.",
+    "- Revise recorrências e cancele/negocie 1 item se existir.",
+    "",
+    "**Plano de ação (30 dias):**",
+    "- Reduzir 5% da maior categoria e medir impacto no saldo.",
+    "- Criar uma reserva (ou aporte recorrente) mesmo pequena e manter consistência.",
+    "- Ajustar métodos de pagamento/categorização para reduzir gastos invisíveis (dinheiro).",
+    "",
+    "**Plano de ação (90 dias):**",
+    "- Consolidar orçamento por categoria com metas mensais realistas.",
+    "- Reavaliar assinaturas/compromissos e manter apenas as de maior valor percebido.",
+    "- Se possível, aumentar aportes e diversificar investimentos gradualmente.",
+    "",
+    "**Metas sugeridas:**",
+    ...metas.map((m) => `- ${m}`),
+    "",
+    "**Perguntas (se faltar dado):**",
+    ...(perguntas.length ? perguntas.map((p) => `- ${p}`) : ["- Sem perguntas no momento."]),
+  ].join("\n")
 }
 
 export interface ScoreContext {
@@ -94,7 +250,12 @@ export async function analisarScore(ctx: ScoreContext): Promise<string> {
   const prompt =
     "Analise o score e responda seguindo exatamente o formato pedido nas instruções do sistema. Use apenas os dados do CONTEXTO."
 
-  return aiRequest({ task: "score", prompt, context, maxTokens: 500, temperature: 0.4 })
+  try {
+    return await aiRequest({ task: "score", prompt, context, maxTokens: 500, temperature: 0.4 })
+  } catch (err) {
+    if (isAiKeyError(err)) return offlineScore(ctx)
+    return offlineScore(ctx)
+  }
 }
 
 export interface CategoriaContext {
@@ -121,7 +282,12 @@ export async function analisarCategoria(ctx: CategoriaContext): Promise<string> 
   const prompt =
     "Faça a análise da categoria e responda seguindo exatamente o formato pedido nas instruções do sistema. Use apenas os dados do CONTEXTO."
 
-  return aiRequest({ task: "categoria", prompt, context, maxTokens: 450, temperature: 0.5 })
+  try {
+    return await aiRequest({ task: "categoria", prompt, context, maxTokens: 450, temperature: 0.5 })
+  } catch (err) {
+    if (isAiKeyError(err)) return offlineCategoria(ctx)
+    return offlineCategoria(ctx)
+  }
 }
 
 type TransacaoLike = {
@@ -323,6 +489,11 @@ export async function analisarRelatorio(ctx: RelatorioContext): Promise<string> 
   const prompt =
     "Gere uma análise completa do período e um plano de ação elaborado. Inclua insights sobre investimentos e assinaturas quando houver dados no CONTEXTO. Use somente o CONTEXTO; não invente referências externas."
 
-  return aiRequest({ task: "report", prompt, context, maxTokens: 900, temperature: 0.45 })
+  try {
+    return await aiRequest({ task: "report", prompt, context, maxTokens: 900, temperature: 0.45 })
+  } catch (err) {
+    if (isAiKeyError(err)) return offlineRelatorio(context)
+    return offlineRelatorio(context)
+  }
 }
 

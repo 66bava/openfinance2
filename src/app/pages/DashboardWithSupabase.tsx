@@ -1,4 +1,5 @@
 ﻿import { useState, useEffect } from "react"
+import { motion } from "motion/react"
 import { useAuth } from "../../lib/auth-context"
 import { useLanguage } from "../../lib/language-context"
 import { Link } from "react-router"
@@ -9,7 +10,7 @@ import {
 import {
   ArrowDownRight, ArrowUpRight, Wallet, PiggyBank,
   Plus, TrendingUp, TrendingDown, Users, Check, X, Trash2,
-  AlertCircle,
+  AlertCircle, CalendarDays,
 } from "lucide-react"
 import {
   getTotaisMes, getGastosPorCategoria,
@@ -18,11 +19,15 @@ import {
 } from "../../lib/queries"
 import { getInvestimentos, calcularPatrimonioEstimado } from "../../lib/queries/investimentos"
 import { getAssinaturas, calcularTotalMensal } from "../../lib/queries/assinaturas"
-import type { Investimento, Assinatura } from "../../lib/types"
+import { getCompromissos } from "../../lib/queries/futuro"
+import type { Investimento, Assinatura, Compromisso } from "../../lib/types"
 import { formatCurrency, formatDate, formatShortDate } from "../../lib/format"
 import { getMinhaMembresia, getAdminPerfil, responderConvite } from "../../lib/queries/familia"
 import { AddTransactionModal } from "../components/dashboard/AddTransactionModal"
 import { ScoreAdvisor } from "../components/dashboard/ScoreAdvisor"
+import { ScorePanel } from "../components/dashboard/ScorePanel"
+import { FinancialCycleSettingsModal } from "../components/dashboard/FinancialCycleSettingsModal"
+import { calculateFinancialScore } from "../../score-engine"
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -34,42 +39,6 @@ function fmtDate(dateStr: string, t: (k: string) => string) {
   if (d.toDateString() === today.toDateString()) return t("dashHoje")
   if (d.toDateString() === yesterday.toDateString()) return t("dashOntem")
   return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })
-}
-
-function calcularScore(
-  pct: number,
-  gastos: number,
-  renda: number,
-  totalInvestido = 0,
-  numInvestimentos = 0,
-  recorrentes = 0,
-  diversificacao = 0,
-  assinaturasMensal = 0,
-  assinaturasCount = 0,
-): number {
-  if (renda === 0) return 300
-  const poupancaScore = Math.min(pct * 20, 400)
-  const equilibrioScore = gastos / renda < 0.8 ? 300 : gastos / renda < 1 ? 150 : 50
-
-  // Bônus por investir: recorrência, patrimônio e diversificação
-  const investScore = numInvestimentos > 0
-    ? Math.min(50 + (totalInvestido / (renda || 1)) * 30 + recorrentes * 18 + diversificacao * 10, 200)
-    : 0
-
-  // Assinaturas: penaliza excesso, premia controle saudável
-  const burden = renda > 0 ? (assinaturasMensal / renda) : 0
-  let subsScore = 0
-  if (assinaturasMensal > 0) {
-    if (burden > 0.15) subsScore -= 100
-    else if (burden > 0.1) subsScore -= 60
-    else if (burden > 0.05) subsScore -= 20
-    else subsScore += 20
-
-    if (assinaturasCount >= 10) subsScore -= 20
-    else if (assinaturasCount >= 7) subsScore -= 10
-  }
-  const base = 300
-  return Math.round(Math.min(Math.max(base + poupancaScore + equilibrioScore + investScore + subsScore, 0), 1000))
 }
 
 function scoreColor(score: number) {
@@ -100,90 +69,6 @@ const CATEGORY_ICONS: Record<string, string> = {
 
 function categoryIcon(nome: string) {
   return CATEGORY_ICONS[nome] ?? "📦"
-}
-
-// ─── ScoreGauge ──────────────────────────────────────────────────────────────
-
-function ScoreGauge({ score }: { score: number }) {
-  const { t } = useLanguage()
-  const pct = score / 1000
-  const angle = pct * 180
-  const rad = (angle * Math.PI) / 180
-  const cx = 120, cy = 110, r = 90
-  const x = cx + r * Math.cos(Math.PI - rad)
-  const y = cy - r * Math.sin(Math.PI - rad)
-  const largeArc = angle > 180 ? 1 : 0
-  const color = scoreColor(score)
-
-  const pilares = [
-    { nome: t("dashPoupanca"), pct: Math.min(pct * 1.2, 1) },
-    { nome: t("dashEquilibrio"), pct: Math.min(pct * 1.1, 1) },
-    { nome: t("dashConsistencia"), pct: Math.min(pct * 0.9, 1) },
-    { nome: t("dashReserva"), pct: Math.min(pct * 0.8, 1) },
-    { nome: t("dashMetas"), pct: Math.min(pct * 0.7, 1) },
-  ]
-
-  return (
-    <div style={{ background: "var(--of-surface)", borderRadius: 16, border: "1px solid var(--of-border)", padding: "20px 20px 16px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
-      <p style={{ fontSize: 12, fontWeight: 600, color: "var(--of-text-muted)", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 4 }}>
-        {t("dashScoreSaude")}
-      </p>
-
-      <svg viewBox="0 0 240 140" width="100%" style={{ display: "block" }}>
-        {/* Track */}
-        <path
-          d={`M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}`}
-          fill="none" stroke="var(--of-border)" strokeWidth="14" strokeLinecap="round"
-        />
-        {/* Fill */}
-        <path
-          d={`M ${cx - r} ${cy} A ${r} ${r} 0 ${largeArc} 1 ${x} ${y}`}
-          fill="none" stroke={color} strokeWidth="14" strokeLinecap="round"
-        />
-        {/* Dot indicator */}
-        <circle cx={x} cy={y} r="7" fill={color} />
-
-        {/* Score */}
-        <text x={cx} y={cy - 22} textAnchor="middle"
-          style={{ fontSize: 44, fontWeight: "800", fill: "var(--of-text)", fontFamily: "system-ui", letterSpacing: "-2" }}>
-          {score}
-        </text>
-        <text x={cx} y={cy - 4} textAnchor="middle"
-          style={{ fontSize: 11, fill: "var(--of-text-muted)", fontFamily: "system-ui" }}>
-          de 1000
-        </text>
-        <text x={cx} y={cy + 14} textAnchor="middle"
-          style={{ fontSize: 12, fontWeight: "700", fill: color, fontFamily: "system-ui" }}>
-          {scoreLabel(score, t)}
-        </text>
-
-        <text x={cx - r} y={cy + 22} style={{ fontSize: 9, fill: "var(--of-text-muted)", fontFamily: "system-ui" }}>0</text>
-        <text x={cx + r - 16} y={cy + 22} style={{ fontSize: 9, fill: "var(--of-text-muted)", fontFamily: "system-ui" }}>1000</text>
-      </svg>
-
-      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 8 }}>
-        {pilares.map((p) => (
-          <div key={p.nome}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
-              <span style={{ fontSize: 11, color: "var(--of-text-secondary)" }}>{p.nome}</span>
-              <span style={{ fontSize: 11, fontWeight: 600, color: scoreColor(Math.round(p.pct * 1000)) }}>
-                {Math.round(p.pct * 100)}%
-              </span>
-            </div>
-            <div style={{ height: 4, background: "var(--of-page-bg)", borderRadius: 2, overflow: "hidden" }}>
-              <div style={{
-                height: "100%",
-                width: `${p.pct * 100}%`,
-                background: scoreColor(Math.round(p.pct * 1000)),
-                borderRadius: 2,
-                transition: "width 0.8s ease",
-              }} />
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
 }
 
 // ─── StatCard ────────────────────────────────────────────────────────────────
@@ -278,6 +163,7 @@ export default function DashboardWithSupabase() {
   const [evolucao, setEvolucao] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [addModalOpen, setAddModalOpen] = useState(false)
+  const [cycleModalOpen, setCycleModalOpen] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
   const [convitePendente, setConvitePendente] = useState<any>(null)
   const [adminConvite, setAdminConvite] = useState<any>(null)
@@ -298,19 +184,26 @@ export default function DashboardWithSupabase() {
     count: 0,
     proximas: [] as Assinatura[],
   })
+  const [finInfo, setFinInfo] = useState({
+    totalMensal: 0,
+    count: 0,
+    itens: [] as Compromisso[],
+  })
 
   const userName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Usuário"
-  const score = calcularScore(
-    totais.percentualEconomia,
-    totais.totalGastos,
-    totais.totalRenda,
-    investInfo.total,
-    investInfo.count,
-    investInfo.recorrentes,
-    investInfo.diversificacao,
-    subInfo.totalMensal,
-    subInfo.count,
-  )
+  const score = calculateFinancialScore({
+    totalRendaPeriodo: totais.totalRenda,
+    totalGastosPeriodo: totais.totalGastos,
+    assinaturasMensal: subInfo.totalMensal,
+    compromissosMensal: finInfo.totalMensal,
+    investimentos: {
+      totalAportes: investInfo.total,
+      patrimonioEstimado: investInfo.patrimonio,
+      recorrentes: investInfo.recorrentes,
+      diversificacao: investInfo.diversificacao,
+    },
+    evolucao: evolucao.map((e) => ({ income: e.income, expenses: e.expenses })),
+  }).score
 
   useEffect(() => {
     async function load() {
@@ -387,23 +280,42 @@ export default function DashboardWithSupabase() {
         })
       } catch { /* silent */ }
     }
+    async function loadFinanciamentos() {
+      try {
+        const fins = await getCompromissos(userId)
+        const totalMensal = fins.reduce((s, c) => s + (Number((c as any).valor_parcela ?? c.valor) || 0), 0)
+        setFinInfo({
+          totalMensal,
+          count: fins.length,
+          itens: fins.slice(0, 3),
+        })
+      } catch { /* silent */ }
+    }
     load()
     loadConvite()
     loadInvestimentos()
     loadAssinaturas()
+    loadFinanciamentos()
   }, [userId, refreshKey])
 
   if (loading) {
     return (
-      <div style={{ minHeight: 400, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        style={{ minHeight: 400, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14 }}
+      >
         <div style={{
-          width: 28, height: 28,
-          border: "2.5px solid #16A34A",
-          borderTopColor: "transparent",
+          width: 32, height: 32,
+          border: "2.5px solid rgba(22,163,74,0.2)",
+          borderTopColor: "#16A34A",
           borderRadius: "50%",
           animation: "spin 0.7s linear infinite",
         }} />
-      </div>
+        <p style={{ fontSize: 13, color: "var(--of-text-muted)", fontWeight: 500 }}>
+          Carregando seu dashboard...
+        </p>
+      </motion.div>
     )
   }
 
@@ -490,33 +402,63 @@ export default function DashboardWithSupabase() {
           <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--of-text)", letterSpacing: "-0.02em" }}>
             {t("dashBomDia")}, {userName} 👋
           </h2>
-          <button
-            onClick={() => setAddModalOpen(true)}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 6,
-              fontSize: 13,
-              fontWeight: 700,
-              color: "var(--of-btn-text)",
-              backgroundColor: "var(--of-btn-bg)",
-              padding: "9px 18px",
-              borderRadius: 10,
-              border: "none",
-              cursor: "pointer",
-              transition: "background 0.15s",
-            }}
-            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#262626")}
-            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "var(--of-btn-bg)")}
-          >
-            <Plus size={15} />
-            {t("dashNovaTx")}
-          </button>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" as const }}>
+            <button
+              onClick={() => setCycleModalOpen(true)}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                fontSize: 13,
+                fontWeight: 700,
+                color: "var(--of-text)",
+                backgroundColor: "var(--of-surface)",
+                padding: "9px 14px",
+                borderRadius: 10,
+                border: "1px solid var(--of-border)",
+                cursor: "pointer",
+                transition: "background 0.15s, border-color 0.15s",
+              }}
+              onMouseOver={(e) => { e.currentTarget.style.backgroundColor = "var(--of-hover)"; e.currentTarget.style.borderColor = "var(--of-text)" }}
+              onMouseOut={(e) => { e.currentTarget.style.backgroundColor = "var(--of-surface)"; e.currentTarget.style.borderColor = "var(--of-border)" }}
+            >
+              <CalendarDays size={15} />
+              Ciclo
+            </button>
+            <button
+              onClick={() => setAddModalOpen(true)}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                fontSize: 13,
+                fontWeight: 700,
+                color: "var(--of-btn-text)",
+                backgroundColor: "var(--of-btn-bg)",
+                padding: "9px 18px",
+                borderRadius: 10,
+                border: "none",
+                cursor: "pointer",
+                transition: "background 0.15s",
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#262626")}
+              onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "var(--of-btn-bg)")}
+            >
+              <Plus size={15} />
+              {t("dashNovaTx")}
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div style={{ display: "grid", gap: 16, marginBottom: 24 }} className="grid grid-cols-2 lg:grid-cols-4">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: "easeOut" }}
+        style={{ display: "grid", gap: 16, marginBottom: 24 }}
+        className="grid grid-cols-2 lg:grid-cols-4"
+      >
         <StatCard
           label={t("dashSaldo")}
           value={fmt(totais.saldoDisponivel)}
@@ -553,7 +495,7 @@ export default function DashboardWithSupabase() {
           iconColor="#16A34A"
           trend={totais.percentualEconomia > 20 ? "up" : "neutral"}
         />
-      </div>
+      </motion.div>
 
       {/* Investimentos + Assinaturas */}
       <div style={{ display: "grid", gap: 16, marginBottom: 24 }} className="grid grid-cols-1 lg:grid-cols-2">
@@ -662,72 +604,96 @@ export default function DashboardWithSupabase() {
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 12 }}>
             <div>
               <p style={{ fontSize: 12, fontWeight: 700, color: "var(--of-text)", marginBottom: 2 }}>
-                {t("dashSubsResumoTitulo")}
+                Planejamento futuro
               </p>
               <p style={{ fontSize: 12, color: "var(--of-text-muted)" }}>
-                {t("dashSubsResumoSub")}
+                Assinaturas e financiamentos que pesam no seu mês.
               </p>
             </div>
-            <Link to="/app/assinaturas" style={{ fontSize: 12, fontWeight: 700, color: "#16A34A", textDecoration: "none" }}>
-              {t("dashVerTodas")}
+            <Link to="/app/futuro" style={{ fontSize: 12, fontWeight: 700, color: "#16A34A", textDecoration: "none" }}>
+              Ver detalhes
             </Link>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 12, marginBottom: 12 }}>
             <div>
               <p style={{ fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--of-text-muted)", fontWeight: 700 }}>
-                {t("dashSubsTotalMensal")}
+                Assinaturas / mês
               </p>
-              <p style={{ fontSize: 16, fontWeight: 800, color: "#EF4444", marginTop: 2 }}>
+              <p style={{ fontSize: 16, fontWeight: 800, color: "var(--of-text)", marginTop: 2 }}>
                 {fmt(subInfo.totalMensal)}
               </p>
+              <p style={{ fontSize: 11, color: "var(--of-text-muted)", marginTop: 2 }}>{subInfo.count} ativas</p>
             </div>
             <div>
               <p style={{ fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--of-text-muted)", fontWeight: 700 }}>
-                {t("dashSubsAtivas")}
+                Financiamentos / mês
               </p>
               <p style={{ fontSize: 16, fontWeight: 800, color: "var(--of-text)", marginTop: 2 }}>
-                {subInfo.count}
+                {fmt(finInfo.totalMensal)}
               </p>
+              <p style={{ fontSize: 11, color: "var(--of-text-muted)", marginTop: 2 }}>{finInfo.count} ativos</p>
             </div>
             <div>
               <p style={{ fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--of-text-muted)", fontWeight: 700 }}>
-                {t("dashSubsProximas")}
+                Total recorrente
               </p>
-              <p style={{ fontSize: 16, fontWeight: 800, color: "var(--of-text)", marginTop: 2 }}>
-                {subInfo.proximas.length}
+              <p style={{ fontSize: 16, fontWeight: 900, color: "#EF4444", marginTop: 2 }}>
+                {fmt(subInfo.totalMensal + finInfo.totalMensal)}
               </p>
+              <p style={{ fontSize: 11, color: "var(--of-text-muted)", marginTop: 2 }}>por mês (estimado)</p>
             </div>
           </div>
 
-          {subInfo.proximas.length === 0 ? (
-            <p style={{ fontSize: 12, color: "var(--of-text-muted)" }}>{t("dashSubsSemProximas")}</p>
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {subInfo.proximas.map((a) => (
-                <div key={a.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-                  <div style={{ minWidth: 0, display: "flex", alignItems: "center", gap: 10 }}>
-                    <div style={{ width: 28, height: 28, borderRadius: 8, background: (a.cor || "#16A34A") + "22", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <span style={{ fontSize: 14 }}>{a.icone || "💳"}</span>
-                    </div>
-                    <div style={{ minWidth: 0 }}>
-                      <p style={{ fontSize: 12, fontWeight: 600, color: "var(--of-text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        {a.nome}
-                      </p>
-                      {a.proximo_pagamento && (
-                        <p style={{ fontSize: 11, color: "var(--of-text-muted)" }}>
-                          {formatDate(a.proximo_pagamento, lang)}
-                        </p>
-                      )}
-                    </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {subInfo.proximas.slice(0, 2).map((a) => (
+              <div key={a.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+                <div style={{ minWidth: 0, display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ width: 28, height: 28, borderRadius: 8, background: (a.cor || "#16A34A") + "22", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <span style={{ fontSize: 14 }}>{a.icone || "💳"}</span>
                   </div>
-                  <p style={{ fontSize: 12, fontWeight: 700, color: "var(--of-text)" }}>{formatCurrency(a.valor, lang)}</p>
+                  <div style={{ minWidth: 0 }}>
+                    <p style={{ fontSize: 12, fontWeight: 600, color: "var(--of-text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {a.nome}
+                    </p>
+                    {a.proximo_pagamento && (
+                      <p style={{ fontSize: 11, color: "var(--of-text-muted)" }}>
+                        Próx.: {formatDate(a.proximo_pagamento, lang)}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              ))}
-            </div>
-          )}
+                <p style={{ fontSize: 12, fontWeight: 700, color: "var(--of-text)" }}>{formatCurrency(a.valor, lang)}</p>
+              </div>
+            ))}
 
-          {totais.totalRenda > 0 && subInfo.totalMensal / totais.totalRenda > 0.12 && (
+            {finInfo.itens.slice(0, 1).map((f) => (
+              <div key={f.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+                <div style={{ minWidth: 0, display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ width: 28, height: 28, borderRadius: 8, background: "#2563EB22", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <span style={{ fontSize: 14 }}>🏦</span>
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    <p style={{ fontSize: 12, fontWeight: 600, color: "var(--of-text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {f.descricao}
+                    </p>
+                    <p style={{ fontSize: 11, color: "var(--of-text-muted)" }}>
+                      Vence dia {f.dia_vencimento}
+                    </p>
+                  </div>
+                </div>
+                <p style={{ fontSize: 12, fontWeight: 700, color: "var(--of-text)" }}>{fmt(Number((f as any).valor_parcela ?? f.valor) || 0)}</p>
+              </div>
+            ))}
+
+            {subInfo.proximas.length === 0 && finInfo.itens.length === 0 && (
+              <p style={{ fontSize: 12, color: "var(--of-text-muted)" }}>
+                Nenhum item recorrente cadastrado.
+              </p>
+            )}
+          </div>
+
+          {totais.totalRenda > 0 && (subInfo.totalMensal + finInfo.totalMensal) / totais.totalRenda > 0.25 && (
             <div style={{
               marginTop: 12,
               display: "flex", alignItems: "center", gap: 10,
@@ -738,7 +704,7 @@ export default function DashboardWithSupabase() {
             }}>
               <AlertCircle size={16} color="#EF4444" />
               <p style={{ fontSize: 12, color: "#991B1B", lineHeight: 1.4 }}>
-                {t("dashSubsAlertaPeso")}
+                Recorrentes acima de 25% da sua renda. Vale revisar antes do próximo mês.
               </p>
             </div>
           )}
@@ -937,8 +903,15 @@ export default function DashboardWithSupabase() {
         {/* Right column */}
         <div className="lg:col-span-4" style={{ display: "flex", flexDirection: "column", gap: 20 }}>
 
-          {/* Score Gauge */}
-          <ScoreGauge score={score} />
+          {/* Score Panel */}
+          <ScorePanel
+            score={score}
+            totais={totais}
+            subInfo={subInfo}
+            finInfo={finInfo}
+            evolucao={evolucao}
+            fmt={fmt}
+          />
 
           {/* Score Advisor IA */}
           <ScoreAdvisor
@@ -1050,6 +1023,13 @@ export default function DashboardWithSupabase() {
       <AddTransactionModal
         open={addModalOpen}
         onOpenChange={setAddModalOpen}
+        onSuccess={() => setRefreshKey((k) => k + 1)}
+      />
+
+      <FinancialCycleSettingsModal
+        open={cycleModalOpen}
+        onOpenChange={setCycleModalOpen}
+        userId={userId}
         onSuccess={() => setRefreshKey((k) => k + 1)}
       />
     </div>
