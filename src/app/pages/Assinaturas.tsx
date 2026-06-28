@@ -184,61 +184,81 @@ function ModalAssinatura({ open, onClose, onSuccess, userId, prefill, categorias
   if (!open) return null
 
   const inputStyle: React.CSSProperties = {
-    width: "100%", padding: "9px 12px",
-    border: "1px solid var(--of-border)", borderRadius: 8,
-    background: "var(--of-page-bg)", color: "var(--of-text)",
-    fontSize: 13, outline: "none", boxSizing: "border-box",
+    width: "100%",
+    borderRadius: 12,
+    padding: "10px 14px",
+    fontSize: 13,
+    outline: "none",
+    transition: "border-color 0.15s",
+    background: "rgba(255,255,255,0.03)",
+    border: "1px solid rgba(255,255,255,0.06)",
+    color: "#AAAA9E",
   }
+
   const labelStyle: React.CSSProperties = {
-    fontSize: 12, fontWeight: 600, color: "var(--of-text-secondary)", marginBottom: 4, display: "block",
+    display: "block",
+    fontSize: 11,
+    fontWeight: 500,
+    color: "#555",
+    marginBottom: 8,
+    letterSpacing: "0.04em",
   }
 
   return (
-    <div style={{
-      position: "fixed", inset: 0, zIndex: 60,
-      background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)",
-      display: "flex", alignItems: "center", justifyContent: "center", padding: 16,
-    }} onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm p-0 sm:p-4"
+      onClick={onClose}
+    >
       <div
         onClick={(e) => e.stopPropagation()}
+        className="w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl overflow-hidden"
         style={{
-          background: "var(--of-surface)", borderRadius: 16,
-          border: "1px solid var(--of-border)", width: "100%", maxWidth: 480,
-          maxHeight: "90vh", overflowY: "auto",
-          boxShadow: "0 20px 60px rgba(0,0,0,0.25)",
+          background: "#0C0C0C",
+          border: "1px solid rgba(255,255,255,0.06)",
+          boxShadow: "0 -4px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.04)",
         }}
       >
-        <div style={{
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-          padding: "18px 20px", borderBottom: "1px solid var(--of-border-light)",
-        }}>
+        {/* Header */}
+        <div
+          className="flex items-center justify-between px-6 pt-6 pb-5"
+          style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+        >
           <div>
-            <h2 style={{ fontSize: 16, fontWeight: 700, color: "var(--of-text)" }}>{t("subModalTituloNova")}</h2>
-            <p style={{ fontSize: 12, color: "var(--of-text-muted)", marginTop: 2 }}>
-              {t("subModalSubtitulo")}
-            </p>
+            <p className="text-[11px] font-semibold tracking-[0.1em] uppercase mb-1" style={{ color: "#444" }}>Nova assinatura</p>
+            <h2 className="text-[17px] font-semibold" style={{ color: "#EEEDE6" }}>{t("subModalTituloNova")}</h2>
           </div>
-          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--of-text-muted)", padding: 4 }}>
-            <X size={18} />
+          <button
+            onClick={onClose}
+            className="w-8 h-8 flex items-center justify-center rounded-lg transition-colors"
+            style={{ color: "#555" }}
+            onMouseOver={(e) => { e.currentTarget.style.color = "#888"; e.currentTarget.style.background = "rgba(255,255,255,0.05)" }}
+            onMouseOut={(e) => { e.currentTarget.style.color = "#555"; e.currentTarget.style.background = "transparent" }}
+          >
+            <X size={15} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ padding: 20, display: "flex", flexDirection: "column", gap: 14 }}>
+        <form
+          onSubmit={handleSubmit}
+          className="px-6 py-5 flex flex-col gap-4 max-h-[72vh] overflow-y-auto"
+        >
+          {/* Name */}
           <div>
             <label style={labelStyle}>{t("subCampoNomeLabel")}</label>
             <input
-              style={inputStyle}
+              style={{ ...inputStyle, fontWeight: 600, color: "#EEEDE6", border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.04)" }}
               placeholder={t("subCampoNomePlaceholder")}
               value={form.nome}
               onChange={(e) => setField("nome", e.target.value)}
             />
           </div>
 
-          <div style={{ display: "flex", gap: 10 }}>
-            <div style={{ flex: 1 }}>
+          {/* Value + Recurrence */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
               <label style={labelStyle}>{t("subCampoValorLabel")}</label>
               <input
-                style={inputStyle}
+                style={{ ...inputStyle, fontWeight: 700, fontSize: 15, color: "#EEEDE6", border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.04)" }}
                 type="number"
                 step="0.01"
                 min="0.01"
@@ -247,9 +267,13 @@ function ModalAssinatura({ open, onClose, onSuccess, userId, prefill, categorias
                 onChange={(e) => setField("valor", e.target.value)}
               />
             </div>
-            <div style={{ flex: 1 }}>
+            <div>
               <label style={labelStyle}>{t("subCampoRecorrenciaLabel")}</label>
-              <select style={inputStyle} value={form.recorrencia} onChange={(e) => setField("recorrencia", e.target.value as RecorrenciaAssinatura)}>
+              <select
+                style={inputStyle}
+                value={form.recorrencia}
+                onChange={(e) => setField("recorrencia", e.target.value as RecorrenciaAssinatura)}
+              >
                 {Object.entries(RECORRENCIA_LABEL).map(([k, v]) => (
                   <option key={k} value={k}>{t(v)}</option>
                 ))}
@@ -257,14 +281,21 @@ function ModalAssinatura({ open, onClose, onSuccess, userId, prefill, categorias
             </div>
           </div>
 
-          <div style={{ display: "flex", gap: 10 }}>
-            <div style={{ flex: 1 }}>
+          {/* Category + Next payment */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
               <label style={labelStyle}>{t("subCampoCategoriaLabel")}</label>
-              <select style={inputStyle} value={form.categoria} onChange={(e) => setField("categoria", e.target.value as CategoriaAssinaturaCode)}>
-                {CATEGORIAS_ASSINATURA.map((c) => <option key={c} value={c}>{t(CATEGORIA_ASSINATURA_LABEL[c])}</option>)}
+              <select
+                style={inputStyle}
+                value={form.categoria}
+                onChange={(e) => setField("categoria", e.target.value as CategoriaAssinaturaCode)}
+              >
+                {CATEGORIAS_ASSINATURA.map((c) => (
+                  <option key={c} value={c}>{t(CATEGORIA_ASSINATURA_LABEL[c])}</option>
+                ))}
               </select>
             </div>
-            <div style={{ flex: 1 }}>
+            <div>
               <label style={labelStyle}>{t("subCampoProximoPagamentoLabel")}</label>
               <input
                 style={inputStyle}
@@ -280,8 +311,9 @@ function ModalAssinatura({ open, onClose, onSuccess, userId, prefill, categorias
             </div>
           </div>
 
-          <div style={{ display: "flex", gap: 10 }}>
-            <div style={{ flex: 1 }}>
+          {/* Expense category + Payment method */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
               <label style={labelStyle}>Categoria da despesa</label>
               <select
                 style={inputStyle}
@@ -294,7 +326,7 @@ function ModalAssinatura({ open, onClose, onSuccess, userId, prefill, categorias
                 ))}
               </select>
             </div>
-            <div style={{ flex: 1 }}>
+            <div>
               <label style={labelStyle}>Forma de pagamento</label>
               <select
                 style={inputStyle}
@@ -311,40 +343,40 @@ function ModalAssinatura({ open, onClose, onSuccess, userId, prefill, categorias
                   { v: "transferencia", l: "Transferência" },
                   { v: "debito_automatico", l: "Débito automático" },
                   { v: "outro", l: "Outro" },
-                ].map((m) => (
-                  <option key={m.v} value={m.v}>{m.l}</option>
-                ))}
+                ].map((m) => <option key={m.v} value={m.v}>{m.l}</option>)}
               </select>
             </div>
           </div>
 
-          <div>
-            <label style={labelStyle}>Dia de cobrança</label>
-            <input
-              style={inputStyle}
-              type="number"
-              min={1}
-              max={31}
-              value={form.dia_cobranca}
-              onChange={(e) => setField("dia_cobranca", Math.max(1, Math.min(31, Number.parseInt(e.target.value || "1", 10) || 1)) as any)}
-            />
-          </div>
-
-          <div style={{ display: "flex", gap: 10 }}>
-            <div style={{ flex: 1 }}>
-              <label style={labelStyle}>{t("subCampoEmojiLabel")}</label>
+          {/* Billing day + Emoji + Color */}
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <label style={labelStyle}>Dia de cobrança</label>
               <input
                 style={inputStyle}
-                placeholder={t("subCampoEmojiPlaceholder")}
+                type="number"
+                min={1}
+                max={31}
+                value={form.dia_cobranca}
+                onChange={(e) =>
+                  setField("dia_cobranca", Math.max(1, Math.min(31, Number.parseInt(e.target.value || "1", 10) || 1)) as any)
+                }
+              />
+            </div>
+            <div>
+              <label style={labelStyle}>{t("subCampoEmojiLabel")}</label>
+              <input
+                style={{ ...inputStyle, textAlign: "center", fontSize: 18 }}
+                placeholder="🎵"
                 maxLength={4}
                 value={form.icone}
                 onChange={(e) => setField("icone", e.target.value)}
               />
             </div>
-            <div style={{ flex: 1 }}>
+            <div>
               <label style={labelStyle}>{t("subCampoCorLabel")}</label>
               <input
-                style={{ ...inputStyle, padding: "6px 12px" }}
+                style={{ ...inputStyle, padding: "6px 8px", height: 42, cursor: "pointer" }}
                 type="color"
                 value={form.cor}
                 onChange={(e) => setField("cor", e.target.value)}
@@ -352,58 +384,56 @@ function ModalAssinatura({ open, onClose, onSuccess, userId, prefill, categorias
             </div>
           </div>
 
-          <div style={{
-            padding: "12px 14px", borderRadius: 10,
-            background: "var(--of-page-bg)", border: "1px solid var(--of-border)",
-          }}>
-            <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
-              <input
-                type="checkbox"
-                checked={form.renovacao_automatica}
-                onChange={(e) => setField("renovacao_automatica", e.target.checked)}
-                style={{ width: 16, height: 16, accentColor: "#16A34A" }}
-              />
-              <div>
-                <p style={{ fontSize: 13, fontWeight: 600, color: "var(--of-text)" }}>{t("subCampoRenovacaoTitulo")}</p>
-                <p style={{ fontSize: 11, color: "var(--of-text-muted)" }}>{t("subCampoRenovacaoDesc")}</p>
-              </div>
-            </label>
-          </div>
+          {/* Auto-renewal */}
+          <label
+            className="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer"
+            style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.05)" }}
+          >
+            <input
+              type="checkbox"
+              checked={form.renovacao_automatica}
+              onChange={(e) => setField("renovacao_automatica", e.target.checked)}
+              className="w-4 h-4 accent-[#16A34A] rounded shrink-0"
+            />
+            <div>
+              <p className="text-sm font-medium" style={{ color: "#AAAA9E" }}>{t("subCampoRenovacaoTitulo")}</p>
+              <p className="text-xs mt-0.5" style={{ color: "#555" }}>{t("subCampoRenovacaoDesc")}</p>
+            </div>
+          </label>
 
+          {/* Notes */}
           <div>
-            <label style={labelStyle}>{t("subCampoObsLabel")}</label>
+            <label style={labelStyle}>
+              {t("subCampoObsLabel")} <span style={{ color: "#383838" }}>(opcional)</span>
+            </label>
             <textarea
-              style={{ ...inputStyle, minHeight: 56, resize: "vertical" } as React.CSSProperties}
+              style={{ ...inputStyle, minHeight: 60, resize: "none" as const }}
               placeholder={t("subCampoObsPlaceholder")}
               value={form.observacoes}
               onChange={(e) => setField("observacoes", e.target.value)}
             />
           </div>
 
-          <div style={{ display: "flex", gap: 10, paddingTop: 4 }}>
-            <button
-              type="button"
-              onClick={onClose}
-              style={{
-                flex: 1, padding: "11px", borderRadius: 10,
-                border: "1px solid var(--of-border)", background: "transparent",
-                color: "var(--of-text)", fontSize: 13, fontWeight: 600, cursor: "pointer",
-              }}
-            >
-              {t("commonCancelar")}
-            </button>
+          {/* Actions */}
+          <div className="flex flex-col gap-2 pt-1 pb-1">
             <button
               type="submit"
               disabled={loading}
-              style={{
-                flex: 2, padding: "11px", borderRadius: 10,
-                border: "none", background: "#16A34A",
-                color: "#fff", fontSize: 13, fontWeight: 700,
-                cursor: loading ? "not-allowed" : "pointer",
-                opacity: loading ? 0.7 : 1,
-              }}
+              className="w-full py-3.5 text-sm font-semibold text-white rounded-xl transition-all disabled:opacity-25 flex items-center justify-center gap-2"
+              style={{ background: "#16A34A" }}
             >
+              {loading && (
+                <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+              )}
               {loading ? t("commonSalvando") : t("subModalSalvar")}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-full py-3 text-sm transition-colors"
+              style={{ color: "#444" }}
+            >
+              {t("commonCancelar")}
             </button>
           </div>
         </form>
@@ -416,17 +446,15 @@ function ModalAssinatura({ open, onClose, onSuccess, userId, prefill, categorias
 
 function AssinaturaCard({
   assinatura,
-  totalMensal,
   onDelete,
 }: {
   assinatura: Assinatura
-  totalMensal: number
+  totalMensal?: number
   onDelete: (id: string) => void
 }) {
   const { t, lang } = useLanguage()
   const fmt = (v: number) => formatCurrency(v, lang)
   const [confirmDelete, setConfirmDelete] = useState(false)
-  const pct = totalMensal > 0 ? (assinatura.valor / totalMensal) * 100 : 0
   const cor = assinatura.cor || "#16A34A"
 
   const proxPag = assinatura.proximo_pagamento
@@ -436,76 +464,99 @@ function AssinaturaCard({
   hoje.setHours(0, 0, 0, 0)
   const diasAteVenc = proxPag ? Math.ceil((proxPag.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24)) : null
 
+  const dueText =
+    diasAteVenc === null
+      ? null
+      : diasAteVenc === 0
+        ? t("subVenceHoje")
+        : diasAteVenc < 0
+          ? t("subVencida")
+          : `Vence em ${diasAteVenc}${t("commonDiaAbrev")}`
+
+  const dueStyle: React.CSSProperties =
+    diasAteVenc === null
+      ? { color: "var(--of-text-muted)" }
+      : diasAteVenc <= 3
+        ? { color: "#EF4444", fontWeight: 600 }
+        : diasAteVenc <= 7
+          ? { color: "#F59E0B", fontWeight: 600 }
+          : { color: "var(--of-text-muted)" }
+
   return (
-    <div style={{
-      background: "var(--of-surface)", border: "1px solid var(--of-border)",
-      borderRadius: 12, padding: "14px 16px",
-      display: "flex", alignItems: "center", gap: 14,
-      transition: "box-shadow 0.2s",
-    }}
-      onMouseOver={(e) => (e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.08)")}
-      onMouseOut={(e) => (e.currentTarget.style.boxShadow = "none")}
+    <div
+      className="flex items-center gap-4 px-5 py-4 group hover:bg-black/[0.02] dark:hover:bg-white/[0.015] transition-colors"
+      style={{ borderTop: "1px solid var(--of-border)" }}
     >
       {/* Icon */}
-      <div style={{
-        width: 44, height: 44, borderRadius: 11,
-        background: cor + "22",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        fontSize: 20, flexShrink: 0,
-      }}>
+      <div
+        className="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0"
+        style={{ background: cor + "1A" }}
+      >
         {assinatura.icone || "💳"}
       </div>
 
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" as const }}>
-          <p style={{ fontSize: 14, fontWeight: 600, color: "var(--of-text)" }}>{assinatura.nome}</p>
+      {/* Info */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 flex-wrap mb-0.5">
+          <p className="text-sm font-semibold text-[var(--of-text)] truncate">{assinatura.nome}</p>
           {assinatura.categoria && (
-            <span style={{
-              fontSize: 10, padding: "2px 8px", borderRadius: 20, fontWeight: 600,
-              background: "var(--of-page-bg)", color: "var(--of-text-muted)",
-              border: "1px solid var(--of-border)",
-            }}>{categoriaLabel(assinatura.categoria, t)}</span>
-          )}
-          {!assinatura.renovacao_automatica && (
-            <span style={{
-              fontSize: 10, padding: "2px 8px", borderRadius: 20, fontWeight: 600,
-              background: "#FEF3C7", color: "#92400E",
-            }}>{t("subBadgeManual")}</span>
-          )}
-        </div>
-        <p style={{ fontSize: 12, color: "var(--of-text-muted)", marginTop: 2 }}>
-          {t(RECORRENCIA_LABEL[assinatura.recorrencia])}
-          {diasAteVenc !== null && (
-            <span style={{
-              marginLeft: 8, fontWeight: 600,
-              color: diasAteVenc <= 3 ? "#DC2626" : diasAteVenc <= 7 ? "#D97706" : "var(--of-text-muted)",
-            }}>
-              · {diasAteVenc === 0 ? t("subVenceHoje") : diasAteVenc < 0 ? t("subVencida") : `${diasAteVenc}${t("commonDiaAbrev")}`}
+            <span
+              className="text-[10px] px-1.5 py-0.5 rounded font-semibold shrink-0"
+              style={{
+                background: cor + "15",
+                color: cor,
+              }}
+            >
+              {categoriaLabel(assinatura.categoria, t)}
             </span>
           )}
-        </p>
-        <div style={{ marginTop: 6, height: 3, background: "var(--of-border)", borderRadius: 2, overflow: "hidden" }}>
-          <div style={{ height: "100%", width: `${Math.min(pct, 100)}%`, background: cor, borderRadius: 2, transition: "width 0.6s ease" }} />
+          {!assinatura.renovacao_automatica && (
+            <span
+              className="text-[10px] px-1.5 py-0.5 rounded font-semibold shrink-0"
+              style={{ background: "rgba(245,158,11,0.12)", color: "#F59E0B" }}
+            >
+              {t("subBadgeManual")}
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-2 text-xs">
+          <span style={{ color: "var(--of-text-muted)" }}>{t(RECORRENCIA_LABEL[assinatura.recorrencia])}</span>
+          {dueText && (
+            <>
+              <span style={{ color: "var(--of-border)" }}>·</span>
+              <span style={dueStyle}>{dueText}</span>
+            </>
+          )}
         </div>
       </div>
 
-      <div style={{ textAlign: "right", flexShrink: 0 }}>
-        <p style={{ fontSize: 16, fontWeight: 700, color: "var(--of-text)" }}>{fmt(assinatura.valor)}</p>
-        <p style={{ fontSize: 11, color: "var(--of-text-muted)" }}>{t(RECORRENCIA_LABEL[assinatura.recorrencia]).toLowerCase()}</p>
+      {/* Value */}
+      <div className="text-right shrink-0">
+        <p className="text-base font-bold tabular-nums" style={{ color: "var(--of-text)" }}>{fmt(assinatura.valor)}</p>
+        <p className="text-[11px] mt-0.5" style={{ color: "var(--of-text-muted)" }}>
+          {t(RECORRENCIA_LABEL[assinatura.recorrencia]).toLowerCase()}
+        </p>
       </div>
 
-      <div style={{ flexShrink: 0 }}>
+      {/* Delete */}
+      <div className="shrink-0">
         {confirmDelete ? (
-          <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+          <div className="flex items-center gap-1.5">
             <button
               onClick={() => onDelete(assinatura.id)}
-              style={{ padding: "4px 8px", background: "#DC2626", color: "#fff", border: "none", borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: "pointer" }}
+              className="px-2.5 py-1 text-white text-xs font-bold rounded-lg transition-colors"
+              style={{ background: "#EF4444" }}
             >
               {t("commonSim")}
             </button>
             <button
               onClick={() => setConfirmDelete(false)}
-              style={{ padding: "4px 8px", background: "var(--of-page-bg)", border: "1px solid var(--of-border)", borderRadius: 6, fontSize: 11, cursor: "pointer", color: "var(--of-text)" }}
+              className="px-2.5 py-1 text-xs rounded-lg transition-colors"
+              style={{
+                border: "1px solid var(--of-border)",
+                color: "var(--of-text)",
+                background: "transparent",
+              }}
             >
               {t("commonNao")}
             </button>
@@ -513,9 +564,16 @@ function AssinaturaCard({
         ) : (
           <button
             onClick={() => setConfirmDelete(true)}
-            style={{ background: "none", border: "none", cursor: "pointer", padding: 6, color: "var(--of-text-muted)", opacity: 0.5, transition: "opacity 0.15s" }}
-            onMouseOver={(e) => { e.currentTarget.style.opacity = "1"; e.currentTarget.style.color = "#DC2626" }}
-            onMouseOut={(e) => { e.currentTarget.style.opacity = "0.5"; e.currentTarget.style.color = "var(--of-text-muted)" }}
+            className="p-2 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+            style={{ color: "var(--of-text-muted)" }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.color = "#EF4444"
+              e.currentTarget.style.background = "rgba(239,68,68,0.08)"
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.color = "var(--of-text-muted)"
+              e.currentTarget.style.background = "transparent"
+            }}
           >
             <Trash2 size={14} />
           </button>
@@ -752,12 +810,12 @@ export default function Assinaturas() {
           {vencendo.length > 0 && (
             <div style={{
               display: "flex", alignItems: "flex-start", gap: 12,
-              background: "#FEF3C7", border: "1px solid #FDE68A",
-              borderRadius: 12, padding: "14px 16px", marginBottom: 20,
+              background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.18)",
+              borderRadius: 12, padding: "14px 16px", marginBottom: 16,
             }}>
-              <Bell size={18} color="#D97706" style={{ flexShrink: 0, marginTop: 1 }} />
+              <Bell size={16} color="#F59E0B" style={{ flexShrink: 0, marginTop: 1 }} />
               <div>
-                <p style={{ fontSize: 13, fontWeight: 700, color: "#92400E", marginBottom: 4 }}>
+                <p style={{ fontSize: 13, fontWeight: 600, color: "#F59E0B", marginBottom: 4 }}>
                   {vencendo.length} {vencendo.length > 1 ? t("subCobrancaPlural") : t("subCobrancaSingular")} {t("subNosProximos7d")}
                 </p>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" as const }}>
@@ -767,7 +825,7 @@ export default function Assinaturas() {
                     hoje.setHours(0, 0, 0, 0)
                     const dias = Math.ceil((d.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24))
                     return (
-                      <span key={a.id} style={{ fontSize: 12, color: "#78350F" }}>
+                      <span key={a.id} style={{ fontSize: 12, color: "var(--of-text-secondary)" }}>
                         {a.icone || "💳"} {a.nome} ({fmt(a.valor)}) — {dias === 0 ? t("commonHoje") : `${t("commonEm")} ${dias}${t("commonDiaAbrev")}`}
                       </span>
                     )
@@ -781,12 +839,12 @@ export default function Assinaturas() {
           {totalMensal > 200 && (
             <div style={{
               display: "flex", alignItems: "center", gap: 12,
-              background: "#FEF2F2", border: "1px solid #FECACA",
-              borderRadius: 12, padding: "12px 16px", marginBottom: 20,
+              background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.15)",
+              borderRadius: 12, padding: "12px 16px", marginBottom: 16,
             }}>
-              <AlertCircle size={18} color="#EF4444" />
-              <p style={{ fontSize: 13, color: "#991B1B" }}>
-                {t("subInsightCustoAlto1")} <strong>{fmt(totalMensal)}{t("commonPorMes")}</strong>{" "}
+              <AlertCircle size={16} color="#EF4444" style={{ flexShrink: 0 }} />
+              <p style={{ fontSize: 13, color: "var(--of-text-secondary)" }}>
+                {t("subInsightCustoAlto1")} <strong style={{ color: "#EF4444" }}>{fmt(totalMensal)}{t("commonPorMes")}</strong>{" "}
                 {t("subInsightCustoAlto2")} ({fmt(totalAnual)}{t("commonPorAno")}).{" "}
                 {t("subInsightCustoAlto3")}
               </p>
@@ -796,27 +854,25 @@ export default function Assinaturas() {
           {/* Lista de assinaturas */}
           <div style={{
             background: "var(--of-surface)", borderRadius: 16,
-            border: "1px solid var(--of-border)",
+            border: "1px solid var(--of-border)", overflow: "hidden",
           }}>
             <div style={{
               display: "flex", alignItems: "center", justifyContent: "space-between",
-              padding: "16px 20px", borderBottom: "1px solid var(--of-border-light)",
+              padding: "16px 20px", borderBottom: "1px solid var(--of-border)",
             }}>
-              <h3 style={{ fontSize: 15, fontWeight: 600, color: "var(--of-text)" }}>
-                {t("subAtivasTitulo")} ({assinaturas.length})
+              <h3 style={{ fontSize: 14, fontWeight: 600, color: "var(--of-text)" }}>
+                {t("subAtivasTitulo")} · {assinaturas.length}
               </h3>
               <span style={{ fontSize: 14, fontWeight: 700, color: "#EF4444" }}>{fmt(totalMensal)}{t("commonPorMes")}</span>
             </div>
-            <div style={{ padding: "12px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
-              {assinaturas.map((a) => (
-                <AssinaturaCard
-                  key={a.id}
-                  assinatura={a}
-                  totalMensal={totalMensal}
-                  onDelete={handleDelete}
-                />
-              ))}
-            </div>
+            {assinaturas.map((a) => (
+              <AssinaturaCard
+                key={a.id}
+                assinatura={a}
+                totalMensal={totalMensal}
+                onDelete={handleDelete}
+              />
+            ))}
           </div>
 
           {/* Quick add section */}

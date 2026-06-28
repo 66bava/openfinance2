@@ -69,7 +69,7 @@ function generatePDF(
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(18);
   doc.setFont("helvetica", "bold");
-  doc.text("Openfy", ml, 15);
+  doc.text("Finance App", ml, 15);
 
   doc.setFontSize(13);
   doc.setFont("helvetica", "normal");
@@ -213,7 +213,7 @@ function generatePDF(
     doc.setFontSize(8);
     doc.setTextColor(153, 153, 153);
     doc.text(
-      `Openfy  ·  Documento confidencial  ·  Pagina ${i} de ${pageCount}`,
+      `Finance App  ·  Documento confidencial  ·  Pagina ${i} de ${pageCount}`,
       pw / 2,
       ph - 10,
       { align: "center" }
@@ -235,7 +235,7 @@ function generateXLSX(
 
   // Aba Resumo
   const resumoData = [
-    ["Openfy — Relatório Mensal"],
+    ["Finance App — Relatório Mensal"],
     [`${month} ${year}  |  ${userName}`],
     ["Gerado em:", new Date().toLocaleDateString("pt-BR")],
     [],
@@ -446,7 +446,7 @@ function ReportsContent() {
                 <span className="text-black" style={{ fontSize: 9, fontWeight: 700 }}>OF</span>
               </div>
               <span className="text-[#E0E0E0] uppercase tracking-wider" style={{ fontSize: 12, fontWeight: 600 }}>
-                Openfy
+                Finance App
               </span>
             </div>
             <h2 style={{ fontSize: 18, fontWeight: 700 }}>
@@ -603,7 +603,7 @@ function ReportsContent() {
             <div className="w-5 h-5 bg-black rounded flex items-center justify-center">
               <span className="text-white" style={{ fontSize: 8, fontWeight: 700 }}>OF</span>
             </div>
-            <span className="text-[#777777]" style={{ fontSize: 11 }}>Openfy — Gestão Financeira</span>
+            <span className="text-[#777777]" style={{ fontSize: 11 }}>Finance App — Gestão Financeira</span>
           </div>
           <span className="text-[#999999]" style={{ fontSize: 11 }}>
             Documento confidencial · {new Date().getFullYear()}

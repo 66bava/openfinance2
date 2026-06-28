@@ -3,15 +3,15 @@ import { LegalLayout } from "./LegalLayout"
 const SECTIONS: Array<{ title: string; text: string }> = [
   {
     title: "1. Aceitação",
-    text: "Ao criar uma conta e usar a Openfy, você concorda com estes Termos de Uso. O aceite pode ser registrado eletronicamente, incluindo data e versão.",
+    text: "Ao criar uma conta e usar a Finance App, você concorda com estes Termos de Uso. O aceite pode ser registrado eletronicamente, incluindo data e versão.",
   },
   {
     title: "2. Descrição do serviço",
-    text: "A Openfy é um produto de organização e inteligência financeira. As análises e recomendações são orientativas e dependem dos dados registrados/importados pelo usuário.",
+    text: "A Finance App é um produto de organização e inteligência financeira. As análises e recomendações são orientativas e dependem dos dados registrados/importados pelo usuário.",
   },
   {
     title: "3. Responsabilidades",
-    text: "Você é responsável por manter a segurança da sua conta. Não compartilhe credenciais. Em integrações futuras via Open Finance, a Openfy não solicitará senha bancária.",
+    text: "Você é responsável por manter a segurança da sua conta. Não compartilhe credenciais. Em integrações futuras via Open Finance, a Finance App não solicitará senha bancária.",
   },
   {
     title: "4. Privacidade",

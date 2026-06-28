@@ -49,7 +49,7 @@ function DashboardMockup() {
             flex: 1, background: "var(--of-surface)", borderRadius: 5,
             padding: "4px 12px", fontSize: 11, color: "var(--of-text-muted)", marginLeft: 8,
           }}>
-            app.openfy.com.br/dashboard
+            app.financeapp.com.br/dashboard
           </div>
         </div>
 

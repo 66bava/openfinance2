@@ -845,7 +845,7 @@
 .ofx .ofx-dashboard .stats-row {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 12px;
+  gap: 10px;
   margin-bottom: 20px;
 }
 
@@ -853,48 +853,52 @@
   background: var(--bg-c);
   border: 1px solid var(--bd);
   border-radius: var(--r);
-  padding: 18px 20px;
-  transition: border-color var(--tr);
+  padding: 20px 22px;
+  transition: border-color var(--tr), box-shadow var(--tr);
 }
 
 .ofx .ofx-dashboard .stat-card:hover {
   border-color: var(--bd-l);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.18);
 }
 
 .ofx .ofx-dashboard .stat-card.highlight {
   background: var(--green-dim);
-  border-color: rgba(34, 197, 94, 0.15);
+  border-color: rgba(34, 197, 94, 0.18);
 }
 
 .ofx .ofx-dashboard .stat-label {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--t3);
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
 .ofx .ofx-dashboard .stat-label svg {
-  width: 13px;
-  height: 13px;
+  width: 12px;
+  height: 12px;
   stroke: currentColor;
   fill: none;
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
+  opacity: 0.7;
 }
 
 .ofx .ofx-dashboard .stat-value {
   font-family: var(--fd);
-  font-size: 22px;
+  font-size: 26px;
   font-weight: 700;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.8px;
   color: var(--t1);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 
 .ofx .ofx-dashboard .stat-card.highlight .stat-value {
@@ -1092,7 +1096,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 11px 0;
+  padding: 12px 0;
   border-bottom: 1px solid var(--bd);
 }
 
@@ -1108,7 +1112,7 @@
 .ofx .ofx-dashboard .tx-icon {
   width: 36px;
   height: 36px;
-  border-radius: 10px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1133,7 +1137,7 @@
 .ofx .ofx-dashboard .tx-meta {
   font-size: 11px;
   color: var(--t3);
-  margin-top: 1px;
+  margin-top: 2px;
 }
 
 .ofx .ofx-dashboard .tx-amount {
@@ -1141,6 +1145,7 @@
   font-size: 14px;
   font-weight: 600;
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
 .ofx .ofx-dashboard .tx-amount.neg {
@@ -2594,14 +2599,9 @@
 
 .ofx .ofx-notifs .card {
   background: var(--bg-c);
-  border: 1px solid var(--bd);
+  border: none;
   border-radius: var(--r);
   overflow: hidden;
-  transition: border-color var(--tr);
-}
-
-.ofx .ofx-notifs .card:hover {
-  border-color: var(--bd-l);
 }
 
 .ofx .ofx-notifs .card-head {
@@ -2609,7 +2609,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  border-bottom: 1px solid var(--bd);
+  border-bottom: none;
   gap: 12px;
 }
 

@@ -50,7 +50,7 @@ export default function ResetPassword() {
       <div style={{ width: "100%", maxWidth: 360, background: "#FFFFFF", borderRadius: 12, border: "1px solid #E0E0E0", boxShadow: "0 2px 16px rgba(0,0,0,0.07)", padding: "32px 32px 28px" }}>
 
         <div style={{ textAlign: "center", marginBottom: 24 }}>
-          <h1 style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.02em", color: "#0A0A0A", marginBottom: 4 }}>Openfy</h1>
+          <h1 style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.02em", color: "#0A0A0A", marginBottom: 4 }}>Finance App</h1>
           <p style={{ fontSize: 13, color: "#777777" }}>
             {done ? "Senha alterada!" : "Crie uma nova senha"}
           </p>

@@ -95,7 +95,7 @@ function CreateGroupView({ onCreate }: { onCreate: (nome: string) => Promise<voi
         Crie seu grupo familiar
       </h2>
       <p style={{ fontSize: 14, color: "var(--of-text-secondary)", marginBottom: 28, lineHeight: 1.6 }}>
-        Convide até {MAX_MEMBROS} familiares para compartilhar o Openfy. Eles verão o convite direto no dashboard.
+        Convide até {MAX_MEMBROS} familiares para compartilhar o Finance App. Eles verão o convite direto no dashboard.
       </p>
 
       <div style={{ textAlign: "left", marginBottom: 20 }}>
@@ -174,7 +174,7 @@ function AdminPanel({
     try {
       const perfil = await buscarPerfilPorEmail(emailConvite.trim())
       if (!perfil) {
-        toast.error("Usuário não encontrado. O email deve estar cadastrado no Openfy.")
+        toast.error("Usuário não encontrado. O email deve estar cadastrado no Finance App.")
         return
       }
       if (perfil.id === grupo.admin_id) {
@@ -297,7 +297,7 @@ function AdminPanel({
         </div>
 
         <p style={{ fontSize: 12, color: "var(--of-text-muted)", marginBottom: 14, lineHeight: 1.5 }}>
-          O familiar precisa ter uma conta no Openfy. O convite aparecerá no dashboard dele.
+          O familiar precisa ter uma conta no Finance App. O convite aparecerá no dashboard dele.
         </p>
 
         <div style={{ display: "flex", gap: 8 }}>
@@ -691,7 +691,7 @@ export default function Familia() {
     return (
       <FeatureLock
         requiredPlan="familia"
-        message="O painel Família está disponível apenas no plano Família. Faça upgrade para convidar até 4 familiares e compartilhar o Openfy."
+        message="O painel Família está disponível apenas no plano Família. Faça upgrade para convidar até 4 familiares e compartilhar o Finance App."
       />
     )
   }

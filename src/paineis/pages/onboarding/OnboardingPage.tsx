@@ -281,7 +281,7 @@ export default function Onboarding() {
                       Open Finance (em breve)
                     </div>
                     <div className="mt-2 text-[12px] font-semibold" style={{ color: "var(--of-text-muted)", lineHeight: 1.6 }}>
-                      Ainda não temos conexão bancária automática ativa neste ambiente. Quando liberarmos, você nunca vai compartilhar senha bancária com a Openfy:
+                      Ainda não temos conexão bancária automática ativa neste ambiente. Quando liberarmos, você nunca vai compartilhar senha bancária com a Finance App:
                       o acesso acontece por autorização (consentimento) no seu próprio banco.
                     </div>
                     <div className="mt-3 text-[12px] font-semibold" style={{ color: "var(--of-text-muted)" }}>

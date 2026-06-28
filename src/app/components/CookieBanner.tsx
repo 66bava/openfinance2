@@ -1,7 +1,7 @@
 ﻿import { useState, useEffect } from "react"
 import { X } from "lucide-react"
 
-const STORAGE_KEY = "openfy_cookie_consent"
+const STORAGE_KEY = "financeapp_cookie_consent"
 
 export default function CookieBanner() {
   const [visible, setVisible] = useState(false)

@@ -67,7 +67,7 @@ export default function Dashboard() {
               fontSize: 11,
               color: "var(--of-text-muted)",
             }}>
-              app.openfy.com.br/dashboard
+              app.financeapp.com.br/dashboard
             </div>
           </div>
           {imgError ? (
@@ -92,7 +92,7 @@ export default function Dashboard() {
           ) : (
             <img
               src="/dashboard-preview.png"
-              alt="Openfy dashboard preview"
+              alt="Finance App dashboard preview"
               style={{ width: "100%", display: "block" }}
               onError={() => setImgError(true)}
             />

@@ -11,8 +11,8 @@
   },
   {
     numero: "0 a 1000",
-    descricao: "é o range do Score de Saúde Financeira exclusivo do Openfy",
-    fonte: "Openfy",
+    descricao: "é o range do Score de Saúde Financeira exclusivo do Finance App",
+    fonte: "Finance App",
   },
 ]
 

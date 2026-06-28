@@ -7,10 +7,14 @@ import { formatCurrency, formatShortDate } from "../../../lib/format"
 import { getUserFinancialSnapshot } from "../../../lib/queries"
 import { calcularPatrimonioEstimado } from "../../../lib/queries/investimentos"
 import { calcularTotalMensal } from "../../../lib/queries/assinaturas"
+import { toast } from "sonner"
 import type { Assinatura, Compromisso, Investimento, MetodoPagamento, Transacao } from "../../../lib/types"
 import { calculateFinancialScore } from "../../../score-engine"
 import type { ScoreResult } from "../../../score-engine"
 import type { AppOutletContext } from "../../../app/components/Layout"
+import { AdjustBalanceModal } from "../../../app/components/dashboard/AdjustBalanceModal"
+import { createBalanceAdjustment } from "../../../lib/queries/balance-adjustments"
+import type { ImportBatchRow } from "../../../lib/queries/imports"
 
 function capitalizeFirst(s: string) {
   return s ? s.charAt(0).toUpperCase() + s.slice(1) : s
@@ -200,6 +204,14 @@ export default function DashboardPage() {
   const [assinaturas, setAssinaturas] = useState<Assinatura[]>([])
   const [compromissos, setCompromissos] = useState<Compromisso[]>([])
   const [snapScore, setSnapScore] = useState<ScoreResult | null>(null)
+  const [importacoes, setImportacoes] = useState<ImportBatchRow[]>([])
+  const [cycleId, setCycleId] = useState<string | null>(null)
+  const [statementBalance, setStatementBalance] = useState<{ batchId: string; value: number } | null>(null)
+  const [dismissedStatementBalance, setDismissedStatementBalance] = useState(false)
+
+  const [showAdjustBalance, setShowAdjustBalance] = useState(false)
+  const [adjustInitialTarget, setAdjustInitialTarget] = useState<number | null>(null)
+  const [adjustInitialReason, setAdjustInitialReason] = useState<string | null>(null)
 
   useEffect(() => {
     if (!user) return
@@ -222,6 +234,33 @@ export default function DashboardPage() {
         setAssinaturas((snap.assinaturas as any) || [])
         setCompromissos((snap.compromissos as any) || [])
         setSnapScore(snap.score)
+
+        const cid = (snap.cycle as any)?.id ? String((snap.cycle as any).id) : null
+        setCycleId(cid)
+
+        const imps = ((snap.importacoesRecentes as any) || []) as ImportBatchRow[]
+        setImportacoes(imps)
+
+        const balanceBatch = (() => {
+          const rows = (imps || []).filter((r: any) => r && r.statement_balance != null && Number.isFinite(Number(r.statement_balance)))
+          const scoped = cid ? rows.filter((r: any) => (r.cycle_id ? String(r.cycle_id) === cid : true)) : rows
+          const sorted = [...scoped].sort((a: any, b: any) => {
+            const da = String(a.imported_at || a.completed_at || a.created_at || "")
+            const db = String(b.imported_at || b.completed_at || b.created_at || "")
+            return da < db ? 1 : da > db ? -1 : 0
+          })
+          const top = sorted[0]
+          if (!top) return null
+          return { batchId: String(top.id), value: Number(top.statement_balance) }
+        })()
+
+        setStatementBalance(balanceBatch)
+        if (balanceBatch?.batchId) {
+          const key = `of-dismiss-statement-balance:${balanceBatch.batchId}`
+          setDismissedStatementBalance(localStorage.getItem(key) === "1")
+        } else {
+          setDismissedStatementBalance(false)
+        }
       })
       .finally(() => setLoading(false))
   }, [user?.id, syncNonce])
@@ -237,6 +276,13 @@ export default function DashboardPage() {
   const saldo = totais.saldoDisponivel
   const economiaValor = Math.max(0, saldo)
   const economiaPct = totais.percentualEconomia
+
+  const balanceMismatch = useMemo(() => {
+    if (!statementBalance) return null
+    const diff = Number(statementBalance.value) - Number(saldo || 0)
+    if (!Number.isFinite(diff) || Math.abs(diff) < 0.01) return null
+    return { diff, batchId: statementBalance.batchId, statement: statementBalance.value }
+  }, [statementBalance, saldo])
 
   const prevCycle = evolucao.length >= 2 ? evolucao[evolucao.length - 2] : null
   const curCycle = evolucao.length >= 1 ? evolucao[evolucao.length - 1] : null
@@ -427,6 +473,23 @@ export default function DashboardPage() {
               Sincronizar
             </button>
 
+            <button
+              type="button"
+              className="btn btn-ghost"
+              onClick={() => {
+                setAdjustInitialTarget(saldo)
+                setAdjustInitialReason(null)
+                setShowAdjustBalance(true)
+              }}
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 1v22" />
+                <path d="M5 6h14" />
+                <path d="M5 18h14" />
+              </svg>
+              Ajustar saldo
+            </button>
+
             <button type="button" className="btn btn-primary" onClick={() => navigate("/app/adicionar")}>
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <line x1="12" y1="5" x2="12" y2="19" />
@@ -436,6 +499,95 @@ export default function DashboardPage() {
             </button>
           </div>
         </div>
+
+        {balanceMismatch && !dismissedStatementBalance ? (
+          <div
+            className="mb-6 rounded-2xl overflow-hidden"
+            style={{
+              background: "rgba(245,158,11,0.05)",
+              border: "1px solid rgba(245,158,11,0.14)",
+            }}
+          >
+            {/* Top bar */}
+            <div
+              className="flex items-center justify-between gap-4 px-5 py-3.5"
+              style={{ borderBottom: "1px solid rgba(245,158,11,0.1)" }}
+            >
+              <div className="flex items-center gap-2.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse shrink-0" />
+                <span className="text-xs font-semibold text-amber-600 tracking-wide">Divergência no extrato importado</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  const key = `of-dismiss-statement-balance:${balanceMismatch.batchId}`
+                  localStorage.setItem(key, "1")
+                  setDismissedStatementBalance(true)
+                }}
+                className="w-7 h-7 flex items-center justify-center rounded-lg text-[#555] hover:text-[#888] hover:bg-white/5 transition-colors"
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
+              {/* Numbers inline - no nested cards */}
+              <div className="flex items-center gap-4 flex-1 flex-wrap">
+                <div>
+                  <p className="text-[11px] text-[#555] mb-1 uppercase tracking-wide font-medium">Calculado</p>
+                  <p className="text-xl font-bold text-[#EEEDE6] tabular-nums">{fmt(saldo)}</p>
+                </div>
+                <div className="text-[#333] text-lg font-light hidden sm:block">→</div>
+                <div>
+                  <p className="text-[11px] text-amber-600/70 mb-1 uppercase tracking-wide font-medium">Extrato</p>
+                  <p className="text-xl font-bold text-[#EEEDE6] tabular-nums">{fmt(balanceMismatch.statement)}</p>
+                </div>
+                <div
+                  className="px-2.5 py-1 rounded-lg text-sm font-bold tabular-nums"
+                  style={{
+                    background: balanceMismatch.diff >= 0 ? "rgba(34,197,94,0.1)" : "rgba(239,68,68,0.1)",
+                    color: balanceMismatch.diff >= 0 ? "#22C55E" : "#EF4444",
+                  }}
+                >
+                  {balanceMismatch.diff >= 0 ? "+" : "−"}{fmt(Math.abs(balanceMismatch.diff))}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center gap-2 flex-wrap shrink-0">
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  style={{ padding: "8px 16px", fontSize: 13 }}
+                  onClick={() => {
+                    setAdjustInitialTarget(balanceMismatch.statement)
+                    setAdjustInitialReason("Saldo do extrato")
+                    setShowAdjustBalance(true)
+                  }}
+                >
+                  Usar saldo do extrato
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  style={{ padding: "8px 16px", fontSize: 13 }}
+                  onClick={() => {
+                    const key = `of-dismiss-statement-balance:${balanceMismatch.batchId}`
+                    localStorage.setItem(key, "1")
+                    setDismissedStatementBalance(true)
+                    toast.message("Mantendo saldo calculado", { description: "Você pode ajustar manualmente a qualquer momento." })
+                  }}
+                >
+                  Ignorar
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
 
         <div className="stats-row" aria-busy={loading}>
           <div className="stat-card">
@@ -579,7 +731,7 @@ export default function DashboardPage() {
               <div className="card-body">
                 {lastTx.length === 0 ? (
                   <div style={{ padding: 10, color: "var(--t2)", fontSize: 13 }}>
-                    Nenhuma transação no ciclo atual. Use “Novo Registro” para começar.
+                    Nenhuma transação no ciclo atual. Use "Novo Registro" para começar.
                   </div>
                 ) : (
                   lastTx.map((t) => {
@@ -627,7 +779,7 @@ export default function DashboardPage() {
               <div className="card-body">
                 {topMethods.length === 0 ? (
                   <div style={{ padding: 10, color: "var(--t2)", fontSize: 13 }}>
-                    Sem dados por método de pagamento. Adicione “pagamento” ao registrar transações.
+                    Sem dados por método de pagamento. Adicione "pagamento" ao registrar transações.
                   </div>
                 ) : (
                   <div className="pay-list">
@@ -657,7 +809,7 @@ export default function DashboardPage() {
                   <svg viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M18 20V10M12 20V4M6 20v-6" />
                   </svg>
-                  Score Openfy
+                  Score Finance App
                 </div>
                 <Link className="card-action" to="/app/score">
                   Ver mais →
@@ -824,7 +976,7 @@ export default function DashboardPage() {
               <div className="card-body">
                 {planningItems.length === 0 ? (
                   <div style={{ padding: 10, color: "var(--t2)", fontSize: 13 }}>
-                    Sem compromissos/assinaturas próximos. Crie itens em “Planejamento” para aparecerem aqui.
+                    Sem compromissos/assinaturas próximos. Crie itens em "Planejamento" para aparecerem aqui.
                   </div>
                 ) : (
                   planningItems.map((p) => (
@@ -843,6 +995,34 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {showAdjustBalance ? (
+        <AdjustBalanceModal
+          lang={lang}
+          currency={currency}
+          currentBalance={saldo}
+          initialTargetBalance={adjustInitialTarget}
+          initialReason={adjustInitialReason}
+          onClose={() => setShowAdjustBalance(false)}
+          onConfirm={async ({ targetBalance, reason }) => {
+            if (!user) return
+            const res = await createBalanceAdjustment(user.id, {
+              currentBalance: saldo,
+              targetBalance,
+              reason,
+              cycleId,
+            })
+            if (res.created) {
+              toast.success("Saldo atualizado", { description: "Ajuste registrado no histórico e dashboard recalculada." })
+              setShowAdjustBalance(false)
+              requestSync()
+            } else {
+              toast.message("Nenhum ajuste necessário", { description: "O novo saldo é igual ao saldo atual." })
+              setShowAdjustBalance(false)
+            }
+          }}
+        />
+      ) : null}
     </div>
   )
 }

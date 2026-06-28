@@ -145,19 +145,28 @@ function emojiForCategory(name: string) {
 
 function TxRow({ emoji, nome, categoria, valor, positivo, data }: TxPreviewRow) {
   return (
-    <div className="flex items-center justify-between py-3 border-b border-[#1A1A1A] last:border-0">
+    <div
+      className="flex items-center justify-between py-3 last:pb-0"
+      style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}
+    >
       <div className="flex items-center gap-3 min-w-0">
-        <div className="w-8 h-8 rounded-lg bg-[#0D0D0D] border border-[#1A1A1A] flex items-center justify-center flex-shrink-0">
-          <span className="text-base">{emoji}</span>
+        <div
+          className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-base"
+          style={{ background: positivo ? "rgba(22,163,74,0.1)" : "rgba(239,68,68,0.08)" }}
+        >
+          {emoji}
         </div>
         <div className="min-w-0">
-          <p className="text-[13px] text-[#D0D0D0] truncate">{nome}</p>
-          <p className="text-[11px] text-[#444]">
+          <p className="text-[13px] truncate" style={{ color: "#D0D0D0" }}>{nome}</p>
+          <p className="text-[11px]" style={{ color: "#555" }}>
             {categoria} · {data}
           </p>
         </div>
       </div>
-      <span className={`text-[13px] font-medium ${positivo ? "text-green-400" : "text-red-400"}`}>
+      <span
+        className="text-[13px] font-semibold tabular-nums shrink-0 ml-3"
+        style={{ color: positivo ? "#22C55E" : "#EF4444" }}
+      >
         {positivo ? "+" : "−"}
         {Math.abs(valor).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
       </span>
@@ -166,34 +175,46 @@ function TxRow({ emoji, nome, categoria, valor, positivo, data }: TxPreviewRow) 
 }
 
 function Badge({ children, variant = "default" }: { children: React.ReactNode; variant?: "default" | "green" | "red" }) {
-  const variants: Record<string, string> = {
-    default: "border border-[#2A2A2A] text-[#666] bg-transparent",
-    green: "border border-green-600/30 text-green-400 bg-green-900/20",
-    red: "border border-red-600/30 text-red-400 bg-red-900/20",
+  const styles: Record<string, React.CSSProperties> = {
+    default: { border: "1px solid rgba(255,255,255,0.08)", color: "#666", background: "transparent" },
+    green: { border: "1px solid rgba(34,197,94,0.2)", color: "#22C55E", background: "rgba(22,163,74,0.08)" },
+    red: { border: "1px solid rgba(239,68,68,0.2)", color: "#EF4444", background: "rgba(239,68,68,0.08)" },
   }
-  return <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] ${variants[variant]}`}>{children}</span>
+  return (
+    <span
+      className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium"
+      style={styles[variant]}
+    >
+      {children}
+    </span>
+  )
 }
 
-function MetricCard({ label, value, color = "text-[#F5F5F0]" }: { label: string; value: React.ReactNode; color?: string }) {
+function MetricCard({ label, value, color }: { label: string; value: React.ReactNode; color?: string }) {
   return (
-    <div className="bg-[#111111] border border-[#1E1E1E] rounded-xl p-4">
-      <p className="text-[11px] uppercase tracking-wider text-[#555] mb-1">{label}</p>
-      <p className={`text-2xl font-semibold ${color}`}>{value}</p>
+    <div
+      className="rounded-2xl p-5"
+      style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+    >
+      <p className="text-[11px] uppercase tracking-wide font-medium mb-3" style={{ color: "#555" }}>{label}</p>
+      <p className="text-2xl font-bold tabular-nums" style={{ color: color || "#EEEDE6" }}>{value}</p>
     </div>
   )
 }
 
 function ConfidenceBar({ value }: { value: number }) {
   return (
-    <div className="flex items-center gap-3 p-3 bg-[#0D0D0D] border border-[#1A1A1A] rounded-lg">
-      <span className="text-green-500 text-base">🧠</span>
+    <div className="flex items-center gap-3 py-3">
       <div className="flex-1">
-        <div className="flex justify-between mb-1">
-          <span className="text-[11px] text-[#555]">Confiança da análise</span>
-          <span className="text-[11px] text-green-400">{value}%</span>
+        <div className="flex justify-between mb-2">
+          <span className="text-[11px] font-medium" style={{ color: "#555" }}>Confiança da análise</span>
+          <span className="text-[11px] font-semibold" style={{ color: "#22C55E" }}>{value}%</span>
         </div>
-        <div className="h-[3px] bg-[#1A1A1A] rounded-full overflow-hidden">
-          <div className="h-full bg-green-600 rounded-full transition-all duration-700" style={{ width: `${value}%` }} />
+        <div className="h-[2px] rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
+          <div
+            className="h-full rounded-full transition-all duration-700"
+            style={{ width: `${value}%`, background: value >= 70 ? "#16A34A" : value >= 40 ? "#F59E0B" : "#EF4444" }}
+          />
         </div>
       </div>
     </div>
@@ -209,7 +230,7 @@ const STEPS = [
   {
     n: "2",
     title: "Arraste ou selecione",
-    desc: "A Openfy lê o arquivo e identifica transações, categorias e método de pagamento.",
+    desc: "A Finance App lê o arquivo e identifica transações, categorias e método de pagamento.",
   },
   {
     n: "3",
@@ -379,68 +400,65 @@ function EmptyState({
             borderRadius: 16,
             border: "1px solid var(--bd, rgba(255,255,255,0.06))",
             background: "var(--bg-c, #111111)",
-            padding: "20px 24px",
+            overflow: "hidden",
             marginBottom: 20,
           }}
         >
-          <div style={{ fontSize: 12, fontWeight: 700, color: "var(--t3, #444440)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 14 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--t3, #444440)", textTransform: "uppercase", letterSpacing: "0.1em", padding: "16px 20px", borderBottom: "1px solid var(--bd, rgba(255,255,255,0.06))" }}>
             Últimas importações
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {recentImports.map((imp) => (
-              <div
-                key={imp.id}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: 12,
-                  padding: "10px 14px",
-                  borderRadius: 10,
-                  border: "1px solid var(--bd, rgba(255,255,255,0.06))",
-                  background: "var(--bg-i, #1A1A1A)",
-                }}
-              >
-                <div style={{ minWidth: 0 }}>
-                  <div
-                    style={{
-                      fontSize: 13,
-                      fontWeight: 600,
-                      color: "var(--t1, #EEEDE6)",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {imp.filename || "Importação"}
-                  </div>
-                  <div style={{ fontSize: 11, color: "var(--t3, #444440)", marginTop: 2 }}>
-                    {imp.tx_count != null ? `${imp.tx_count} transações` : ""}
-                    {imp.created_at ? ` · ${new Date(imp.created_at).toLocaleDateString("pt-BR")}` : ""}
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => onDeleteImport(imp.id)}
-                  aria-label="Remover importação"
+          {recentImports.map((imp, idx) => (
+            <div
+              key={imp.id}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 12,
+                padding: "12px 20px",
+                borderTop: idx > 0 ? "1px solid var(--bd, rgba(255,255,255,0.04))" : undefined,
+              }}
+            >
+              <div style={{ minWidth: 0 }}>
+                <div
                   style={{
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    color: "var(--t3, #444440)",
-                    padding: 4,
-                    flexShrink: 0,
-                    display: "flex",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: "var(--t1, #EEEDE6)",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
                   }}
                 >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                    <line x1="18" y1="6" x2="6" y2="18" />
-                    <line x1="6" y1="6" x2="18" y2="18" />
-                  </svg>
-                </button>
+                  {imp.filename || "Importação"}
+                </div>
+                <div style={{ fontSize: 11, color: "var(--t3, #444440)", marginTop: 2 }}>
+                  {imp.tx_count != null ? `${imp.tx_count} transações` : ""}
+                  {imp.created_at ? ` · ${new Date(imp.created_at).toLocaleDateString("pt-BR")}` : ""}
+                </div>
               </div>
-            ))}
-          </div>
+              <button
+                type="button"
+                onClick={() => onDeleteImport(imp.id)}
+                aria-label="Remover importação"
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "var(--t3, #444440)",
+                  padding: 6,
+                  flexShrink: 0,
+                  display: "flex",
+                  borderRadius: 8,
+                }}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+          ))}
         </div>
       )}
 
@@ -548,7 +566,7 @@ function UploadState({
         </div>
       </div>
 
-      <div className="bg-[#0D0D0D] border border-[#1A1A1A] rounded-xl overflow-hidden">
+      <div className="bg-[#0D0D0D] border-0 rounded-xl overflow-hidden">
         <button className="w-full flex items-center justify-between px-4 py-3 text-left" onClick={() => setShowGuide(!showGuide)}>
           <span className="text-[12px] uppercase tracking-widest text-[#333]">Como exportar do seu banco</span>
           <svg
@@ -584,7 +602,7 @@ function UploadState({
       {history.length > 0 && (
         <div>
           <p className="text-[11px] uppercase tracking-widest text-[#333] mb-2">Importações anteriores</p>
-          <div className="bg-[#111] border border-[#1E1E1E] rounded-xl overflow-hidden">
+          <div className="bg-[#111] border-0 rounded-xl overflow-hidden">
             {history.map((item) => (
               <div key={item.id} className="flex items-center gap-3 px-4 py-3 border-b border-[#1A1A1A] last:border-0">
                 <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#444" strokeWidth="1.5" aria-hidden="true">
@@ -632,7 +650,7 @@ function ProcessingState({ filename, activeStep, progress }: { filename: string;
   const step = PASSOS_PROCESSAMENTO[Math.min(PASSOS_PROCESSAMENTO.length - 1, Math.max(0, activeStep))]!
   return (
     <div className="flex-1 flex flex-col items-center justify-center gap-8 py-12 min-h-[520px]">
-      <div className="flex items-center gap-2.5 px-4 py-2 bg-[#111] border border-[#1E1E1E] rounded-lg max-w-full">
+      <div className="flex items-center gap-2.5 px-4 py-2 bg-[#111] border-0 rounded-lg max-w-full">
         <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#16A34A" strokeWidth="1.5" aria-hidden="true">
           <path
             strokeLinecap="round"
@@ -739,13 +757,21 @@ function PreviewState({
   detectedPlans?: DetectedPlan[]
   confirmedPlanKeys?: Set<string>
   onTogglePlanKey?: (key: string) => void
-  detectedInvestments?: DetectedInvestment[]
+  detectedInvestments?: DetectedInvestmentV2[]
   confirmedInvestmentKeys?: Set<string>
   onToggleInvestmentKey?: (key: string) => void
 }) {
   const [visible, setVisible] = useState(60)
   const [editing, setEditing] = useState<number | null>(null)
   const [query, setQuery] = useState("")
+  const idxByFingerprint = useMemo(() => {
+    const map = new Map<string, number>()
+    for (const it of items) {
+      const fp = candidateFingerprint({ date: it.tx.date, description: it.tx.description, amount: it.tx.amount, type: it.tx.type })
+      map.set(fp, it.idx)
+    }
+    return map
+  }, [items])
 
   useEffect(() => {
     if (focusEditIdx == null) return
@@ -784,14 +810,15 @@ function PreviewState({
     <div className="flex flex-col gap-5">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <h2 className="text-lg font-medium text-[#F5F5F0] mb-0.5">Revisão da importação</h2>
-          <p className="text-[12px] text-[#444] truncate">
+          <p className="text-xs font-semibold tracking-widest text-[#444] uppercase mb-2">Revisão da importação</p>
+          <h2 className="text-xl font-bold text-[#F5F5F0] mb-1">Confirme o que será importado</h2>
+          <p className="text-sm text-[#555] truncate">
             {data.filename} · {effectiveTxs.length} transações · {data.filesizeLabel}
           </p>
         </div>
-        <div className="flex items-center gap-1.5 flex-shrink-0">
+        <div className="flex items-center gap-1.5 shrink-0 px-3 py-1.5 bg-green-950/20 border border-green-900/25 rounded-lg">
           <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-          <span className="text-[11px] text-green-500">verificado</span>
+          <span className="text-xs font-semibold text-green-500">Verificado</span>
         </div>
       </div>
 
@@ -825,76 +852,84 @@ function PreviewState({
       </div>
 
       {savedCount > 0 || pendingFailuresCount > 0 ? (
-        <div className="bg-[#111] border border-[#1E1E1E] rounded-xl p-3 text-[12px] text-[#666]">
+        <div className="bg-[#111] border-0 rounded-xl p-3 text-[12px] text-[#666]">
           <span className="text-[#888]">Status do salvamento:</span>{" "}
           {savedCount > 0 ? <span>{savedCount} já salvas</span> : <span>nenhuma salva ainda</span>}
           {pendingFailuresCount > 0 ? <span>{` · ${pendingFailuresCount} com erro (edite e tente novamente)`}</span> : null}
         </div>
       ) : null}
 
-      <div className="grid grid-cols-2 gap-2.5">
-        <MetricCard label="Receitas" value={fmt(effectiveIncome)} color="text-green-400" />
-        <MetricCard label="Despesas" value={fmt(effectiveExpenses)} color="text-red-400" />
-        <MetricCard label="Saldo" value={fmt(effectiveBalance)} />
-        <MetricCard label="Transações" value={effectiveTxs.length} />
+      <div className="grid grid-cols-2 gap-3">
+        <MetricCard label="Receitas" value={fmt(effectiveIncome)} color="#22C55E" />
+        <MetricCard label="Despesas" value={fmt(effectiveExpenses)} color="#EF4444" />
+        <MetricCard label="Saldo do período" value={fmt(effectiveBalance)} />
+        <MetricCard label="Transações selecionadas" value={effectiveTxs.length} />
       </div>
 
-      <div className="bg-[#111] border border-[#1E1E1E] rounded-xl p-4 flex items-center gap-4">
-        <div>
-          <p className="text-[38px] font-semibold text-green-500 leading-none">{data.score}</p>
-          <p className="text-[11px] text-[#444] mt-1">Score estimado</p>
+      <div className="bg-[#111] border-0 rounded-2xl p-5 flex items-center gap-5">
+        <div className="shrink-0 text-center">
+          <p className="text-4xl font-bold text-green-400 leading-none tabular-nums">{data.score}</p>
+          <p className="text-xs text-[#444] mt-2">Score estimado</p>
         </div>
-        <div className="flex-1">
-          <div className="flex justify-between mb-1.5">
-            <span className="text-[12px] text-[#555]">Score Financeiro</span>
-            <span className="text-[12px] text-green-400">
+        <div className="flex-1 min-w-0">
+          <div className="flex justify-between mb-2">
+            <span className="text-sm font-medium text-[#666]">Score Financeiro</span>
+            <span className="text-sm font-semibold text-green-400">
               {data.score >= 850 ? "Excelente" : data.score >= 700 ? "Bom" : data.score >= 400 ? "Regular" : "Crítico"}
             </span>
           </div>
-          <div className="h-1 bg-[#1A1A1A] rounded-full overflow-hidden">
-            <div className="h-full bg-green-600 rounded-full transition-all duration-700" style={{ width: `${(data.score / 1000) * 100}%` }} />
+          <div className="h-2 bg-[#1A1A1A] rounded-full overflow-hidden">
+            <div
+              className="h-full bg-green-600 rounded-full transition-all duration-700"
+              style={{ width: `${(data.score / 1000) * 100}%` }}
+            />
           </div>
-          <div className="flex justify-between mt-1">
-            <span className="text-[10px] text-[#333]">0</span>
-            <span className="text-[10px] text-[#333]">1000</span>
+          <div className="flex justify-between mt-1.5">
+            <span className="text-xs text-[#333]">0</span>
+            <span className="text-xs text-[#333]">1000</span>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-          {[
-            { label: "Assinaturas", value: data.assinaturas },
-            { label: "Recorrências", value: data.recorrencias },
-            { label: "Salário", value: data.salario > 0 ? fmt(data.salario) : "—" },
-          ].map((item) => (
-          <div key={item.label} className="bg-[#111] border border-[#1E1E1E] rounded-lg p-3 text-center">
-            <p className="text-lg font-semibold text-[#F5F5F0]">{item.value}</p>
-            <p className="text-[11px] text-[#444] mt-0.5">{item.label}</p>
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          { label: "Assinaturas detectadas", value: data.assinaturas },
+          { label: "Recorrências", value: data.recorrencias },
+          { label: "Salário", value: data.salario > 0 ? fmt(data.salario) : "—" },
+        ].map((item) => (
+          <div key={item.label} className="bg-[#111] border-0 rounded-2xl p-4 text-center">
+            <p className="text-xl font-bold text-[#F5F5F0] tabular-nums mb-1.5">{item.value}</p>
+            <p className="text-xs text-[#444]">{item.label}</p>
           </div>
         ))}
       </div>
 
       {detectedSubs && detectedSubs.length > 0 && (
-        <div className="bg-[#0D0D0D] border border-green-900/30 rounded-xl p-4">
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-[11px] uppercase tracking-widest text-green-700">Assinaturas detectadas</p>
-            <span className="text-[11px] text-[#444]">{confirmedSubKeys?.size ?? 0} selecionada(s)</span>
+        <div className="bg-[#0D0D0D] border border-green-900/25 rounded-2xl p-5">
+          <div className="flex items-start justify-between gap-3 mb-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                <p className="text-xs font-semibold tracking-widest text-green-600 uppercase">Assinaturas detectadas</p>
+              </div>
+              <p className="text-sm text-[#555] leading-relaxed">Quer cadastrar estas assinaturas? Selecione as que deseja salvar.</p>
+            </div>
+            <span className="text-xs text-[#444] shrink-0 mt-1">{confirmedSubKeys?.size ?? 0} selecionada(s)</span>
           </div>
-          <p className="text-[12px] text-[#555] mb-3">Quer cadastrar estas assinaturas no módulo de assinaturas? Selecione as que deseja salvar.</p>
           <div className="flex flex-col gap-2">
             {detectedSubs.map((sub) => {
               const checked = confirmedSubKeys?.has(sub.key) ?? false
               return (
-                <label key={sub.key} className="flex items-center gap-3 cursor-pointer py-1">
+                <label key={sub.key} className="flex items-center gap-3 cursor-pointer px-3 py-3 bg-[#111] border border-[#1A1A1A] rounded-xl hover:border-green-900/30 transition-colors">
                   <input
                     type="checkbox"
                     checked={checked}
                     onChange={() => onToggleSubKey?.(sub.key)}
-                    className="w-4 h-4 accent-green-600 flex-shrink-0"
+                    className="w-4 h-4 accent-green-600 shrink-0"
                   />
-                  <span className="flex-1 text-[13px] text-[#D0D0D0] truncate">{sub.name}</span>
-                  <span className="text-[12px] text-[#555] flex-shrink-0">
-                    {sub.monthlyEstimate.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}/mês
+                  <span className="flex-1 text-sm font-medium text-[#D0D0D0] truncate">{sub.name}</span>
+                  <span className="text-sm font-semibold text-[#888] shrink-0 tabular-nums">
+                    {sub.monthlyEstimate.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}<span className="text-[#444] font-normal">/mês</span>
                   </span>
                 </label>
               )
@@ -904,27 +939,32 @@ function PreviewState({
       )}
 
       {detectedPlans && detectedPlans.length > 0 && (
-        <div className="bg-[#0D0D0D] border border-amber-900/30 rounded-xl p-4">
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-[11px] uppercase tracking-widest text-amber-600">Planejamento detectado</p>
-            <span className="text-[11px] text-[#444]">{confirmedPlanKeys?.size ?? 0} selecionado(s)</span>
+        <div className="bg-[#0D0D0D] border border-amber-900/25 rounded-2xl p-5">
+          <div className="flex items-start justify-between gap-3 mb-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                <p className="text-xs font-semibold tracking-widest text-amber-600 uppercase">Planejamento detectado</p>
+              </div>
+              <p className="text-sm text-[#555] leading-relaxed">Sugestões de contas fixas e financiamentos. Selecione para criar no Planejamento.</p>
+            </div>
+            <span className="text-xs text-[#444] shrink-0 mt-1">{confirmedPlanKeys?.size ?? 0} selecionado(s)</span>
           </div>
-          <p className="text-[12px] text-[#555] mb-3">Sugestões de contas fixas e financiamentos. Selecione para criar no Planejamento.</p>
           <div className="flex flex-col gap-2">
             {detectedPlans.map((p) => {
               const checked = confirmedPlanKeys?.has(p.key) ?? false
               const label = p.kind === "financiamento" ? "Financiamento" : "Conta fixa"
               return (
-                <label key={p.key} className="flex items-center gap-3 cursor-pointer py-1">
+                <label key={p.key} className="flex items-center gap-3 cursor-pointer px-3 py-3 bg-[#111] border border-[#1A1A1A] rounded-xl hover:border-amber-900/30 transition-colors">
                   <input
                     type="checkbox"
                     checked={checked}
                     onChange={() => onTogglePlanKey?.(p.key)}
-                    className="w-4 h-4 accent-amber-600 flex-shrink-0"
+                    className="w-4 h-4 accent-amber-600 shrink-0"
                   />
-                  <span className="flex-1 text-[13px] text-[#D0D0D0] truncate">{p.name}</span>
-                  <span className="text-[11px] text-[#444] flex-shrink-0">{label}</span>
-                  <span className="text-[12px] text-[#555] flex-shrink-0">{fmt(p.monthlyEstimate)}/mês</span>
+                  <span className="flex-1 text-sm font-medium text-[#D0D0D0] truncate">{p.name}</span>
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-amber-950/30 text-amber-500 border border-amber-900/20 shrink-0">{label}</span>
+                  <span className="text-sm font-semibold text-[#888] shrink-0 tabular-nums">{fmt(p.monthlyEstimate)}<span className="text-[#444] font-normal">/mês</span></span>
                 </label>
               )
             })}
@@ -933,25 +973,73 @@ function PreviewState({
       )}
 
       {detectedInvestments && detectedInvestments.length > 0 && (
-        <div className="bg-[#0D0D0D] border border-blue-900/30 rounded-xl p-4">
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-[11px] uppercase tracking-widest text-blue-600">Investimentos detectados</p>
-            <span className="text-[11px] text-[#444]">{confirmedInvestmentKeys?.size ?? 0} selecionado(s)</span>
+        <div className="bg-[#0D0D0D] border border-blue-900/25 rounded-2xl p-5">
+          <div className="flex items-start justify-between gap-3 mb-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                <p className="text-xs font-semibold tracking-widest text-blue-500 uppercase">Investimentos detectados</p>
+              </div>
+              <p className="text-sm text-[#555] leading-relaxed">
+                Selecione apenas <span className="text-[#888] font-semibold">aportes</span> para registrar em Investimentos. Os demais ficam como transações normais.
+              </p>
+            </div>
+            <span className="text-xs text-[#444] shrink-0 mt-1">{confirmedInvestmentKeys?.size ?? 0} selecionado(s)</span>
           </div>
-          <p className="text-[12px] text-[#555] mb-3">Quer registrar estes aportes automaticamente em Investimentos? (recomendado apenas para aportes)</p>
           <div className="flex flex-col gap-2">
             {detectedInvestments.map((inv) => {
               const checked = confirmedInvestmentKeys?.has(inv.key) ?? false
+              const canAutoSave = inv.action === "aporte"
+              const idx = idxByFingerprint.get(inv.key) ?? null
+              const dateLabel = (() => {
+                try {
+                  return new Date(inv.date + "T00:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "short" }).replace(".", "")
+                } catch {
+                  return inv.date
+                }
+              })()
               return (
-                <label key={inv.key} className="flex items-center gap-3 cursor-pointer py-1">
+                <label
+                  key={inv.key}
+                  className={`flex items-center gap-3 cursor-pointer px-3 py-3 bg-[#111] border border-[#1A1A1A] rounded-xl transition-colors ${canAutoSave ? "hover:border-blue-900/30" : "opacity-60 cursor-not-allowed"}`}
+                >
                   <input
                     type="checkbox"
                     checked={checked}
-                    onChange={() => onToggleInvestmentKey?.(inv.key)}
-                    className="w-4 h-4 accent-blue-600 flex-shrink-0"
+                    disabled={!canAutoSave}
+                    onChange={() => (canAutoSave ? onToggleInvestmentKey?.(inv.key) : null)}
+                    className="w-4 h-4 accent-blue-600 shrink-0"
                   />
-                  <span className="flex-1 text-[13px] text-[#D0D0D0] truncate">{inv.name}</span>
-                  <span className="text-[12px] text-[#555] flex-shrink-0">{fmt(inv.amount)}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-[#D0D0D0] truncate">{inv.name || "Investimento não classificado"}</p>
+                    <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
+                      <span className="text-xs text-[#444]">{dateLabel}</span>
+                      <span className="text-[#333]">·</span>
+                      <span className="text-xs text-[#444]">{investmentActionLabel(inv.action)}</span>
+                      {inv.probableType ? (
+                        <>
+                          <span className="text-[#333]">·</span>
+                          <span className="text-xs text-[#444]">{inv.probableType}</span>
+                        </>
+                      ) : null}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="text-sm font-semibold text-[#888] tabular-nums">{fmt(inv.amount)}</span>
+                    {idx != null ? (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          setEditing(idx)
+                        }}
+                        className="text-xs text-[#3B82F6] hover:text-[#60A5FA] transition-colors"
+                      >
+                        Editar
+                      </button>
+                    ) : null}
+                  </div>
                 </label>
               )
             })}
@@ -964,7 +1052,7 @@ function PreviewState({
           <p className="text-[11px] uppercase tracking-widest text-[#333] mb-2">Métodos detectados</p>
           <div className="flex flex-wrap gap-1.5">
             {data.paymentMethods.map((m) => (
-              <div key={m.method} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#111] border border-[#1E1E1E] rounded-lg">
+              <div key={m.method} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#111] border-0 rounded-lg">
                 <span className="text-[12px] text-[#888]">{methodLabel(m.method)}</span>
                 <span className="text-[12px] text-[#444]">{m.count}</span>
               </div>
@@ -974,7 +1062,7 @@ function PreviewState({
       )}
 
       {data.statementBalance != null && (
-        <div className="bg-[#0D0D0D] border border-[#1A1A1A] rounded-xl p-4">
+        <div className="bg-[#0D0D0D] border-0 rounded-xl p-4">
           <p className="text-[11px] uppercase tracking-widest text-[#333] mb-1">Saldo do extrato</p>
           <p className="text-[13px] text-[#666]">{fmt(data.statementBalance)}</p>
         </div>
@@ -986,7 +1074,7 @@ function PreviewState({
           {data.categorias.map((cat) => (
             <div
               key={cat.nome}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#111] border border-[#1E1E1E] rounded-lg"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#111] border-0 rounded-lg"
             >
               <span className="text-sm">{cat.emoji}</span>
               <span className="text-[12px] text-[#888]">{cat.nome}</span>
@@ -998,7 +1086,7 @@ function PreviewState({
 
       <div>
         <p className="text-[11px] uppercase tracking-widest text-[#333] mb-2">Prévia das transações</p>
-        <div className="bg-[#111] border border-[#1E1E1E] rounded-xl px-4">
+        <div className="bg-[#111] border-0 rounded-xl px-4">
           {data.transacoes_preview.map((tx, i) => (
             <TxRow key={i} {...tx} />
           ))}
@@ -1010,7 +1098,7 @@ function PreviewState({
 
       <ConfidenceBar value={data.confiancaIA} />
 
-      <div className="bg-[#0D0D0D] border border-[#1A1A1A] rounded-xl p-4">
+      <div className="bg-[#0D0D0D] border-0 rounded-xl p-4">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <p className="text-[11px] uppercase tracking-widest text-[#333] mb-1">Detecção</p>
@@ -1040,7 +1128,7 @@ function PreviewState({
         <div className="flex items-center justify-between gap-3 mb-2">
           <p className="text-[11px] uppercase tracking-widest text-[#333]">Transações (editável)</p>
         </div>
-        <div className="bg-[#111] border border-[#1E1E1E] rounded-xl overflow-hidden">
+        <div className="bg-[#111] border-0 rounded-xl overflow-hidden">
           {shown.map(({ idx, tx, excluded }) => {
             const isEditing = editing === idx
             const conf = Math.round((tx.category.confidence || 0) * 100)
@@ -1234,13 +1322,13 @@ function SuccessState({
 
       <div className="flex flex-wrap gap-2 justify-center">
         {[`${data.transacoes} transações`, `${data.categorias.length} categorias`, `${data.recorrencias} recorrências`, `${data.assinaturas} assinaturas`].map((chip) => (
-          <span key={chip} className="px-3 py-1.5 bg-[#111] border border-[#1E1E1E] rounded-full text-[12px] text-[#666]">
+          <span key={chip} className="px-3 py-1.5 bg-[#111] border-0 rounded-full text-[12px] text-[#666]">
             {chip}
           </span>
         ))}
       </div>
 
-      <div className="bg-[#111] border border-[#1E1E1E] rounded-xl px-8 py-4">
+      <div className="bg-[#111] border-0 rounded-xl px-8 py-4">
         <p className="text-[11px] text-[#333] mb-2">Score atualizado</p>
         <div className="flex items-center gap-3 justify-center">
           <span className="text-base text-[#444]">{data.scorePrevio}</span>
@@ -1255,7 +1343,7 @@ function SuccessState({
       {history.length > 0 && (
         <div className="w-full max-w-xs text-left">
           <p className="text-[11px] uppercase tracking-widest text-[#333] mb-2">Histórico</p>
-          <div className="bg-[#111] border border-[#1E1E1E] rounded-xl overflow-hidden">
+          <div className="bg-[#111] border-0 rounded-xl overflow-hidden">
             {history.slice(0, 3).map((item) => (
               <div key={item.id} className="flex items-center gap-3 px-4 py-3 border-b border-[#1A1A1A] last:border-0">
                 <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#16A34A" strokeWidth="1.5" aria-hidden="true">
@@ -1387,12 +1475,12 @@ function ErrorState({
               {showDetails ? "Ocultar detalhes" : "Ver detalhes técnicos"}
             </button>
             {showDetails ? (
-              <div className="mt-2 bg-[#0B0B0B] border border-[#1A1A1A] rounded-lg p-3 text-[12px] text-[#888] whitespace-pre-wrap break-words">
+              <div className="mt-2 bg-[#0B0B0B] border-0 rounded-lg p-3 text-[12px] text-[#888] whitespace-pre-wrap break-words">
                 {debugMessage}
               </div>
             ) : null}
             <div className="mt-2 text-[12px] text-[#444]">
-              Dica: se aparecer “row-level security”, rode a migration `20260517_transacoes_rls_own_policy.sql`. Se aparecer “coluna não existe”,
+              Dica: se aparecer "row-level security", rode a migration `20260517_transacoes_rls_own_policy.sql`. Se aparecer "coluna não existe",
               aplique a migration `20260514_import_batches_and_transacoes_import_id.sql` e/ou atualize o schema.
             </div>
           </div>
@@ -1422,7 +1510,7 @@ function ErrorState({
             "Baixe o arquivo OFX no internet banking",
             "Se preferir, registre manualmente no Registro Rápido",
           ].map((text) => (
-            <div key={text} className="flex items-center gap-3 p-3 bg-[#111] border border-[#1E1E1E] rounded-lg">
+            <div key={text} className="flex items-center gap-3 p-3 bg-[#111] border-0 rounded-lg">
               <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#444" strokeWidth="1.5" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
               </svg>
@@ -1568,7 +1656,7 @@ function PartialSaveState({
 
       {showDetails ? (
         <div className="w-full max-w-2xl text-left">
-          <div className="bg-[#111] border border-[#1E1E1E] rounded-xl overflow-hidden">
+          <div className="bg-[#111] border-0 rounded-xl overflow-hidden">
             {failures.slice(0, 200).map((f) => {
               const tx = byIdx.get(f.idx)
               return (
@@ -1712,11 +1800,15 @@ function detectPlanningSuggestions(
     /\baluguel\b|\bcondomin(?:io|io)\b|\bluz\b|\benergia\b|\bagua\b|\b[aá]gua\b|\bgas\b|\binternet\b|\btelefone\b|\bcelular\b|\bclaro\b|\bvivo\b|\btim\b|\boi\b|\bsabesp\b|\bcopasa\b|\bcemig\b|\benel\b|\blight\b|\bunimed\b|\bplano\s+de\s+saude\b|\bseguro\b|\bacademia\b|\bmensalidade\b|\bescola\b|\bcurso\b|\bfaculdade\b|\bcreche\b/
   const financeRe =
     /\bfinanciament(?:o|os)\b|\bprestac(?:ao|ão)\b|\bparcela\b|\bconsorcio\b|\bcons[oó]rcio\b|\bemprestimo\b|\bempr[eé]stimo\b|\bcdc\b|\bcredito\s+consignado\b/
+  // Filtro anti-falso-positivo: compras comuns não devem virar planejamento automaticamente
+  const notPlanRe =
+    /\bifood\b|\brappi\b|\buber\b|\b99\b|\brestaurante\b|\blanche\b|\bdelivery\b|\bmercado\b|\bsupermerc\b|\bpadaria\b|\bposto\b|\bgasolina\b|\bcombust[íi]vel\b|\bfarm[aá]cia\b|\bshopping\b|\bamazon\b|\bmercadolivre\b|\bmagalu\b|\bloj(a|as)\b|\bpassagem\b|\bmetr[oô]\b|\bônibus\b|\bonibus\b/
 
   for (const r of recurring || []) {
     if (r.cadence !== "mensal") continue
     if (subsKeys.has(r.key)) continue
     const nk = normalizeKey(r.description)
+    if (notPlanRe.test(nk)) continue
     const kind: DetectedPlan["kind"] | null = financeRe.test(nk) ? "financiamento" : fixedRe.test(nk) ? "despesa_fixa" : null
     if (!kind) continue
 
@@ -1732,35 +1824,76 @@ function detectPlanningSuggestions(
     })
   }
 
-  // fallback por palavra-chave (mesmo sem recorrência)
-  for (const t of txs || []) {
-    if (t.type !== "despesa") continue
-    const nk = normalizeKey(t.description)
-    const kind: DetectedPlan["kind"] | null = financeRe.test(nk) ? "financiamento" : fixedRe.test(nk) ? "despesa_fixa" : null
-    if (!kind) continue
-    const key = `${normalizeKey(t.description)}|${kind}`
-    if (out.has(key)) continue
-    out.set(key, {
-      key,
-      name: t.description,
-      monthlyEstimate: Number(t.amount) || 0,
-      kind,
-      dueDay: dueDayFromISO(t.date),
-    })
-  }
-
   return [...out.values()]
     .filter((x) => x.monthlyEstimate > 0)
     .sort((a, b) => b.monthlyEstimate - a.monthlyEstimate)
     .slice(0, 12)
 }
 
-function detectInvestmentSuggestions(txs: ImportedTransactionCandidate[]): DetectedInvestment[] {
-  const out: DetectedInvestment[] = []
+function classifyInvestmentAction(t: ImportedTransactionCandidate): "aporte" | "rendimento" | "resgate" | "movimentacao_interna" | "nao_classificado" {
+  const nk = normalizeKey(t.description)
+  const reason = String(t.category?.reason || "")
+
+  if (reason === "investimento_aporte") return "aporte"
+  if (reason === "investimento_rendimento") return "rendimento"
+
+  if (/\bresgate\b|\bvencimento\b/.test(nk)) return "resgate"
+  if (/\brendimento\b|\bjuros\b|\bdividend/.test(nk)) return "rendimento"
+  if (/\btransfer[eê]ncia\b|\btransferencia\b|\bmovimentac[aã]o\b|\bportabilidade\b/.test(nk)) return "movimentacao_interna"
+  if (/\baplicac[aã]o\b|\baplicação\b|\baporte\b/.test(nk)) return t.type === "despesa" ? "aporte" : "resgate"
+
+  return "nao_classificado"
+}
+
+function guessInvestmentType(desc: string): string | null {
+  const s = normalizeKey(desc)
+  if (/\btesouro\b|\btesouro\s+direto\b/.test(s)) return "Tesouro Direto"
+  if (/\bcdb\b/.test(s)) return "CDB"
+  if (/\blci\b/.test(s)) return "LCI"
+  if (/\blca\b/.test(s)) return "LCA"
+  if (/\bfii\b|\bfundo\b/.test(s)) return "Fundos"
+  if (/\bpoupanc/.test(s)) return "Poupança"
+  if (/\bcaixinha\b/.test(s)) return "Caixinha"
+  if (/\bcrypt\b|\bbitcoin\b|\beth\b/.test(s)) return "Cripto"
+  return null
+}
+
+type DetectedInvestmentAction = ReturnType<typeof classifyInvestmentAction>
+
+type DetectedInvestmentV2 = DetectedInvestment & {
+  action: DetectedInvestmentAction
+  probableType: string | null
+}
+
+function investmentActionLabel(action: DetectedInvestmentAction) {
+  switch (action) {
+    case "aporte":
+      return "Aporte"
+    case "rendimento":
+      return "Rendimento"
+    case "resgate":
+      return "Resgate"
+    case "movimentacao_interna":
+      return "Movimentação interna"
+    default:
+      return "Investimento não classificado"
+  }
+}
+
+function detectInvestmentSuggestions(txs: ImportedTransactionCandidate[]): DetectedInvestmentV2[] {
+  const out: DetectedInvestmentV2[] = []
   for (const t of txs || []) {
     if (!t.isInvestment) continue
     const key = candidateFingerprint({ date: t.date, description: t.description, amount: t.amount, type: t.type })
-    out.push({ key, name: t.description, amount: t.amount, date: t.date, type: t.type })
+    out.push({
+      key,
+      name: t.description,
+      amount: t.amount,
+      date: t.date,
+      type: t.type,
+      action: classifyInvestmentAction(t),
+      probableType: guessInvestmentType(t.description),
+    })
   }
   return out.slice(0, 20)
 }
@@ -1794,7 +1927,7 @@ export default function ImportacaoPage() {
   const [confirmedSubKeys, setConfirmedSubKeys] = useState<Set<string>>(new Set())
   const [detectedPlans, setDetectedPlans] = useState<DetectedPlan[]>([])
   const [confirmedPlanKeys, setConfirmedPlanKeys] = useState<Set<string>>(new Set())
-  const [detectedInvestments, setDetectedInvestments] = useState<DetectedInvestment[]>([])
+  const [detectedInvestments, setDetectedInvestments] = useState<DetectedInvestmentV2[]>([])
   const [confirmedInvestmentKeys, setConfirmedInvestmentKeys] = useState<Set<string>>(new Set())
   const [excluded, setExcluded] = useState<Set<number>>(new Set())
   const [overrides, setOverrides] = useState<Map<number, Partial<ImportedTransactionCandidate>>>(new Map())
@@ -2656,7 +2789,7 @@ export default function ImportacaoPage() {
       }
 
       // Cria/atualiza investimentos confirmados (apenas aportes por enquanto)
-      const invToApply = detectedInvestments.filter((i) => confirmedInvestmentKeys.has(i.key) && i.type === "despesa")
+      const invToApply = detectedInvestments.filter((i) => confirmedInvestmentKeys.has(i.key) && i.action === "aporte")
       if (invToApply.length > 0) {
         const existingInvs = await getInvestimentos(user.id).catch(() => [])
         for (const inv of invToApply) {

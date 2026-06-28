@@ -83,9 +83,11 @@
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.396 0.141 25.723);
   --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
+  --border: hsl(220, 13%, 6%);
+  --input: rgba(255, 255, 255, 0.08);
+  --ring: #16A34A;
+  --input-background: #181818;
+  --switch-background: #3a3a3a;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
   --chart-1: oklch(0.488 0.243 264.376);

@@ -380,7 +380,7 @@ export default function Admin() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
-    a.download = `usuarios-openfy-${new Date().toISOString().slice(0, 10)}.csv`
+    a.download = `usuarios-financeapp-${new Date().toISOString().slice(0, 10)}.csv`
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -402,7 +402,7 @@ export default function Admin() {
         <div style={{ maxWidth: 960, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: 56 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <Shield size={18} style={{ color: "#10B981" }} />
-            <span style={{ fontSize: 15, fontWeight: 700, color: "#FFFFFF" }}>Openfy Admin</span>
+            <span style={{ fontSize: 15, fontWeight: 700, color: "#FFFFFF" }}>Finance App Admin</span>
             <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", padding: "2px 8px", borderRadius: 10, background: "#374151", color: "#9CA3AF" }}>
               CEO
             </span>
@@ -445,7 +445,7 @@ export default function Admin() {
             <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
               <div>
                 <h1 style={{ fontSize: 20, fontWeight: 800, color: "#111827", letterSpacing: "-0.01em" }}>Painel do Founder</h1>
-                <p style={{ fontSize: 13, color: "#6B7280", marginTop: 2 }}>Visão geral da plataforma Openfy</p>
+                <p style={{ fontSize: 13, color: "#6B7280", marginTop: 2 }}>Visão geral da plataforma Finance App</p>
               </div>
               <button
                 onClick={loadStats}

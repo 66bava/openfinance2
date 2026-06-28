@@ -29,7 +29,7 @@ function titleForPath(pathname: string) {
   if (pathname.startsWith("/app/transacoes")) return "Transações"
   if (pathname.startsWith("/app/ciclos")) return "Ciclos"
   if (pathname.startsWith("/app/perfil")) return "Configurações"
-  return "Openfy"
+  return "Finance App"
 }
 
 function initialsFromProfile(p: Profile | null, email?: string | null) {

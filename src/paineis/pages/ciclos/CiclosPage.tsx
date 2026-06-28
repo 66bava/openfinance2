@@ -8,11 +8,21 @@ import { formatCurrency } from "../../../lib/format"
 import { getUserCyclesSnapshots } from "../../../lib/queries"
 import { getCurrentCycleRange } from "../../../lib/financial-cycle"
 import { getUserFinancialSettings } from "../../../lib/queries/financial-settings"
-import { ensureActiveCycle, resetCycle, type ResetType } from "../../../lib/queries/cycles"
+import { deleteCycle, ensureActiveCycle, resetCycle, type ResetType } from "../../../lib/queries/cycles"
 import type { FinancialCycle } from "../../../lib/types"
 import type { AppOutletContext } from "../../../app/components/Layout"
 import { PanelLoader } from "../../components/PanelLoader"
 import { ResetCycleModal } from "../../../app/components/dashboard/ResetCycleModal"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../../../app/components/ui/alert-dialog"
 
 function fmtRange(inicio: string, fim: string) {
   try {
@@ -35,6 +45,8 @@ export default function CiclosPage() {
   const [cycles, setCycles] = useState<Array<Awaited<ReturnType<typeof getUserCyclesSnapshots>>[number]>>([])
   const [activeCycle, setActiveCycle] = useState<FinancialCycle | null>(null)
   const [showReset, setShowReset] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<null | { id: string; label: string; inicio: string; fim: string }>(null)
 
   const fmt = (v: number) => formatCurrency(v, lang, currency)
 
@@ -85,6 +97,21 @@ export default function CiclosPage() {
     requestSync()
   }
 
+  const onConfirmDelete = async () => {
+    if (!user || !deleteTarget) return
+    setDeleting(true)
+    try {
+      const res = await deleteCycle(user.id, deleteTarget.id)
+      toast.success("Ciclo apagado", { description: `${res.deletedTransactions} transações removidas e saldo recalculado.` })
+      setDeleteTarget(null)
+      requestSync()
+    } catch (e: any) {
+      toast.error("Não foi possível apagar o ciclo", { description: String(e?.message || "").slice(0, 140) })
+    } finally {
+      setDeleting(false)
+    }
+  }
+
   return (
     <div className="ofx-cycles">
       <div className="page">
@@ -126,6 +153,7 @@ export default function CiclosPage() {
                 {top.map((c) => {
                   const saldo = Number(c.totals.saldo) || 0
                   const econPct = Number(c.totals.economiaPct) || 0
+                  const canDelete = Boolean((c as any).id) && String((c as any).status || "") !== "active"
                   return (
                     <div key={c.inicio + c.fim} className="cycle-item">
                       <div className="cycle-main">
@@ -149,6 +177,23 @@ export default function CiclosPage() {
                           <span style={{ color: "#22C55E" }}>+{fmt(c.totals.renda)}</span>
                           <span style={{ color: "#EF4444" }}>−{fmt(c.totals.gastos)}</span>
                         </div>
+                        {canDelete ? (
+                          <button
+                            type="button"
+                            className="card-action"
+                            style={{ marginTop: 10, justifyContent: "center" }}
+                            onClick={() =>
+                              setDeleteTarget({
+                                id: String((c as any).id),
+                                label: String(c.label || "Ciclo"),
+                                inicio: c.inicio,
+                                fim: c.fim,
+                              })
+                            }
+                          >
+                            Apagar ciclo
+                          </button>
+                        ) : null}
                       </div>
                     </div>
                   )
@@ -165,6 +210,30 @@ export default function CiclosPage() {
             onConfirm={onConfirmReset}
           />
         ) : null}
+
+        <AlertDialog open={Boolean(deleteTarget)} onOpenChange={(open) => (!open ? setDeleteTarget(null) : null)}>
+          <AlertDialogContent className="border" style={{ background: "var(--bg-c)", borderColor: "var(--bd)", color: "var(--t1)" }}>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Apagar ciclo</AlertDialogTitle>
+              <AlertDialogDescription style={{ color: "var(--t3)" }}>
+                Isso apaga definitivamente as transações e importações do período {deleteTarget?.inicio} → {deleteTarget?.fim}. Não é possível desfazer.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel className="border" style={{ borderColor: "var(--bd)", background: "var(--bg-i)", color: "var(--t1)" }}>
+                Cancelar
+              </AlertDialogCancel>
+              <AlertDialogAction
+                className="border"
+                disabled={deleting}
+                style={{ borderColor: "rgba(239,68,68,0.35)", background: "rgba(239,68,68,0.12)", color: "#EF4444" }}
+                onClick={() => void onConfirmDelete()}
+              >
+                {deleting ? "Apagando..." : "Apagar agora"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   )

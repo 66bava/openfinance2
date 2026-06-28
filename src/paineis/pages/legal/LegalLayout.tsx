@@ -22,9 +22,9 @@ export function LegalLayout(props: {
   return (
     <div className="ofx ofx-legal">
       <header className="legal-nav">
-        <Link to="/" className="legal-brand" aria-label="Openfy">
+        <Link to="/" className="legal-brand" aria-label="Finance App">
           <BrandMark />
-          <span className="legal-brand-text">Openfy</span>
+          <span className="legal-brand-text">Finance App</span>
         </Link>
         <Link to={backTo} className="legal-back">
           ← Voltar
@@ -43,7 +43,7 @@ export function LegalLayout(props: {
         <div className="legal-note">
           <div className="legal-note-title">Segurança e transparência</div>
           <div className="legal-note-text">
-            A Openfy nunca solicita sua senha bancária. Quando a conexão bancária via Open Finance estiver disponível, a autorização acontece diretamente no seu banco (consentimento),
+            A Finance App nunca solicita sua senha bancária. Quando a conexão bancária via Open Finance estiver disponível, a autorização acontece diretamente no seu banco (consentimento),
             e você pode revogar o acesso a qualquer momento.
           </div>
         </div>

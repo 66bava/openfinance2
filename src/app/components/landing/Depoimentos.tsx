@@ -6,7 +6,7 @@
     inicial: "A",
   },
   {
-    texto: "Já testei vários apps de finanças. O Openfy é o primeiro que me fez continuar usando depois da primeira semana.",
+    texto: "Já testei vários apps de finanças. O Finance App é o primeiro que me fez continuar usando depois da primeira semana.",
     nome: "Carlos",
     info: "34 anos",
     inicial: "C",

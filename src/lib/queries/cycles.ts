@@ -386,6 +386,57 @@ export async function deleteCycle(
 
   if (delErr) throw delErr
 
+  // Se o ciclo apagado era a referência de saldo para o ciclo ativo atual, recalcula opening_balance/carried_balance.
+  try {
+    const { data: active } = await supabase
+      .from("financial_cycles")
+      .select("id,start_date,end_date,status,opening_balance")
+      .eq("user_id", userId)
+      .eq("status", "active")
+      .maybeSingle()
+
+    if (active?.id && active.start_date) {
+      const { data: lastClosed } = await supabase
+        .from("financial_cycles")
+        .select("closing_balance,carried_balance,end_date")
+        .eq("user_id", userId)
+        .eq("status", "closed")
+        .lt("end_date", active.start_date)
+        .order("end_date", { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      const newOpening = Number((lastClosed as any)?.closing_balance ?? (lastClosed as any)?.carried_balance ?? 0) || 0
+
+      const { data: txRows } = await supabase
+        .from("transacoes")
+        .select("valor,tipo")
+        .eq("user_id", userId)
+        .gte("data", String(active.start_date))
+        .lte("data", String(active.end_date))
+
+      let incomeTotal = 0
+      let expenseTotal = 0
+      for (const t of txRows ?? []) {
+        if ((t as any).tipo === "receita") incomeTotal += Number((t as any).valor) || 0
+        else expenseTotal += Number((t as any).valor) || 0
+      }
+
+      await supabase
+        .from("financial_cycles")
+        .update({
+          opening_balance: newOpening,
+          income_total: incomeTotal,
+          expense_total: expenseTotal,
+          carried_balance: newOpening + incomeTotal - expenseTotal,
+        })
+        .eq("id", String(active.id))
+        .eq("user_id", userId)
+    }
+  } catch {
+    // best-effort (compatibilidade com schema antigo)
+  }
+
   return { deletedTransactions: txCount ?? 0 }
 }
 

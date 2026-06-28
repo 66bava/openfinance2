@@ -4,7 +4,7 @@ interface OFLogoProps {
   ariaLabel?: string
 }
 
-export function OFLogo({ size = "md", variant = "horizontal", ariaLabel = "Openfy" }: OFLogoProps) {
+export function OFLogo({ size = "md", variant = "horizontal", ariaLabel = "Finance App" }: OFLogoProps) {
   const sizes = {
     sm: { box: 28, text: 14, gap: 8 },
     md: { box: 34, text: 16, gap: 10 },
@@ -56,7 +56,7 @@ export function OFLogo({ size = "md", variant = "horizontal", ariaLabel = "Openf
             fontFamily: "var(--font-display)",
           }}
         >
-          Openfy
+          Finance App
         </span>
       )}
     </div>

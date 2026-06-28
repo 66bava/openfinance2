@@ -66,7 +66,7 @@ export async function exportUserDataToJson(userId: string, opts?: { includeAudit
 
   const date = new Date()
   const stamp = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`
-  downloadJson(`openfy-dados-${stamp}.json`, payload)
+  downloadJson(`financeapp-dados-${stamp}.json`, payload)
   return payload
 }
 

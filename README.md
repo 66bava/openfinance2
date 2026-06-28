@@ -1,6 +1,6 @@
-# Openfy (Open Finance-ready)
+# Finance App (Open Finance-ready)
 
-Este repositório está em refatoração para transformar a Openfy em uma plataforma financeira mais automática, simples e preparada para Open Finance.
+Este repositório está em refatoração para transformar a Finance App em uma plataforma financeira mais automática, simples e preparada para Open Finance.
 
 ## Docs
 

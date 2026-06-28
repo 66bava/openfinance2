@@ -269,7 +269,7 @@ export default function Cadastro() {
           }}>
             <span style={{ color: "#FFFFFF", fontSize: 16, fontWeight: 800 }}>O</span>
           </div>
-          <span style={{ color: "#FFFFFF", fontSize: 18, fontWeight: 700, letterSpacing: "-0.02em" }}>Openfy</span>
+          <span style={{ color: "#FFFFFF", fontSize: 18, fontWeight: 700, letterSpacing: "-0.02em" }}>Finance App</span>
         </div>
 
         <div>
@@ -343,7 +343,7 @@ export default function Cadastro() {
             <div style={{ width: 32, height: 32, background: "#0A0A0A", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }}>
               <span style={{ color: "#FFFFFF", fontSize: 14, fontWeight: 800 }}>O</span>
             </div>
-            <span style={{ fontSize: 18, fontWeight: 700, color: "#0A0A0A" }}>Openfy</span>
+            <span style={{ fontSize: 18, fontWeight: 700, color: "#0A0A0A" }}>Finance App</span>
           </div>
 
           <div style={{ marginBottom: 28 }}>
@@ -561,7 +561,7 @@ export default function Cadastro() {
                   style={{ marginTop: 2, accentColor: "#16A34A", width: 16, height: 16, flexShrink: 0 }}
                 />
                 <span style={{ fontSize: 12, color: "#525252", lineHeight: 1.5 }}>
-                  Aceito receber dicas financeiras e novidades do Openfy por e-mail.{" "}
+                  Aceito receber dicas financeiras e novidades do Finance App por e-mail.{" "}
                   <span style={{ color: "#A3A3A3" }}>(opcional)</span>
                 </span>
               </label>

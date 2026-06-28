@@ -2,10 +2,10 @@ import { motion } from "motion/react"
 import { useLanguage } from "../../../lib/language-context"
 import { OFLogo } from "../OFLogo"
 
-function OpenfyIcon() {
+function FinanceAppIcon() {
   return (
     <div style={{ transform: "scale(1.1)" }}>
-      <OFLogo size="lg" variant="icon" ariaLabel="Openfy" />
+      <OFLogo size="lg" variant="icon" ariaLabel="Finance App" />
     </div>
   )
 }
@@ -56,9 +56,9 @@ export default function Founder() {
           <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.1 }}>
             <div style={{ background: "var(--of-page-bg)", border: "1px solid var(--of-border)", borderRadius: 20, padding: "36px 32px", marginBottom: 24 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 28 }}>
-                <OpenfyIcon />
+                <FinanceAppIcon />
                 <div>
-                  <p style={{ fontSize: 16, fontWeight: 700, color: "var(--of-text)", marginBottom: 2 }}>Openfy</p>
+                  <p style={{ fontSize: 16, fontWeight: 700, color: "var(--of-text)", marginBottom: 2 }}>Finance App</p>
                   <p style={{ fontSize: 13, color: "var(--of-text-muted)" }}>{t("founderDev")}</p>
                 </div>
               </div>

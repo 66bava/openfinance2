@@ -13,6 +13,7 @@ import { criarCompromisso, getCompromissos } from "../../../lib/queries/futuro"
 import type { Assinatura, Categoria, Compromisso, MetodoPagamento, Profile } from "../../../lib/types"
 import { PanelLoader } from "../../components/PanelLoader"
 import type { AppOutletContext } from "../../../app/components/Layout"
+import { ManageSubscriptionsModal } from "../../../app/components/planning/ManageSubscriptionsModal"
 
 type AddKind = "assinatura" | "conta_fixa" | "financiamento"
 
@@ -95,7 +96,7 @@ export default function PlanejamentoPage() {
   const { user } = useAuth()
   const { lang } = useLanguage()
   const { currency } = useUserSettings()
-  const { syncNonce } = useOutletContext<AppOutletContext>()
+  const { syncNonce, requestSync } = useOutletContext<AppOutletContext>()
   const fmt = (v: number) => formatCurrency(v, lang, currency)
 
   const [loading, setLoading] = useState(true)
@@ -108,6 +109,7 @@ export default function PlanejamentoPage() {
   const [addOpen, setAddOpen] = useState(false)
   const [addKind, setAddKind] = useState<AddKind>("assinatura")
   const [saving, setSaving] = useState(false)
+  const [manageSubsOpen, setManageSubsOpen] = useState(false)
 
   const [nome, setNome] = useState("")
   const [valorRaw, setValorRaw] = useState("")
@@ -137,6 +139,14 @@ export default function PlanejamentoPage() {
       })
       .finally(() => setLoading(false))
   }, [user?.id, syncNonce])
+
+  async function reloadAll() {
+    if (!user) return
+    const userId = user.id
+    const [subs, comps] = await Promise.all([getAssinaturas(userId), getCompromissos(userId)])
+    setAssinaturas(subs || [])
+    setCompromissos(comps || [])
+  }
 
   const subsMensal = useMemo(() => calcularTotalMensal(assinaturas), [assinaturas])
 
@@ -337,7 +347,12 @@ export default function PlanejamentoPage() {
                   <div className="dot purple" />
                   Assinaturas <span className="section-count">{assinaturas.length} ativas · {fmt(subsMensal)}/mês</span>
                 </div>
-                <button type="button" className="btn btn-ghost" style={{ padding: "5px 12px", fontSize: 12 }} disabled>
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  style={{ padding: "5px 12px", fontSize: 12 }}
+                  onClick={() => setManageSubsOpen(true)}
+                >
                   Gerenciar
                 </button>
               </div>
@@ -708,6 +723,20 @@ export default function PlanejamentoPage() {
             </DialogPrimitive.Content>
           </DialogPrimitive.Portal>
         </DialogPrimitive.Root>
+
+        {manageSubsOpen && user ? (
+          <ManageSubscriptionsModal
+            userId={user.id}
+            lang={lang}
+            currency={currency}
+            assinaturas={assinaturas}
+            onClose={() => setManageSubsOpen(false)}
+            onChanged={async () => {
+              await reloadAll()
+              requestSync()
+            }}
+          />
+        ) : null}
       </div>
     </div>
   )

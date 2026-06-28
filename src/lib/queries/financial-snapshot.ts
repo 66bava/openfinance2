@@ -20,6 +20,8 @@ export type CategoryAgg = { name: string; value: number; percent: number }
 export type MetodoAgg = { metodo_pagamento: MetodoPagamento | null; total: number; count: number }
 
 export type UserCycleSnapshot = {
+  id?: string | null
+  status?: string | null
   inicio: string
   fim: string
   label: string
@@ -394,12 +396,14 @@ export async function getUserCyclesSnapshots(
 
   // Preferência: se existir a tabela `financial_cycles`, usa o histórico real (com saldo herdado).
   // Caso não exista/esteja vazio, cai no modo "por range" derivado do ciclo_start_day.
-  let cycles: Array<{ inicio: string; fim: string; label: string; opening_balance?: number; carried_balance?: number; score_snapshot?: number | null }> = []
+  let cycles: Array<{ id?: string; status?: string; inicio: string; fim: string; label: string; opening_balance?: number; carried_balance?: number; score_snapshot?: number | null }> = []
   try {
     const hist = await getCycleHistory(userId, Math.max(2, Math.min(24, count + 6)))
     if ((hist ?? []).length > 0) {
       const sorted = [...(hist as any[])]
         .map((c) => ({
+          id: String((c as any).id ?? ""),
+          status: String((c as any).status ?? ""),
           inicio: String(c.start_date),
           fim: String(c.end_date),
           label: new Date(String(c.start_date) + "T00:00:00").toLocaleDateString("pt-BR", { month: "short", year: "2-digit" }).replace(".", ""),
@@ -470,6 +474,8 @@ export async function getUserCyclesSnapshots(
       : emptyCycleScore
 
     return {
+      id: (c as any).id ? String((c as any).id) : null,
+      status: (c as any).status ? String((c as any).status) : null,
       inicio: c.inicio,
       fim: c.fim,
       label: c.label,

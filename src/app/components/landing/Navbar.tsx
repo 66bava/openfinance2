@@ -7,11 +7,11 @@ import { useLanguage } from "../../../lib/language-context"
 import type { Lang } from "../../../lib/i18n"
 import { OFLogo } from "../OFLogo"
 
-function OpenfyLogo() {
-  return <OFLogo size="sm" variant="horizontal" ariaLabel="Openfy" />
+function FinanceAppLogo() {
+  return <OFLogo size="sm" variant="horizontal" ariaLabel="Finance App" />
 }
 
-export { OpenfyLogo }
+export { FinanceAppLogo }
 
 const LANG_OPTIONS: { code: Lang; labelKey: "langLongPT" | "langLongEN" | "langLongES" }[] = [
   { code: "pt", labelKey: "langLongPT" },
@@ -191,7 +191,7 @@ export default function Navbar() {
           height: 64, display: "flex", alignItems: "center", justifyContent: "space-between",
         }}>
           <a href="/" style={{ textDecoration: "none" }}>
-            <OpenfyLogo />
+            <FinanceAppLogo />
           </a>
 
           {/* Desktop nav links */}

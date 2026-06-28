@@ -34,8 +34,8 @@
   <rect x="104" y="164" width="8" height="28" rx="2" fill="white"/>
   <rect x="116" y="168" width="8" height="24" rx="2" fill="white"/>
 
-  <!-- Openfy wordmark -->
-  <text x="148" y="196" font-family="system-ui, -apple-system, sans-serif" font-size="32" font-weight="800" fill="white" letter-spacing="-1">Openfy</text>
+  <!-- Finance App wordmark -->
+  <text x="148" y="196" font-family="system-ui, -apple-system, sans-serif" font-size="32" font-weight="800" fill="white" letter-spacing="-1">Finance App</text>
 
   <!-- Green divider line -->
   <rect x="80" y="238" width="60" height="3" rx="1.5" fill="url(#accent)"/>
@@ -81,5 +81,5 @@
   <text x="786" y="459" font-family="system-ui, sans-serif" font-size="13" fill="#D1FAE5">Você está economizando mais que 78% dos usuários</text>
 
   <!-- Bottom URL -->
-  <text x="80" y="580" font-family="system-ui, sans-serif" font-size="18" fill="#374151">useopenfy.com.br</text>
+  <text x="80" y="580" font-family="system-ui, sans-serif" font-size="18" fill="#374151">financeapp.com.br</text>
 </svg>

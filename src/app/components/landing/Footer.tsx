@@ -2,10 +2,10 @@ import { Link } from "react-router"
 import { useLanguage } from "../../../lib/language-context"
 import { OFLogo } from "../OFLogo"
 
-function OpenfyLogoWhite() {
+function FinanceAppLogoWhite() {
   return (
     <div style={{ color: "var(--of-btn-text)" }}>
-      <OFLogo size="sm" variant="horizontal" ariaLabel="Openfy" />
+      <OFLogo size="sm" variant="horizontal" ariaLabel="Finance App" />
     </div>
   )
 }
@@ -26,7 +26,7 @@ export default function Footer() {
   ]
 
   const colunaContato = [
-    { label: "suporte@openfy.com.br", href: "mailto:suporte@openfy.com.br" },
+    { label: "suporte@financeapp.com.br", href: "mailto:suporte@financeapp.com.br" },
     { label: "Instagram", href: "#" },
     { label: "LinkedIn", href: "#" },
   ]
@@ -36,7 +36,7 @@ export default function Footer() {
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
         <div style={{ marginBottom: 56 }} className="grid grid-cols-2 md:grid-cols-4 gap-10">
           <div className="col-span-2 md:col-span-1">
-            <div style={{ marginBottom: 16 }}><OpenfyLogoWhite /></div>
+            <div style={{ marginBottom: 16 }}><FinanceAppLogoWhite /></div>
             <p style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", lineHeight: 1.65, maxWidth: 240 }}>
               {t("footerDesc")}
             </p>

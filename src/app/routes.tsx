@@ -6,6 +6,7 @@ import AddExpense from "./pages/AddExpense"
 import Insights from "./pages/Insights"
 import Planejamento from "./pages/Planejamento"
 import InvestimentosPanel from "./pages/InvestimentosPanel"
+import InvestimentosGerenciar from "./pages/InvestimentosGerenciar"
 import ProfilePanel from "./pages/ProfilePanel"
 import Cartoes from "./pages/Cartoes"
 import Importacao from "./pages/Importacao"
@@ -82,6 +83,7 @@ export const router = createBrowserRouter([
           { path: "notificacoes", Component: Notificacoes },
           { path: "ciclos", Component: Ciclos },
           { path: "investimentos", Component: InvestimentosPanel },
+          { path: "investimentos/gerenciar", Component: InvestimentosGerenciar },
           { path: "perfil", Component: ProfilePanel },
         ],
       },

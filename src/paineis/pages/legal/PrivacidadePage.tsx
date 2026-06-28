@@ -3,7 +3,7 @@ import { LegalLayout } from "./LegalLayout"
 const SECTIONS: Array<{ title: string; text: string }> = [
   {
     title: "1. Visão geral",
-    text: "Esta página descreve, de forma resumida, como a Openfy trata dados pessoais e financeiros. O texto final pode ser atualizado sem alterar a estrutura da página.",
+    text: "Esta página descreve, de forma resumida, como a Finance App trata dados pessoais e financeiros. O texto final pode ser atualizado sem alterar a estrutura da página.",
   },
   {
     title: "2. Dados que coletamos",

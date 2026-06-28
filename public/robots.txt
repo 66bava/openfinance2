@@ -4,4 +4,4 @@ Disallow: /app/
 Disallow: /admin
 Disallow: /auth/
 
-Sitemap: https://useopenfy.com.br/sitemap.xml
+Sitemap: https://financeapp.com.br/sitemap.xml

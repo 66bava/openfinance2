@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
-import { Link } from "react-router"
+import { Link, useOutletContext } from "react-router"
 import { toast } from "sonner"
 import { useAuth } from "../../../lib/auth-context"
 import { useLanguage } from "../../../lib/language-context"
@@ -13,6 +13,8 @@ import { exportUserDataToJson, requestUserDataOperation } from "../../../lib/use
 import { supabase } from "../../../lib/supabase"
 import type { Profile } from "../../../lib/types"
 import { PanelLoader } from "../../components/PanelLoader"
+import type { AppOutletContext } from "../../../app/components/Layout"
+import { resetFinancialData } from "../../../lib/queries/reset-financial"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -133,6 +135,7 @@ export default function ProfilePanel() {
   const { lang, setLang } = useLanguage()
   const { theme, themePreference, setThemePreference } = useTheme()
   const { currency, dateLocale, setCurrency, setDateLocale } = useUserSettings()
+  const { requestSync } = useOutletContext<AppOutletContext>()
 
   const [loading, setLoading] = useState(true)
   const [profile, setProfile] = useState<Profile | null>(null)
@@ -162,6 +165,8 @@ export default function ProfilePanel() {
   const [requestingDelete, setRequestingDelete] = useState(false)
   const [deletingTransacoes, setDeletingTransacoes] = useState(false)
   const [confirmDeleteTransacoesText, setConfirmDeleteTransacoesText] = useState("")
+  const [resettingFinancial, setResettingFinancial] = useState(false)
+  const [confirmResetText, setConfirmResetText] = useState("")
 
   useEffect(() => {
     if (!user) return
@@ -360,6 +365,22 @@ export default function ProfilePanel() {
     } finally {
       setDeletingTransacoes(false)
       setConfirmDeleteTransacoesText("")
+    }
+  }
+
+  async function handleResetFinancialData() {
+    if (!user || resettingFinancial) return
+    if (confirmResetText.trim().toUpperCase() !== "RESETAR") return
+    setResettingFinancial(true)
+    try {
+      await resetFinancialData(user.id)
+      toast.success("Dados financeiros resetados", { description: "Transações, ciclos, importações, investimentos e assinaturas foram apagados." })
+      setConfirmResetText("")
+      requestSync()
+    } catch (e: any) {
+      toast.error("Não foi possível resetar", { description: String(e?.message || "").slice(0, 160) })
+    } finally {
+      setResettingFinancial(false)
     }
   }
 
@@ -820,7 +841,7 @@ export default function ProfilePanel() {
                 Dados & Privacidade
               </div>
               <p style={{ fontSize: 12, color: "var(--t3)", lineHeight: 1.6, marginBottom: 14 }}>
-                A Openfy nunca solicita sua senha bancária. Seus dados ficam protegidos e você tem controle total.
+                A Finance App nunca solicita sua senha bancária. Seus dados ficam protegidos e você tem controle total.
               </p>
 
               <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 8, marginBottom: 14 }}>
@@ -886,6 +907,73 @@ export default function ProfilePanel() {
                   </svg>
                   {exporting ? "Gerando exportação..." : "Exportar meus dados (JSON)"}
                 </button>
+
+                {/* Delete transactions */}
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <button
+                      type="button"
+                      onClick={() => setConfirmResetText("")}
+                      disabled={resettingFinancial}
+                      style={{
+                        width: "100%",
+                        borderRadius: 12,
+                        padding: "11px 16px",
+                        border: "1px solid rgba(239,68,68,0.3)",
+                        background: "rgba(239,68,68,0.07)",
+                        color: "#EF4444",
+                        fontSize: 12,
+                        fontWeight: 700,
+                        cursor: resettingFinancial ? "default" : "pointer",
+                        opacity: resettingFinancial ? 0.6 : 1,
+                        textAlign: "left" as const,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 10,
+                      }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                        <path d="M21 12a9 9 0 1 1-9-9" />
+                        <polyline points="21 3 21 9 15 9" />
+                      </svg>
+                      {resettingFinancial ? "Resetando..." : "Resetar dados financeiros"}
+                    </button>
+                  </AlertDialogTrigger>
+
+                  <AlertDialogContent className="border" style={{ background: "var(--bg-c)", borderColor: "var(--bd)", color: "var(--t1)" }}>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Resetar dados financeiros</AlertDialogTitle>
+                      <AlertDialogDescription style={{ color: "var(--t3)" }}>
+                        Esta ação apaga <b>transações</b>, <b>ciclos</b>, <b>importações</b>, <b>investimentos</b>, <b>assinaturas</b>, <b>metas</b> e outros dados financeiros.{" "}
+                        Você mantém apenas o perfil e o login. Não é possível desfazer.
+                        Para confirmar, digite <b>RESETAR</b> abaixo.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+
+                    <div>
+                      <input
+                        value={confirmResetText}
+                        onChange={(e) => setConfirmResetText(e.target.value)}
+                        placeholder="Digite RESETAR"
+                        style={{ ...INPUT, marginTop: 8 }}
+                      />
+                    </div>
+
+                    <AlertDialogFooter>
+                      <AlertDialogCancel className="border" style={{ borderColor: "var(--bd)", background: "var(--bg-i)", color: "var(--t1)" }}>
+                        Cancelar
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        className="border"
+                        disabled={confirmResetText.trim().toUpperCase() !== "RESETAR" || resettingFinancial}
+                        style={{ borderColor: "rgba(239,68,68,0.35)", background: "rgba(239,68,68,0.12)", color: "#EF4444" }}
+                        onClick={() => void handleResetFinancialData()}
+                      >
+                        Resetar agora
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
 
                 {/* Delete transactions */}
                 <AlertDialog>

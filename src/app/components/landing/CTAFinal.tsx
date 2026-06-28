@@ -55,7 +55,7 @@ export default function CTAFinal() {
             Criar conta grátis
           </Link>
           <a
-            href="mailto:suporte@openfy.app"
+            href="mailto:suporte@financeapp.com.br"
             style={{
               display: "inline-flex",
               alignItems: "center",

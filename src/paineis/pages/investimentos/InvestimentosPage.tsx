@@ -63,7 +63,7 @@ const FEATURES = [
   },
   {
     label: "Impacto no Score",
-    desc: "Investir regularmente melhora seu Score Financeiro Openfy.",
+    desc: "Investir regularmente melhora seu Score Financeiro com a Finance App.",
   },
 ]
 
@@ -239,7 +239,7 @@ export default function InvestimentosPage() {
                 margin: "0 auto 32px",
               }}
             >
-              Registre ações, renda fixa, FIIs, fundos e cripto. A Openfy calcula patrimônio
+              Registre ações, renda fixa, FIIs, fundos e cripto. A Finance App calcula patrimônio
               estimado, distribuição por categoria e impacto no seu Score automaticamente.
             </p>
 

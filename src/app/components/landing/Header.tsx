@@ -60,7 +60,7 @@ export default function Header() {
               textDecoration: "none",
             }}
           >
-            Openfy
+            Finance App
           </a>
 
           {/* Navegação desktop */}

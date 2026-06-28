@@ -227,10 +227,10 @@ export function AppSidebar() {
             />
           </svg>
         </div>
-        <span className="logo-text">Openfy</span>
+        <span className="logo-text">Finance App</span>
       </div>
 
-      <nav className="sidebar-nav" aria-label="Navegação">
+      <nav className="sidebar-nav" aria-label="Navegação principal">
         <div className="nav-group">
           <div className="nav-group-label">Principal</div>
           {NAV_PRINCIPAL.map((item) => (

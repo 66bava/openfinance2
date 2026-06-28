@@ -15,7 +15,7 @@ import type { Profile as ProfileType } from "../../lib/types"
 import { ConfigureIncomeModal } from "../components/dashboard/ConfigureIncomeModal"
 import { ConfigurarSalarioModal } from "../components/dashboard/ConfigurarSalarioModal"
 
-const UPGRADE_TEXT = "Quero+assinar+o+plano+Pro+do+Openfy"
+const UPGRADE_TEXT = "Quero+assinar+o+plano+Pro+do+Finance+App"
 
 const fmt = (v: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v)
@@ -200,7 +200,7 @@ export default function Profile() {
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
       a.href = url
-      a.download = `openfy-dados-${new Date().toISOString().split("T")[0]}.json`
+      a.download = `financeapp-dados-${new Date().toISOString().split("T")[0]}.json`
       a.click()
       URL.revokeObjectURL(url)
       await logAudit(userId, "exportacao_dados", {})
@@ -225,7 +225,7 @@ export default function Profile() {
       await supabase.auth.signOut()
       navigate("/", { replace: true })
     } catch {
-      toast.error("Erro ao excluir conta. Entre em contato: suporte@openfy.app")
+      toast.error("Erro ao excluir conta. Entre em contato: suporte@financeapp.com.br")
       setDeletando(false)
     }
   }
@@ -611,7 +611,7 @@ export default function Profile() {
                 <div style={{ padding: "20px", background: "#F0FDF4", border: "1px solid #BBF7D0", borderRadius: 12 }}>
                   <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 12 }}>
                     <div>
-                      <h3 style={{ fontSize: 18, fontWeight: 700, color: "var(--of-text)" }}>Openfy Pro</h3>
+                      <h3 style={{ fontSize: 18, fontWeight: 700, color: "var(--of-text)" }}>Finance App Pro</h3>
                       <p style={{ fontSize: 12, color: "var(--of-text-muted)", marginTop: 2 }}>R$ 19,90/mês</p>
                     </div>
                     <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.04em", padding: "3px 10px", borderRadius: 10, backgroundColor: "#16A34A", color: "#FFFFFF" }}>
@@ -933,7 +933,7 @@ export default function Profile() {
                 }}>
                   <div>
                     <p style={{ fontSize: 13, fontWeight: 600, color: "var(--of-text)" }}>E-mails de marketing</p>
-                    <p style={{ fontSize: 11, color: "var(--of-text-secondary)", marginTop: 2 }}>Dicas financeiras e novidades do Openfy</p>
+                    <p style={{ fontSize: 11, color: "var(--of-text-secondary)", marginTop: 2 }}>Dicas financeiras e novidades do Finance App</p>
                   </div>
                   <button
                     onClick={() => handleMarketingToggle(!marketingToggle)}
@@ -1069,7 +1069,7 @@ export default function Profile() {
         )}
 
         <p style={{ fontSize: 11, textAlign: "center", color: "var(--of-text-muted)", marginTop: 20 }}>
-          Openfy v1.0.0 · © {new Date().getFullYear()}
+          Finance App v1.0.0 · © {new Date().getFullYear()}
         </p>
       </div>
 
@@ -1086,7 +1086,7 @@ export default function Profile() {
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <Crown size={20} style={{ color: "#F59E0B" }} />
-                <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--of-text)" }}>Openfy Pro</h2>
+                <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--of-text)" }}>Finance App Pro</h2>
               </div>
               <button onClick={() => setShowUpgradeModal(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--of-text-muted)", padding: 4 }}>
                 <X size={20} />

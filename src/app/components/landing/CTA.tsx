@@ -104,7 +104,7 @@ export default function CTA() {
               {t("ctaCriarConta")}
             </Link>
             <a
-              href="mailto:suporte@openfy.com.br"
+              href="mailto:suporte@financeapp.com.br"
               style={{ display: "inline-flex", alignItems: "center", color: "rgba(255,255,255,0.7)", fontSize: 15, fontWeight: 500, padding: "14px 32px", borderRadius: 8, textDecoration: "none", border: "1.5px solid rgba(255,255,255,0.2)", minHeight: 48, transition: "border-color 0.15s" }}
               onMouseOver={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.6)")}
               onMouseOut={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)")}

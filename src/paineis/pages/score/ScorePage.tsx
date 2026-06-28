@@ -139,7 +139,7 @@ export default function ScorePage() {
 
         <div className="main-grid">
           <div className="score-hero">
-            <div className="score-period">SAÚDE FINANCEIRA · OPENFY</div>
+            <div className="score-period">SAÚDE FINANCEIRA · FINANCE APP</div>
 
             <div className="gauge-wrap" aria-label="Gauge do score">
               <svg viewBox="0 0 220 136" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">

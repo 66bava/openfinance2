@@ -1,5 +1,5 @@
 /**
- * Openfy — Importação Financeira
+ * Finance App — Importação Financeira
  * Componente completo com todos os estados.
  * Integrar com Supabase: substituir os handlers simulados pelos reais.
  *
@@ -141,7 +141,7 @@ function EmptyState({ onStart }) {
       <div>
         <h2 className="text-xl font-medium text-[#F5F5F0] mb-2">Nenhuma importação ainda</h2>
         <p className="text-[14px] text-[#555] max-w-xs leading-relaxed">
-          Exporte o extrato do seu banco e jogue aqui. A Openfy organiza tudo automaticamente.
+          Exporte o extrato do seu banco e jogue aqui. A Finance App organiza tudo automaticamente.
         </p>
       </div>
 

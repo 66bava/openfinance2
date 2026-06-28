@@ -796,19 +796,21 @@ export function detectSubscriptions(
     /\bnetflix\b|\bspotify\b|\bprime\b|\bamazon\b|\bhbo\b|\bdisney\b|\bopenai\b|\bclaude\b|\badobe\b|\bcanva\b/.test(
       normalizeDescKey(desc),
     )
+  const hasSubKeyword = (desc: string) =>
+    /\bassinat(?:ura|)\b|\bmensalidade\b|\bplano\b|\bsubscription\b/.test(normalizeDescKey(desc))
 
   for (const r of recurring) {
     if (r.cadence !== "mensal") continue
-    if (!isBrandSub(r.description)) continue
-    subsByKey.set(r.key, { key: r.key, name: r.description, monthlyEstimate: r.amountMedian, confidence: 0.9 })
+    if (!isBrandSub(r.description) && !hasSubKeyword(r.description)) continue
+    subsByKey.set(r.key, { key: r.key, name: r.description, monthlyEstimate: r.amountMedian, confidence: isBrandSub(r.description) ? 0.9 : 0.72 })
   }
 
-  // fallback sem recorrência: transações com "assinatura"
+  // Sem recorrência, só sugere para marcas muito fortes (evita falso positivo)
   for (const t of txs) {
     if (t.type !== "despesa") continue
-    if (!isBrandSub(t.description) && !/\bassinat/.test(normalizeDescKey(t.description))) continue
+    if (!isBrandSub(t.description)) continue
     const key = `${normalizeDescKey(t.description)}|${Math.round(t.amount * 100)}`
-    if (!subsByKey.has(key)) subsByKey.set(key, { key, name: t.description, monthlyEstimate: t.amount, confidence: 0.7 })
+    if (!subsByKey.has(key)) subsByKey.set(key, { key, name: t.description, monthlyEstimate: t.amount, confidence: 0.75 })
   }
 
   return [...subsByKey.values()].slice(0, 20)

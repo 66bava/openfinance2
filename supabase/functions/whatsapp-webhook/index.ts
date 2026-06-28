@@ -120,7 +120,7 @@ Deno.serve(async (req) => {
       if (!wUser) {
         await sendMessage(
           from,
-          "📱 Olá! Para usar a Openfy pelo WhatsApp, vincule seu número no app:\n\n*Perfil → WhatsApp → Conectar*\n\nopenfy.com.br/app",
+          "📱 Olá! Para usar a Finance App pelo WhatsApp, vincule seu número no app:\n\n*Perfil → WhatsApp → Conectar*\n\nfinanceapp.com.br/app",
         )
         continue
       }
@@ -167,7 +167,7 @@ Deno.serve(async (req) => {
 
           await sendMessage(
             from,
-            `✅ Despesa registrada!\n\n*${p.descricao}* — R$ ${p.valor.toFixed(2).replace(".", ",")}\n\nVeja no dashboard: openfy.com.br/app`,
+            `✅ Despesa registrada!\n\n*${p.descricao}* — R$ ${p.valor.toFixed(2).replace(".", ",")}\n\nVeja no dashboard: financeapp.com.br/app`,
           )
           continue
         }
@@ -203,7 +203,7 @@ Deno.serve(async (req) => {
 
           await sendMessage(
             from,
-            `📊 *Resumo do mês*\n\n💚 Receitas: ${fmt(renda)}\n🔴 Despesas: ${fmt(gastos)}\n💰 Saldo: ${fmt(saldo)}\n📈 Poupança: ${pct}%\n\nAcesse o dashboard completo: openfy.com.br/app`,
+            `📊 *Resumo do mês*\n\n💚 Receitas: ${fmt(renda)}\n🔴 Despesas: ${fmt(gastos)}\n💰 Saldo: ${fmt(saldo)}\n📈 Poupança: ${pct}%\n\nAcesse o dashboard completo: financeapp.com.br/app`,
           )
           continue
         }
@@ -237,7 +237,7 @@ Deno.serve(async (req) => {
         // ── Help ─────────────────────────────────────────────────────────────
         await sendMessage(
           from,
-          `🤖 *Openfy via WhatsApp*\n\nComandos disponíveis:\n\n• *Registrar gasto*: escreva descrição + valor\n  _Ex: Uber 23,90_\n  _Ex: Mercado 180,00 Alimentação_\n\n• *Ver saldo*: escreva "saldo" ou "resumo"\n\nAcesse o app para relatórios completos: openfy.com.br/app`,
+          `🤖 *Finance App via WhatsApp*\n\nComandos disponíveis:\n\n• *Registrar gasto*: escreva descrição + valor\n  _Ex: Uber 23,90_\n  _Ex: Mercado 180,00 Alimentação_\n\n• *Ver saldo*: escreva "saldo" ou "resumo"\n\nAcesse o app para relatórios completos: financeapp.com.br/app`,
         )
       }
 

@@ -1,7 +1,7 @@
 import { useSearchParams, Link } from "react-router"
 import { CheckCircle, MessageCircle, ArrowLeft } from "lucide-react"
 
-const WHATSAPP_PROOF_TEXT = "Olá! Acabei de fazer o pagamento do plano Pro do Openfy. Segue o comprovante:"
+const WHATSAPP_PROOF_TEXT = "Olá! Acabei de fazer o pagamento do plano Pro do Finance App. Segue o comprovante:"
 
 export default function Obrigado() {
   const [params] = useSearchParams()
@@ -140,8 +140,8 @@ export default function Obrigado() {
 
         <p style={{ fontSize: 12, color: "#9CA3AF", marginBottom: 24 }}>
           Ou envie para{" "}
-          <a href="mailto:suporte@openfy.app" style={{ color: "#16A34A", fontWeight: 600 }}>
-            suporte@openfy.app
+          <a href="mailto:suporte@financeapp.com.br" style={{ color: "#16A34A", fontWeight: 600 }}>
+            suporte@financeapp.com.br
           </a>
         </p>
 

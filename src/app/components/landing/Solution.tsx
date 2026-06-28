@@ -122,7 +122,7 @@ export default function Solution() {
               }}>
                 <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#8257E5" }} />
                 <span style={{ fontSize: 11, fontWeight: 600, color: "#A78BFA", letterSpacing: "0.06em", textTransform: "uppercase" }}>
-                  Exclusivo Openfy
+                  Exclusivo Finance App
                 </span>
               </div>
               <h3 style={{

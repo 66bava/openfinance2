@@ -56,7 +56,7 @@ export async function notifyScoreChange(
   const subiu = delta > 0
   const title = subiu ? "Seu score subiu!" : "Seu score caiu"
   const message = subiu
-    ? `Parabéns! Seu score Openfy foi de ${scoreBefore} para ${scoreAfter} (+${absDelta} pts).`
+    ? `Parabéns! Seu score Finance App foi de ${scoreBefore} para ${scoreAfter} (+${absDelta} pts).`
     : `Atenção: seu score caiu de ${scoreBefore} para ${scoreAfter} (−${absDelta} pts). Revise seus gastos.`
 
   await createNotification(userId, {

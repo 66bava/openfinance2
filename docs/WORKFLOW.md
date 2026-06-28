@@ -1,4 +1,4 @@
-# Workflow de Git (Openfy)
+# Workflow de Git (Finance App)
 
 ## Branches
 

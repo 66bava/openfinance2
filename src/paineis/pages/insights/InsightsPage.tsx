@@ -264,7 +264,7 @@ export default function InsightsPage() {
         <div className="page-header">
           <div>
             <div className="page-title">Insights IA</div>
-            <div className="page-sub">A IA da Openfy analisa seus dados e te avisa só do que importa.</div>
+            <div className="page-sub">A IA da Finance App analisa seus dados e te avisa só do que importa.</div>
           </div>
           <div style={{ display: "flex", gap: 8 }}>
             <button type="button" className="btn btn-ghost" onClick={() => regenerate(true)} disabled={generating}>

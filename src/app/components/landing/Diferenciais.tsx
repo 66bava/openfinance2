@@ -118,7 +118,7 @@ export default function Diferenciais() {
             letterSpacing: "-0.02em",
             lineHeight: 1.2,
           }}>
-            O que só o Openfy oferece
+            O que só o Finance App oferece
           </h2>
         </div>
 

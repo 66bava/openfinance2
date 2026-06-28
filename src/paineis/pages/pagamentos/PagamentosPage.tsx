@@ -437,7 +437,7 @@ export default function PagamentosPage() {
                           <strong style={{ color: "var(--green-b)" }}>Pix</strong> pode reduzir risco de juros caso a fatura não seja paga integralmente.
                         </>
                       )
-                      : "Adicione transações com método de pagamento para a Openfy sugerir melhorias."}
+                      : "Adicione transações com método de pagamento para a Finance App sugerir melhorias."}
                   </div>
                 </div>
               </div>

@@ -2,7 +2,7 @@
   <rect width="1440" height="900" fill="#F5F5F0"/>
   
   <rect x="0" y="0" width="280" height="900" fill="#0A0A0A"/>
-  <text x="40" y="50" font-family="DM Sans" font-size="24" font-weight="700" fill="#16A34A">Openfy</text>
+  <text x="40" y="50" font-family="DM Sans" font-size="24" font-weight="700" fill="#16A34A">Finance App</text>
   
   <rect x="20" y="240" width="240" height="48" rx="8" fill="#16A34A"/>
   <text x="40" y="268" font-family="Inter" font-size="15" font-weight="600" fill="#FFFFFF">🔍 Análise</text>
