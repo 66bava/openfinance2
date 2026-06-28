@@ -1,95 +1,11 @@
-# Dependencies
 node_modules/
-.pnp
-.pnp.js
-
-# Build outputs
 dist/
-build/
-out/
-.next/
-.nuxt/
-.output/
-
-# Environment files - NUNCA commitar
 .env
 .env.local
-.env.development
-.env.development.local
-.env.test
-.env.test.local
-.env.production
-.env.production.local
-.env.staging
-.env.*.local
-*.env
-
-# Segredos & credenciais
-*.pem
-*.key
-*.cert
-*.p12
-*.pfx
-*.jks
-secrets/
-credentials/
-.secrets
-
-# Logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-logs/
-
-# OS generated
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-desktop.ini
-
-# IDE & editor
-.vscode/settings.json
-.vscode/launch.json
-.idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-.project
-.classpath
-
-# Claude Code internal
+.env*.local
 .claude/
-.agents/
-skills-lock.json
-pixel-agents/node_modules/
-pixel-agents/.env
-pixel-agents/.env.local
-
-# MCP config (pode conter tokens/URLs privadas)
 .mcp.json
 
-# Cache
-.cache/
-.parcel-cache/
-.eslintcache
-.stylelintcache
-*.tsbuildinfo
-
-# Testes
-coverage/
-.nyc_output/
-
-# Misc
-*.bak
-*.tmp
-*.temp
+*.log
 .vercel
+.env.local
